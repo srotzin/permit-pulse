@@ -1,0 +1,12 @@
+{
+  "name": "permit-pulse",
+  "version": "1.0.0",
+  "description": "Real-time construction market intelligence — Simpson Strong-Tie",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

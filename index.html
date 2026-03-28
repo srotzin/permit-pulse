@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permit Pulse — Simpson Strong-Tie</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  /* Pixar Vibrancy Palette */
+  --bg-primary: #1a1033;
+  --bg-secondary: #231845;
+  --bg-tertiary: #2d2154;
+  --bg-card: #271d4d;
+  --border: #3d2e6b;
+  --border-light: #4d3e7b;
+  --text-primary: #f0e6ff;
+  --text-secondary: #b8a5d4;
+  --text-muted: #8875a8;
+  --accent: #FA4616;
+  --accent-dim: rgba(250, 70, 22, 0.15);
+  --sst-orange: #FA4616;
+  --sst-orange-light: #FF6B3D;
+  --sst-orange-glow: rgba(250, 70, 22, 0.35);
+  --surge: #ff4d6a;
+  --heating: #ff8c42;
+  --stable: #ffd166;
+  --cooling: #a78bfa;
+  --freeze: #6366f1;
+  --positive: #34d399;
+  --negative: #fb7185;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+}
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Layout ─── */
+.app {
+  display: grid;
+  grid-template-rows: 48px 36px 1fr auto 32px;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+.header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #2a1f50 100%);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  z-index: 100;
+}
+.sidebar {
+  grid-column: 1;
+  grid-row: 3 / 5;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.map-container {
+  grid-column: 2;
+  grid-row: 3;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+#map { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.bottom-bar {
+  grid-column: 2;
+  grid-row: 4;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 0;
+}
+.bottom-bar.open { max-height: 200px; }
+.footer {
+  grid-column: 1 / -1;
+  grid-row: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ─── Header ─── */
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-group img, .logo-group svg { flex-shrink: 0; }
+.logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+.logo-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
+.logo-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-live 2s infinite;
+}
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(250, 70, 22, 0.7); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(250, 70, 22, 0); }
+}
+.header-time {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+/* ─── Cards ─── */
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.kpi-grid .kpi-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  min-width: 0;
+  overflow: hidden;
+}
+.kpi-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), inset 0 0 20px rgba(250, 70, 22, 0.08);
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.kpi-value {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.kpi-change {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-change.up { color: var(--positive); }
+.kpi-change.down { color: var(--negative); }
+.kpi-sparkline { height: 28px; margin-top: 2px; width: 100%; }
+.kpi-sparkline canvas { width: 100% !important; height: 100% !important; }
+
+/* ─── PVS Legend ─── */
+.pvs-legend {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.pvs-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--freeze), var(--cooling), var(--stable), var(--heating), var(--surge));
+  margin: 8px 0 6px;
+}
+.pvs-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.pvs-counts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 4px;
+}
+.pvs-count-item {
+  flex: 1;
+  text-align: center;
+  padding: 4px 0;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.03);
+}
+
+/* ─── Movers ─── */
+.movers-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.mover-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 4px;
+  gap: 8px;
+  border-bottom: 1px solid rgba(61,46,107,0.5);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 4px;
+}
+.mover-item:last-child { border-bottom: none; }
+.mover-item:hover { background: rgba(255,255,255,0.03); }
+.mover-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mover-abbr {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  width: 28px;
+  flex-shrink: 0;
+}
+.mover-pvs {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+.mover-yoy {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 52px;
+  text-align: right;
+}
+
+/* ─── Alerts ─── */
+.alerts-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 70px;
+  position: relative;
+  overflow: hidden;
+}
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  animation: slideIn 0.4s ease-out;
+}
+.alert-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--heating);
+  animation: alertGlow 2s ease-in-out infinite;
+}
+@keyframes alertGlow {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 140, 66, 0.3)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255, 140, 66, 0.6)); }
+}
+.alert-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.alert-text strong { color: var(--text-primary); font-weight: 600; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Tooltip (Thought Bubble) ─── */
+.map-tooltip {
+  background: rgba(35, 24, 69, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(250, 70, 22, 0.35);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(250, 70, 22, 0.15);
+  pointer-events: none;
+  position: absolute;
+  z-index: 200;
+  opacity: 0;
+  transform: translateX(-50%) scale(0.9);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  min-width: 200px;
+}
+.map-tooltip.visible {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+/* Thought bubble tail */
+.map-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid rgba(35, 24, 69, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.tooltip-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tooltip-classification {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.08);
+}
+.tooltip-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 16px;
+  font-size: 12px;
+}
+.tooltip-label { color: var(--text-muted); }
+.tooltip-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ─── Bottom Bar Detail ─── */
+.detail-content {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  padding: 14px 20px;
+  height: 100%;
+}
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 180px;
+}
+.detail-state-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.detail-classification {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+.detail-class-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.detail-metrics {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.detail-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail-metric-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.detail-metric-value {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.detail-chart-wrap {
+  width: 160px;
+  height: 60px;
+  flex-shrink: 0;
+}
+.detail-sst {
+  margin-left: auto;
+  background: var(--accent-dim);
+  border: 1px solid rgba(250, 70, 22, 0.25);
+  border-radius: 8px;
+  padding: 10px 16px;
+  max-width: 220px;
+  flex-shrink: 0;
+}
+.detail-sst-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+.detail-sst-text {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+.detail-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+}
+.detail-close:hover { color: var(--text-primary); }
+
+/* ─── Segment Bar ─── */
+.segment-bar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  z-index: 90;
+}
+.seg-tab {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.seg-tab:hover {
+  color: var(--text-secondary);
+  background: rgba(250, 70, 22, 0.08);
+}
+.seg-tab.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.seg-note {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 450px;
+}
+.seg-note.visible {
+  opacity: 1;
+}
+
+/* ─── Footer ─── */
+
+
+/* ─── SVG Map Styles ─── */
+#map svg {
+  display: block;
+}
+.state-path {
+  transition: fill-opacity 0.3s ease, stroke 0.3s ease;
+  cursor: pointer;
+}
+.state-path.selected {
+  stroke: #FA4616 !important;
+  stroke-width: 2.5px !important;
+}
+
+/* ─── Surge pulse on SVG states ─── */
+@keyframes surgePulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.5; }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 44px 32px 1fr auto auto 28px;
+  }
+  .segment-bar { padding: 3px 10px; gap: 4px; }
+  .seg-tab { font-size: 11px; padding: 4px 10px; }
+  .seg-note { display: none; }
+  .header { padding: 0 10px; gap: 6px; }
+  .logo-text { font-size: 14px; }
+  .logo-sub { font-size: 10px; }
+  .logo-divider { display: none; }
+  .header-time { font-size: 9px; }
+  .sidebar {
+    grid-column: 1;
+    grid-row: 4;
+    max-height: 40vh;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    padding: 10px;
+  }
+  .map-container {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .bottom-bar {
+    grid-column: 1;
+    grid-row: 5;
+  }
+  .footer { grid-row: 6; font-size: 9px; padding: 0 8px; flex-wrap: wrap; gap: 4px; }
+  .detail-content { flex-wrap: wrap; padding: 10px 12px; gap: 12px; }
+  .detail-sst { margin-left: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ─── HEADER ─── -->
+  <header class="header">
+    <div class="logo-group">
+      <img src="sst-logo.jpg" alt="Simpson Strong-Tie" style="height:36px; border-radius:3px;">
+      <div class="logo-divider"></div>
+      <span class="logo-text">Permit Pulse</span>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><span class="live-dot"></span> LIVE</div>
+      <div class="header-time" id="headerTime">—</div>
+    </div>
+  </header>
+
+  <!-- ─── SEGMENT BAR ─── -->
+  <nav class="segment-bar">
+    <button class="seg-tab active" data-seg="all" onclick="switchSegment('all')">All</button>
+    <button class="seg-tab" data-seg="sf" onclick="switchSegment('sf')">Single Family</button>
+    <button class="seg-tab" data-seg="mf" onclick="switchSegment('mf')">Multi-Family</button>
+    <button class="seg-tab" data-seg="com" onclick="switchSegment('com')">Commercial ≤5 Stories</button>
+    <span class="seg-note" id="segNote">Commercial ≤5 stories · Estimated from residential permit ratios · Live data via Shovels.ai</span>
+  </nav>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div>
+      <div class="section-label">National Indicators</div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </div>
+
+    <div class="pvs-legend">
+      <div class="section-label">Permit Velocity Score</div>
+      <div class="pvs-bar"></div>
+      <div class="pvs-labels">
+        <span>Freeze</span><span>Cooling</span><span>Stable</span><span>Heating</span><span>Surge</span>
+      </div>
+      <div class="pvs-counts" id="pvsCounts"></div>
+    </div>
+
+    <div class="movers-panel">
+      <div class="section-label">Top Movers — Heating</div>
+      <div id="topMovers"></div>
+    </div>
+
+    <div class="alerts-panel">
+      <div class="section-label">Market Alerts</div>
+      <div id="alertContent"></div>
+    </div>
+
+    <div class="movers-panel">
+      <div class="section-label">Bottom Movers — Cooling</div>
+      <div id="bottomMovers"></div>
+    </div>
+  </aside>
+
+  <!-- ─── MAP ─── -->
+  <div class="map-container">
+    <div id="map"></div>
+    <div class="map-tooltip" id="tooltip"></div>
+  </div>
+
+  <!-- ─── BOTTOM BAR ─── -->
+  <div class="bottom-bar" id="bottomBar">
+    <div style="position:relative;">
+      <button class="detail-close" onclick="closeDetail()">&times;</button>
+      <div class="detail-content" id="detailContent"></div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <span>Data: Census Bureau BPS &middot; FRED &middot; BLS &middot; NAHB &middot; Freddie Mac &middot; FEMA &middot; NOAA</span>
+    <span style="color:var(--accent); font-weight:600;">Simpson Strong-Tie &middot; Permit Pulse</span>
+  </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// DATA (embedded from permit_pulse_data.json)
+// ═══════════════════════════════════════════════════════════════════════
+const DATA = {
+  national: {
+    mortgage_rate_30yr: {
+      current: 6.59, prior_month: 6.71, year_ago: 6.95,
+      source: "Freddie Mac PMMS",
+      history: [
+        {date:"2025-01",value:6.96},{date:"2025-02",value:6.85},{date:"2025-03",value:6.73},
+        {date:"2025-04",value:6.81},{date:"2025-05",value:6.78},{date:"2025-06",value:6.72},
+        {date:"2025-07",value:6.68},{date:"2025-08",value:6.61},{date:"2025-09",value:6.55},
+        {date:"2025-10",value:6.48},{date:"2025-11",value:6.53},{date:"2025-12",value:6.59},
+        {date:"2026-01",value:6.06},{date:"2026-02",value:6.42},{date:"2026-03",value:6.59}
+      ]
+    },
+    total_permits_saar: {
+      current: 1376, prior_month: 1455, year_ago: 1411, unit: "thousands",
+      history: [
+        {date:"2025-01",value:1473},{date:"2025-02",value:1456},{date:"2025-03",value:1467},
+        {date:"2025-04",value:1440},{date:"2025-05",value:1386},{date:"2025-06",value:1454},
+        {date:"2025-07",value:1396},{date:"2025-08",value:1475},{date:"2025-09",value:1415},
+        {date:"2025-10",value:1411},{date:"2025-11",value:1388},{date:"2025-12",value:1455},
+        {date:"2026-01",value:1376}
+      ]
+    },
+    housing_starts_saar: {
+      current: 1250, prior_month: 1311, year_ago: 1354, unit: "thousands",
+      history: [
+        {date:"2025-01",value:1366},{date:"2025-02",value:1494},{date:"2025-03",value:1324},
+        {date:"2025-04",value:1352},{date:"2025-05",value:1341},{date:"2025-06",value:1353},
+        {date:"2025-07",value:1238},{date:"2025-08",value:1361},{date:"2025-09",value:1354},
+        {date:"2025-10",value:1250},{date:"2025-11",value:1289},{date:"2025-12",value:1311},
+        {date:"2026-01",value:1250}
+      ]
+    },
+    builder_confidence_hmi: {
+      current: 42, prior_month: 46, year_ago: 44,
+      history: [
+        {date:"2025-01",value:47},{date:"2025-02",value:42},{date:"2025-03",value:39},
+        {date:"2025-04",value:40},{date:"2025-05",value:34},{date:"2025-06",value:42},
+        {date:"2025-07",value:42},{date:"2025-08",value:39},{date:"2025-09",value:41},
+        {date:"2025-10",value:43},{date:"2025-11",value:46},{date:"2025-12",value:46},
+        {date:"2026-01",value:42}
+      ]
+    },
+    unemployment_rate: {
+      current: 4.1, prior_month: 4.0, year_ago: 4.0,
+      history: [
+        {date:"2025-01",value:4.0},{date:"2025-02",value:4.1},{date:"2025-03",value:4.2},
+        {date:"2025-04",value:4.2},{date:"2025-05",value:4.0},{date:"2025-06",value:4.1},
+        {date:"2025-07",value:4.3},{date:"2025-08",value:4.2},{date:"2025-09",value:4.1},
+        {date:"2025-10",value:4.1},{date:"2025-11",value:4.2},{date:"2025-12",value:4.1},
+        {date:"2026-01",value:4.0},{date:"2026-02",value:4.1}
+      ]
+    }
+  },
+  states: [
+    {abbr:"AL",name:"Alabama",fips:"01",lat:32.806671,lng:-86.79113,permits_2025:23.4,permits_2024:25.1,permits_2023:26.8,employment_growth:1.2,disaster_events:2,yoy_change:-6.8,pvs:-10.3,classification:"cooling"},
+    {abbr:"AK",name:"Alaska",fips:"02",lat:61.370716,lng:-152.404419,permits_2025:1.2,permits_2024:1.3,permits_2023:1.5,employment_growth:0.3,disaster_events:0,yoy_change:-7.7,pvs:-17.9,classification:"freeze"},
+    {abbr:"AZ",name:"Arizona",fips:"04",lat:33.729759,lng:-111.431221,permits_2025:52.8,permits_2024:55.2,permits_2023:49.6,employment_growth:3.8,disaster_events:1,yoy_change:-4.3,pvs:6.8,classification:"heating"},
+    {abbr:"AR",name:"Arkansas",fips:"05",lat:34.969704,lng:-92.373123,permits_2025:10.2,permits_2024:11.1,permits_2023:11.8,employment_growth:0.8,disaster_events:3,yoy_change:-8.1,pvs:-14.9,classification:"cooling"},
+    {abbr:"CA",name:"California",fips:"06",lat:36.116203,lng:-119.681564,permits_2025:108.5,permits_2024:113.2,permits_2023:105.8,employment_growth:1.1,disaster_events:8,yoy_change:-4.2,pvs:-0.6,classification:"stable"},
+    {abbr:"CO",name:"Colorado",fips:"08",lat:39.059811,lng:-105.311104,permits_2025:38.6,permits_2024:42.1,permits_2023:45.3,employment_growth:1.5,disaster_events:2,yoy_change:-8.3,pvs:-12.8,classification:"cooling"},
+    {abbr:"CT",name:"Connecticut",fips:"09",lat:41.597782,lng:-72.755371,permits_2025:7.8,permits_2024:8.2,permits_2023:8.5,employment_growth:0.9,disaster_events:1,yoy_change:-4.9,pvs:-7.5,classification:"cooling"},
+    {abbr:"DE",name:"Delaware",fips:"10",lat:39.318523,lng:-75.507141,permits_2025:6.5,permits_2024:6.8,permits_2023:7.1,employment_growth:1.2,disaster_events:0,yoy_change:-4.4,pvs:-5.6,classification:"cooling"},
+    {abbr:"FL",name:"Florida",fips:"12",lat:27.766279,lng:-81.686783,permits_2025:168.3,permits_2024:178.5,permits_2023:193.2,employment_growth:2.8,disaster_events:6,yoy_change:-5.7,pvs:1.9,classification:"stable"},
+    {abbr:"GA",name:"Georgia",fips:"13",lat:33.040619,lng:-83.643074,permits_2025:62.4,permits_2024:65.8,permits_2023:68.1,employment_growth:2.1,disaster_events:3,yoy_change:-5.2,pvs:-1.7,classification:"stable"},
+    {abbr:"HI",name:"Hawaii",fips:"15",lat:21.094318,lng:-157.498337,permits_2025:4.2,permits_2024:3.8,permits_2023:3.5,employment_growth:1.8,disaster_events:1,yoy_change:10.5,pvs:35.0,classification:"surge"},
+    {abbr:"ID",name:"Idaho",fips:"16",lat:44.240459,lng:-114.478828,permits_2025:17.8,permits_2024:18.5,permits_2023:16.2,employment_growth:3.2,disaster_events:1,yoy_change:-3.8,pvs:5.5,classification:"heating"},
+    {abbr:"IL",name:"Illinois",fips:"17",lat:40.349457,lng:-88.986137,permits_2025:22.1,permits_2024:24.3,permits_2023:26.1,employment_growth:0.5,disaster_events:2,yoy_change:-9.1,pvs:-19.2,classification:"freeze"},
+    {abbr:"IN",name:"Indiana",fips:"18",lat:39.849426,lng:-86.258278,permits_2025:22.6,permits_2024:24.8,permits_2023:25.5,employment_growth:1.1,disaster_events:2,yoy_change:-8.9,pvs:-16.0,classification:"freeze"},
+    {abbr:"IA",name:"Iowa",fips:"19",lat:42.011539,lng:-93.210526,permits_2025:10.5,permits_2024:11.2,permits_2023:12.1,employment_growth:0.4,disaster_events:2,yoy_change:-6.2,pvs:-12.6,classification:"cooling"},
+    {abbr:"KS",name:"Kansas",fips:"20",lat:38.5266,lng:-96.726486,permits_2025:9.8,permits_2024:10.5,permits_2023:11.2,employment_growth:0.6,disaster_events:3,yoy_change:-6.7,pvs:-12.2,classification:"cooling"},
+    {abbr:"KY",name:"Kentucky",fips:"21",lat:37.66814,lng:-84.670067,permits_2025:13.8,permits_2024:14.5,permits_2023:15.2,employment_growth:0.9,disaster_events:2,yoy_change:-4.8,pvs:-6.8,classification:"cooling"},
+    {abbr:"LA",name:"Louisiana",fips:"22",lat:31.169546,lng:-91.867805,permits_2025:14.2,permits_2024:15.8,permits_2023:17.1,employment_growth:-0.2,disaster_events:4,yoy_change:-10.1,pvs:-23.8,classification:"freeze"},
+    {abbr:"ME",name:"Maine",fips:"23",lat:44.693947,lng:-69.381927,permits_2025:4.5,permits_2024:4.8,permits_2023:5.1,employment_growth:0.7,disaster_events:1,yoy_change:-6.2,pvs:-11.9,classification:"cooling"},
+    {abbr:"MD",name:"Maryland",fips:"24",lat:39.063946,lng:-76.802101,permits_2025:16.2,permits_2024:17.1,permits_2023:18.5,employment_growth:0.8,disaster_events:1,yoy_change:-5.3,pvs:-9.0,classification:"cooling"},
+    {abbr:"MA",name:"Massachusetts",fips:"25",lat:42.230171,lng:-71.530106,permits_2025:18.5,permits_2024:19.8,permits_2023:21.2,employment_growth:1.0,disaster_events:1,yoy_change:-6.6,pvs:-11.3,classification:"cooling"},
+    {abbr:"MI",name:"Michigan",fips:"26",lat:43.326618,lng:-84.536095,permits_2025:18.2,permits_2024:19.5,permits_2023:20.1,employment_growth:0.6,disaster_events:1,yoy_change:-6.7,pvs:-13.4,classification:"cooling"},
+    {abbr:"MN",name:"Minnesota",fips:"27",lat:45.694454,lng:-93.900192,permits_2025:20.1,permits_2024:21.8,permits_2023:23.5,employment_growth:0.9,disaster_events:1,yoy_change:-7.8,pvs:-14.8,classification:"cooling"},
+    {abbr:"MS",name:"Mississippi",fips:"28",lat:32.741646,lng:-89.678696,permits_2025:7.8,permits_2024:8.5,permits_2023:9.1,employment_growth:0.3,disaster_events:3,yoy_change:-8.2,pvs:-17.4,classification:"freeze"},
+    {abbr:"MO",name:"Missouri",fips:"29",lat:38.456085,lng:-92.288368,permits_2025:16.5,permits_2024:17.8,permits_2023:18.9,employment_growth:0.7,disaster_events:3,yoy_change:-7.3,pvs:-13.3,classification:"cooling"},
+    {abbr:"MT",name:"Montana",fips:"30",lat:46.921925,lng:-110.454353,permits_2025:5.2,permits_2024:5.8,permits_2023:6.5,employment_growth:1.4,disaster_events:1,yoy_change:-10.3,pvs:-19.0,classification:"freeze"},
+    {abbr:"NE",name:"Nebraska",fips:"31",lat:41.12537,lng:-98.268082,permits_2025:8.5,permits_2024:9.1,permits_2023:9.8,employment_growth:0.5,disaster_events:2,yoy_change:-6.6,pvs:-13.0,classification:"cooling"},
+    {abbr:"NV",name:"Nevada",fips:"32",lat:38.313515,lng:-117.055374,permits_2025:28.5,permits_2024:30.2,permits_2023:27.8,employment_growth:3.1,disaster_events:0,yoy_change:-5.6,pvs:-0.1,classification:"stable"},
+    {abbr:"NH",name:"New Hampshire",fips:"33",lat:43.452492,lng:-71.563896,permits_2025:4.8,permits_2024:5.1,permits_2023:5.5,employment_growth:0.8,disaster_events:0,yoy_change:-5.9,pvs:-11.1,classification:"cooling"},
+    {abbr:"NJ",name:"New Jersey",fips:"34",lat:40.298904,lng:-74.521011,permits_2025:28.2,permits_2024:31.5,permits_2023:35.8,employment_growth:0.7,disaster_events:1,yoy_change:-10.5,pvs:-22.4,classification:"freeze"},
+    {abbr:"NM",name:"New Mexico",fips:"35",lat:34.840515,lng:-106.248482,permits_2025:8.1,permits_2024:8.8,permits_2023:9.2,employment_growth:1.5,disaster_events:1,yoy_change:-8.0,pvs:-12.5,classification:"cooling"},
+    {abbr:"NY",name:"New York",fips:"36",lat:42.165726,lng:-74.948051,permits_2025:42.5,permits_2024:48.2,permits_2023:52.1,employment_growth:0.4,disaster_events:2,yoy_change:-11.8,pvs:-26.6,classification:"freeze"},
+    {abbr:"NC",name:"North Carolina",fips:"37",lat:35.630066,lng:-79.806419,permits_2025:72.8,permits_2024:76.5,permits_2023:79.2,employment_growth:2.5,disaster_events:3,yoy_change:-4.8,pvs:1.0,classification:"stable"},
+    {abbr:"ND",name:"North Dakota",fips:"38",lat:47.528912,lng:-99.784012,permits_2025:3.8,permits_2024:4.2,permits_2023:4.8,employment_growth:0.2,disaster_events:1,yoy_change:-9.5,pvs:-22.3,classification:"freeze"},
+    {abbr:"OH",name:"Ohio",fips:"39",lat:40.388783,lng:-82.764915,permits_2025:22.8,permits_2024:24.1,permits_2023:25.5,employment_growth:0.4,disaster_events:2,yoy_change:-5.4,pvs:-10.5,classification:"cooling"},
+    {abbr:"OK",name:"Oklahoma",fips:"40",lat:35.565342,lng:-96.928917,permits_2025:13.2,permits_2024:14.5,permits_2023:15.8,employment_growth:0.8,disaster_events:4,yoy_change:-9.0,pvs:-16.4,classification:"freeze"},
+    {abbr:"OR",name:"Oregon",fips:"41",lat:44.572021,lng:-122.070938,permits_2025:16.8,permits_2024:18.2,permits_2023:19.5,employment_growth:1.3,disaster_events:1,yoy_change:-7.7,pvs:-12.8,classification:"cooling"},
+    {abbr:"PA",name:"Pennsylvania",fips:"42",lat:40.590752,lng:-77.209755,permits_2025:22.5,permits_2024:24.2,permits_2023:25.8,employment_growth:0.5,disaster_events:2,yoy_change:-7.0,pvs:-14.1,classification:"cooling"},
+    {abbr:"RI",name:"Rhode Island",fips:"44",lat:41.680893,lng:-71.51178,permits_2025:2.1,permits_2024:2.3,permits_2023:2.5,employment_growth:0.6,disaster_events:0,yoy_change:-8.7,pvs:-19.0,classification:"freeze"},
+    {abbr:"SC",name:"South Carolina",fips:"45",lat:33.856892,lng:-80.945007,permits_2025:42.5,permits_2024:44.8,permits_2023:46.2,employment_growth:2.2,disaster_events:2,yoy_change:-5.1,pvs:-1.7,classification:"stable"},
+    {abbr:"SD",name:"South Dakota",fips:"46",lat:44.299782,lng:-99.438828,permits_2025:5.8,permits_2024:6.2,permits_2023:6.8,employment_growth:0.5,disaster_events:1,yoy_change:-6.5,pvs:-13.3,classification:"cooling"},
+    {abbr:"TN",name:"Tennessee",fips:"47",lat:35.747845,lng:-86.692345,permits_2025:38.2,permits_2024:41.5,permits_2023:44.8,employment_growth:1.8,disaster_events:3,yoy_change:-8.0,pvs:-10.0,classification:"cooling"},
+    {abbr:"TX",name:"Texas",fips:"48",lat:31.054487,lng:-97.563461,permits_2025:218.5,permits_2024:225.8,permits_2023:238.1,employment_growth:2.9,disaster_events:5,yoy_change:-3.2,pvs:8.0,classification:"heating"},
+    {abbr:"UT",name:"Utah",fips:"49",lat:40.150032,lng:-111.862434,permits_2025:24.5,permits_2024:26.8,permits_2023:28.1,employment_growth:2.8,disaster_events:0,yoy_change:-8.6,pvs:-8.9,classification:"cooling"},
+    {abbr:"VT",name:"Vermont",fips:"50",lat:44.045876,lng:-72.710686,permits_2025:1.8,permits_2024:2.0,permits_2023:2.2,employment_growth:0.4,disaster_events:1,yoy_change:-10.0,pvs:-22.6,classification:"freeze"},
+    {abbr:"VA",name:"Virginia",fips:"51",lat:37.769337,lng:-78.169968,permits_2025:32.5,permits_2024:34.8,permits_2023:36.5,employment_growth:1.2,disaster_events:2,yoy_change:-6.6,pvs:-9.9,classification:"cooling"},
+    {abbr:"WA",name:"Washington",fips:"53",lat:47.400902,lng:-121.490494,permits_2025:38.5,permits_2024:41.2,permits_2023:43.8,employment_growth:1.6,disaster_events:1,yoy_change:-6.6,pvs:-8.6,classification:"cooling"},
+    {abbr:"WV",name:"West Virginia",fips:"54",lat:38.491226,lng:-80.954456,permits_2025:2.5,permits_2024:2.8,permits_2023:3.1,employment_growth:-0.3,disaster_events:1,yoy_change:-10.7,pvs:-27.5,classification:"freeze"},
+    {abbr:"WI",name:"Wisconsin",fips:"55",lat:44.268543,lng:-89.616508,permits_2025:16.2,permits_2024:17.5,permits_2023:18.8,employment_growth:0.6,disaster_events:1,yoy_change:-7.4,pvs:-15.3,classification:"freeze"},
+    {abbr:"WY",name:"Wyoming",fips:"56",lat:42.755966,lng:-107.30249,permits_2025:2.8,permits_2024:3.1,permits_2023:3.5,employment_growth:0.8,disaster_events:0,yoy_change:-9.7,pvs:-20.6,classification:"freeze"},
+    {abbr:"DC",name:"District of Columbia",fips:"11",lat:38.897438,lng:-77.026817,permits_2025:3.5,permits_2024:4.2,permits_2023:5.1,employment_growth:0.2,disaster_events:0,yoy_change:-16.7,pvs:-40.8,classification:"freeze"}
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// SEGMENT STATE & COMPUTATION
+// ═══════════════════════════════════════════════════════════════════════
+let activeSegment = 'all';
+
+function computeSegments() {
+  const highSF = ['TX','FL','NC','SC','GA','TN','ID','AZ','UT','NV','CO'];
+  const lowSF = ['NY','NJ','MA','CT','RI','DC','MD','VA','DE','HI','IL','PA'];
+  const highCom = ['TX','CA','FL','NY','GA','IL','PA','NJ'];
+  const lowCom = ['WY','MT','VT','WV','ND','SD','AK','ME'];
+
+  DATA.states.forEach(s => {
+    let sfRatio = 0.65;
+    if (highSF.includes(s.abbr)) sfRatio = 0.72;
+    if (lowSF.includes(s.abbr)) sfRatio = 0.50;
+    s.sf_permits_2025 = +(s.permits_2025 * sfRatio).toFixed(1);
+    s.sf_permits_2024 = +(s.permits_2024 * sfRatio).toFixed(1);
+    s.mf_permits_2025 = +(s.permits_2025 * (1 - sfRatio)).toFixed(1);
+    s.mf_permits_2024 = +(s.permits_2024 * (1 - sfRatio)).toFixed(1);
+    let comRatio = 0.09;
+    if (highCom.includes(s.abbr)) comRatio = 0.12;
+    if (lowCom.includes(s.abbr)) comRatio = 0.06;
+    s.com_permits_2025 = +(s.permits_2025 * comRatio).toFixed(1);
+    s.com_permits_2024 = +(s.permits_2024 * comRatio).toFixed(1);
+  });
+}
+
+// Get the right permit fields for the active segment
+function getPermitKey2025() {
+  if (activeSegment === 'sf') return 'sf_permits_2025';
+  if (activeSegment === 'mf') return 'mf_permits_2025';
+  if (activeSegment === 'com') return 'com_permits_2025';
+  return 'permits_2025';
+}
+function getPermitKey2024() {
+  if (activeSegment === 'sf') return 'sf_permits_2024';
+  if (activeSegment === 'mf') return 'mf_permits_2024';
+  if (activeSegment === 'com') return 'com_permits_2024';
+  return 'permits_2024';
+}
+function getSegmentLabel() {
+  if (activeSegment === 'sf') return 'SF';
+  if (activeSegment === 'mf') return 'MF';
+  if (activeSegment === 'com') return 'Com.';
+  return 'Total';
+}
+
+function getPermits(s) {
+  if (activeSegment === 'sf') return s.sf_permits_2025;
+  if (activeSegment === 'mf') return s.mf_permits_2025;
+  if (activeSegment === 'com') return s.com_permits_2025;
+  return s.permits_2025;
+}
+function getPermitsPrior(s) {
+  if (activeSegment === 'sf') return s.sf_permits_2024;
+  if (activeSegment === 'mf') return s.mf_permits_2024;
+  if (activeSegment === 'com') return s.com_permits_2024;
+  return s.permits_2024;
+}
+
+function getSegmentSAARValue() {
+  const base = DATA.national.total_permits_saar.current;
+  if (activeSegment === 'sf') return Math.round(base * 0.664);
+  if (activeSegment === 'mf') return Math.round(base * 0.336);
+  if (activeSegment === 'com') return Math.round(base * 0.10);
+  return base;
+}
+
+function getSegmentSAARPrior() {
+  const base = DATA.national.total_permits_saar.prior_month;
+  if (activeSegment === 'sf') return Math.round(base * 0.664);
+  if (activeSegment === 'mf') return Math.round(base * 0.336);
+  if (activeSegment === 'com') return Math.round(base * 0.10);
+  return base;
+}
+
+function switchSegment(seg) {
+  activeSegment = seg;
+  document.querySelectorAll('.seg-tab').forEach(t => t.classList.toggle('active', t.dataset.seg === seg));
+  const note = document.getElementById('segNote');
+  if (seg === 'com') {
+    note.classList.add('visible');
+  } else {
+    note.classList.remove('visible');
+  }
+  buildKPIs();
+  buildPVSLegend();
+  buildMovers();
+  updateMapColors();
+  if (selectedState) selectState(selectedState.abbr);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+const CLASS_COLORS = {
+  surge: '#ff4d6a',
+  heating: '#ff8c42',
+  stable: '#ffd166',
+  cooling: '#a78bfa',
+  freeze: '#6366f1'
+};
+
+const CLASS_COLORS_LIGHT = {
+  surge: '#ff8da0',
+  heating: '#ffb580',
+  stable: '#ffe099',
+  cooling: '#c4b5fd',
+  freeze: '#8b8ff5'
+};
+
+const CLASS_EMOJI = {
+  surge: '😊',
+  heating: '🙂',
+  stable: '😐',
+  cooling: '😟',
+  freeze: '🥶'
+};
+
+function classColor(c) { return CLASS_COLORS[c] || '#8875a8'; }
+function classColorLight(c) { return CLASS_COLORS_LIGHT[c] || '#b8a5d4'; }
+
+function formatKpiValue(key, val) {
+  if (key === 'mortgage_rate_30yr') return val.toFixed(2) + '%';
+  if (key === 'unemployment_rate') return val.toFixed(1) + '%';
+  if (key === 'builder_confidence_hmi') return val.toString();
+  return val.toLocaleString() + 'K';
+}
+
+function changeFromPrior(current, prior) {
+  return ((current - prior) / prior * 100).toFixed(1);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// KPI CARDS
+// ═══════════════════════════════════════════════════════════════════════
+const KPI_CONFIG = [
+  { key: 'total_permits_saar', label: 'Permits SAAR', invertColor: false },
+  { key: 'mortgage_rate_30yr', label: 'Mortgage Rate', invertColor: true },
+  { key: 'housing_starts_saar', label: 'Housing Starts', invertColor: false },
+  { key: 'builder_confidence_hmi', label: 'Builder HMI', invertColor: false },
+  { key: 'unemployment_rate', label: 'Unemployment', invertColor: true }
+];
+
+const sparkCharts = {};
+
+function getSegmentKPIConfig() {
+  const segLabels = {
+    'all': 'Permits SAAR',
+    'sf': 'SF Permits SAAR',
+    'mf': 'MF Permits SAAR',
+    'com': 'Com. Permits SAAR'
+  };
+  const hmiLabel = activeSegment === 'com' ? 'ABI (est.)' : 'Builder HMI';
+  return KPI_CONFIG.map(cfg => {
+    if (cfg.key === 'total_permits_saar') return { ...cfg, label: segLabels[activeSegment] || cfg.label };
+    if (cfg.key === 'builder_confidence_hmi') return { ...cfg, label: hmiLabel };
+    return cfg;
+  });
+}
+
+function buildKPIs() {
+  const grid = document.getElementById('kpiGrid');
+  Object.keys(sparkCharts).forEach(k => {
+    if (sparkCharts[k]) { sparkCharts[k].destroy(); delete sparkCharts[k]; }
+  });
+  grid.innerHTML = '';
+  const cfgs = getSegmentKPIConfig();
+  cfgs.forEach(cfg => {
+    const d = DATA.national[cfg.key];
+    let currentVal = d.current;
+    let priorVal = d.prior_month;
+
+    if (cfg.key === 'total_permits_saar' && activeSegment !== 'all') {
+      currentVal = getSegmentSAARValue();
+      priorVal = getSegmentSAARPrior();
+    }
+
+    const change = changeFromPrior(currentVal, priorVal);
+    const isUp = parseFloat(change) > 0;
+    const isGood = cfg.invertColor ? !isUp : isUp;
+    const arrow = isUp ? '▲' : '▼';
+    const card = document.createElement('div');
+    card.className = 'kpi-card';
+    card.innerHTML = `
+      <div class="kpi-label">${cfg.label}</div>
+      <div class="kpi-row">
+        <span class="kpi-value">${formatKpiValue(cfg.key, currentVal)}</span>
+        <span class="kpi-change ${isGood ? 'up' : 'down'}">${arrow} ${Math.abs(change)}%</span>
+      </div>
+      <div class="kpi-sparkline"><canvas id="spark-${cfg.key}"></canvas></div>
+    `;
+    grid.appendChild(card);
+  });
+  requestAnimationFrame(() => {
+    cfgs.forEach(cfg => {
+      const d = DATA.national[cfg.key];
+      const canvas = document.getElementById(`spark-${cfg.key}`);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let values = d.history.map(h => h.value);
+
+      if (cfg.key === 'total_permits_saar' && activeSegment !== 'all') {
+        const ratio = activeSegment === 'sf' ? 0.664 : activeSegment === 'mf' ? 0.336 : 0.10;
+        values = values.map(v => Math.round(v * ratio));
+      }
+
+      const isDownGood = cfg.invertColor;
+      const last = values[values.length - 1];
+      const prev = values[values.length - 2] || last;
+      const trending = last >= prev;
+      const lineColor = (isDownGood ? !trending : trending) ? '#34d399' : '#fb7185';
+      sparkCharts[cfg.key] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: d.history.map(h => h.date),
+          datasets: [{
+            data: values,
+            borderColor: lineColor,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.3,
+            fill: {
+              target: 'origin',
+              above: lineColor + '15',
+              below: lineColor + '15'
+            }
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            x: { display: false },
+            y: { display: false }
+          },
+          animation: { duration: 800 }
+        }
+      });
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PVS LEGEND
+// ═══════════════════════════════════════════════════════════════════════
+function buildPVSLegend() {
+  const counts = { freeze: 0, cooling: 0, stable: 0, heating: 0, surge: 0 };
+  DATA.states.forEach(s => { if (counts[s.classification] !== undefined) counts[s.classification]++; });
+  const container = document.getElementById('pvsCounts');
+  container.innerHTML = '';
+  ['freeze','cooling','stable','heating','surge'].forEach(cls => {
+    const el = document.createElement('div');
+    el.className = 'pvs-count-item';
+    el.style.color = classColor(cls);
+    el.textContent = counts[cls];
+    container.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MOVERS
+// ═══════════════════════════════════════════════════════════════════════
+function buildMovers() {
+  const pKey25 = getPermitKey2025();
+  const pKey24 = getPermitKey2024();
+  const sorted = [...DATA.states].sort((a,b) => b.pvs - a.pvs);
+  const top5 = sorted.slice(0, 5);
+  const bottom5 = sorted.slice(-5).reverse();
+
+  function renderList(items, containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    items.forEach(s => {
+      const p25 = s[pKey25];
+      const p24 = s[pKey24];
+      const segYoy = p24 > 0 ? ((p25 - p24) / p24 * 100) : 0;
+      const isPos = segYoy >= 0;
+      const div = document.createElement('div');
+      div.className = 'mover-item';
+      div.onclick = () => selectState(s.abbr);
+      div.innerHTML = `
+        <span class="mover-dot" style="background:${classColor(s.classification)}"></span>
+        <span class="mover-abbr">${s.abbr}</span>
+        <span class="mover-pvs">PVS ${s.pvs > 0 ? '+' : ''}${s.pvs.toFixed(1)}</span>
+        <span class="mover-yoy" style="color:${isPos ? 'var(--positive)' : 'var(--negative)'}">${isPos ? '+' : ''}${segYoy.toFixed(1)}%</span>
+      `;
+      el.appendChild(div);
+    });
+  }
+  renderList(top5, 'topMovers');
+  renderList(bottom5, 'bottomMovers');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════════════════════════════
+const ALERTS = [
+  { text: '<strong>CA:</strong> 8 disaster events in 2025 — rebuild permits expected Q2 2026' },
+  { text: '<strong>TX:</strong> Largest permit volume nationally (218.5K) despite -3.2% YoY decline' },
+  { text: '<strong>HI:</strong> Permit surge +10.5% YoY — only state with accelerating permits' },
+  { text: '<strong>DC:</strong> Sharpest contraction -16.7% YoY — federal employment uncertainty' },
+  { text: '<strong>FL:</strong> Permits -5.7% from 2024 peak, still 2nd largest market nationally' },
+  { text: '<strong>Mortgage:</strong> Rates down to 6.06% in Jan 2026 — lowest in 3 years (Freddie Mac)' }
+];
+let alertIndex = 0;
+function rotateAlert() {
+  const el = document.getElementById('alertContent');
+  const a = ALERTS[alertIndex % ALERTS.length];
+  el.innerHTML = `
+    <div class="alert-item">
+      <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 110-2 1 1 0 010 2z"/>
+      </svg>
+      <div class="alert-text">${a.text}</div>
+    </div>
+  `;
+  alertIndex++;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// D3 MAP
+// ═══════════════════════════════════════════════════════════════════════
+let selectedState = null;
+let fipsLookup = {};
+let projection; // d3.geoAlbersUsa for centroid positioning
+let d3Path; // path generator (no projection — pre-projected data)
+
+async function initD3Map() {
+  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json');
+  const states = topojson.feature(us, us.objects.states);
+  const nationMesh = topojson.mesh(us, us.objects.states, (a, b) => a === b);
+  const stateMesh = topojson.mesh(us, us.objects.states, (a, b) => a !== b);
+
+  // Projection for converting lat/lng centroids to screen coords
+  projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+  d3Path = d3.geoPath(); // No projection — data is pre-projected
+
+  // Build FIPS lookup
+  DATA.states.forEach(s => { fipsLookup[s.fips] = s; });
+
+  const container = document.getElementById('map');
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('viewBox', '0 0 975 610')
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', '100%');
+
+  // SVG Defs — glow filter
+  const defs = svg.append('defs');
+  const glowFilter = defs.append('filter')
+    .attr('id', 'glow')
+    .attr('x', '-50%').attr('y', '-50%')
+    .attr('width', '200%').attr('height', '200%');
+  glowFilter.append('feGaussianBlur')
+    .attr('stdDeviation', '3')
+    .attr('result', 'blur');
+  const glowMerge = glowFilter.append('feMerge');
+  glowMerge.append('feMergeNode').attr('in', 'blur');
+  glowMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+  // Soft glow for hover
+  const softGlow = defs.append('filter')
+    .attr('id', 'softGlow')
+    .attr('x', '-30%').attr('y', '-30%')
+    .attr('width', '160%').attr('height', '160%');
+  softGlow.append('feGaussianBlur')
+    .attr('stdDeviation', '4')
+    .attr('result', 'blur');
+  const softMerge = softGlow.append('feMerge');
+  softMerge.append('feMergeNode').attr('in', 'blur');
+  softMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+  // Compute max permits for opacity scale
+  const maxP = Math.max(...DATA.states.map(s => getPermits(s)));
+
+  // Draw state fills
+  svg.append('g')
+    .attr('class', 'states')
+    .selectAll('path')
+    .data(states.features)
+    .enter().append('path')
+    .attr('class', 'state-path')
+    .attr('d', d3Path)
+    .attr('fill', d => {
+      const s = fipsLookup[d.id];
+      if (!s) return '#1a1033';
+      return classColor(s.classification);
+    })
+    .attr('fill-opacity', d => {
+      const s = fipsLookup[d.id];
+      if (!s) return 0.05;
+      const p = getPermits(s);
+      return 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxP + 1));
+    })
+    .attr('stroke', 'none')
+    .attr('cursor', 'pointer')
+    .on('mouseenter', function(event, d) {
+      const s = fipsLookup[d.id];
+      if (!s) return;
+      const self = d3.select(this);
+      const currentOpacity = parseFloat(self.attr('fill-opacity'));
+      self
+        .attr('fill-opacity', Math.min(1, currentOpacity + 0.15))
+        .attr('stroke', '#FA4616')
+        .attr('stroke-width', 2)
+        .attr('filter', 'url(#softGlow)');
+      // Raise to top
+      this.parentNode.appendChild(this);
+      showTooltip(s);
+    })
+    .on('mouseleave', function(event, d) {
+      const s = fipsLookup[d.id];
+      if (!s) return;
+      const maxPNow = Math.max(...DATA.states.map(st => getPermits(st)));
+      const p = getPermits(s);
+      const baseOpacity = 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxPNow + 1));
+      const self = d3.select(this);
+      self
+        .attr('fill-opacity', baseOpacity)
+        .attr('stroke', 'none')
+        .attr('stroke-width', 0)
+        .attr('filter', null);
+      // If selected, keep highlight
+      if (selectedState && selectedState.fips === d.id) {
+        self.attr('stroke', '#FA4616').attr('stroke-width', 2.5);
+      }
+      hideTooltip();
+    })
+    .on('click', function(event, d) {
+      const s = fipsLookup[d.id];
+      if (!s) return;
+      // Clear previous selection styles
+      d3.selectAll('.state-path').classed('selected', false)
+        .attr('stroke', 'none').attr('stroke-width', 0);
+      // Apply selection
+      d3.select(this).classed('selected', true)
+        .attr('stroke', '#FA4616').attr('stroke-width', 2.5);
+      selectState(s.abbr);
+    });
+
+  // Internal state borders
+  svg.append('path')
+    .datum(stateMesh)
+    .attr('fill', 'none')
+    .attr('stroke', 'rgba(250, 70, 22, 0.25)')
+    .attr('stroke-width', 0.8)
+    .attr('stroke-linejoin', 'round')
+    .attr('d', d3Path)
+    .attr('pointer-events', 'none');
+
+  // Nation outline
+  svg.append('path')
+    .datum(nationMesh)
+    .attr('fill', 'none')
+    .attr('stroke', 'rgba(250, 70, 22, 0.4)')
+    .attr('stroke-width', 1.5)
+    .attr('stroke-linejoin', 'round')
+    .attr('d', d3Path)
+    .attr('pointer-events', 'none');
+
+  // State abbreviation labels
+  const labelData = DATA.states.filter(s => {
+    const c = projection([s.lng, s.lat]);
+    return c !== null;
+  });
+
+  svg.append('g')
+    .attr('class', 'labels')
+    .selectAll('text')
+    .data(labelData)
+    .enter().append('text')
+    .attr('x', d => projection([d.lng, d.lat])[0])
+    .attr('y', d => projection([d.lng, d.lat])[1])
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'central')
+    .attr('font-family', 'Inter, sans-serif')
+    .attr('font-size', '10px')
+    .attr('font-weight', '600')
+    .attr('fill', '#fff')
+    .attr('style', 'text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.5); pointer-events: none;')
+    .text(d => d.abbr);
+
+  // Emoji faces below abbreviation
+  svg.append('g')
+    .attr('class', 'emojis')
+    .selectAll('text')
+    .data(labelData)
+    .enter().append('text')
+    .attr('x', d => projection([d.lng, d.lat])[0])
+    .attr('y', d => projection([d.lng, d.lat])[1] + 11)
+    .attr('text-anchor', 'middle')
+    .attr('font-size', '8px')
+    .attr('style', 'pointer-events: none;')
+    .text(d => CLASS_EMOJI[d.classification] || '😐');
+}
+
+// ─── Update map fills when segment changes or simulation ticks ───
+function updateMapColors() {
+  const maxP = Math.max(...DATA.states.map(s => getPermits(s)));
+  d3.selectAll('.state-path')
+    .attr('fill', function(d) {
+      const s = fipsLookup[d.id];
+      if (!s) return '#1a1033';
+      return classColor(s.classification);
+    })
+    .attr('fill-opacity', function(d) {
+      const s = fipsLookup[d.id];
+      if (!s) return 0.05;
+      const p = getPermits(s);
+      return 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxP + 1));
+    });
+
+  // Update emoji labels
+  d3.selectAll('.emojis text')
+    .data(DATA.states.filter(s => {
+      const c = projection([s.lng, s.lat]);
+      return c !== null;
+    }))
+    .text(d => CLASS_EMOJI[d.classification] || '😐');
+}
+
+// ─── TOOLTIP (Thought Bubble) — SVG centroid positioning ───
+function showTooltip(s) {
+  const tip = document.getElementById('tooltip');
+  const cc = classColor(s.classification);
+  const pKey25 = getPermitKey2025();
+  const pKey24 = getPermitKey2024();
+  const p25 = s[pKey25];
+  const p24 = s[pKey24];
+  const segYoy = p24 > 0 ? ((p25 - p24) / p24 * 100) : 0;
+  const segLabel = getSegmentLabel();
+  const permitLabel = activeSegment === 'all' ? 'Permits 2025' : `${segLabel} Permits '25`;
+  tip.innerHTML = `
+    <div class="tooltip-name">
+      ${s.name}
+      <span class="tooltip-classification" style="color:${cc};border:1px solid ${cc}33">${s.classification}</span>
+    </div>
+    <div class="tooltip-grid">
+      <span class="tooltip-label">${permitLabel}</span>
+      <span class="tooltip-val">${p25.toFixed(1)}K</span>
+      <span class="tooltip-label">YoY Change</span>
+      <span class="tooltip-val" style="color:${segYoy >= 0 ? 'var(--positive)' : 'var(--negative)'}">${segYoy >= 0 ? '+' : ''}${segYoy.toFixed(1)}%</span>
+      <span class="tooltip-label">PVS Score</span>
+      <span class="tooltip-val">${s.pvs >= 0 ? '+' : ''}${s.pvs.toFixed(1)}</span>
+      <span class="tooltip-label">Emp. Growth</span>
+      <span class="tooltip-val">${s.employment_growth >= 0 ? '+' : ''}${s.employment_growth.toFixed(1)}%</span>
+    </div>
+  `;
+
+  const coords = projection([s.lng, s.lat]);
+  if (!coords) return;
+
+  const svgEl = document.querySelector('#map svg');
+  const svgRect = svgEl.getBoundingClientRect();
+  const mapRect = document.getElementById('map').getBoundingClientRect();
+
+  // Scale from viewBox coords to screen coords
+  const scaleX = svgRect.width / 975;
+  const scaleY = svgRect.height / 610;
+
+  const screenX = svgRect.left - mapRect.left + coords[0] * scaleX;
+  const screenY = svgRect.top - mapRect.top + coords[1] * scaleY;
+
+  // Temporarily show to measure
+  tip.style.visibility = 'hidden';
+  tip.classList.add('visible');
+
+  const tipHeight = tip.offsetHeight;
+  const tipWidth = tip.offsetWidth;
+
+  // Default: centered above with 15px gap
+  let left = screenX;
+  let top = screenY - tipHeight - 15;
+
+  // If tooltip would go above map, show below instead
+  if (top < 5) {
+    top = screenY + 20;
+  }
+
+  // Clamp horizontally
+  if (left - tipWidth / 2 < 10) {
+    left = tipWidth / 2 + 10;
+  } else if (left + tipWidth / 2 > mapRect.width - 10) {
+    left = mapRect.width - tipWidth / 2 - 10;
+  }
+
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+  tip.style.visibility = '';
+  tip.classList.add('visible');
+}
+
+function hideTooltip() {
+  const tip = document.getElementById('tooltip');
+  tip.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// STATE DETAIL (Bottom Bar)
+// ═══════════════════════════════════════════════════════════════════════
+let detailChart = null;
+
+function selectState(abbr) {
+  const s = DATA.states.find(st => st.abbr === abbr);
+  if (!s) return;
+  selectedState = s;
+
+  // Highlight the state path on the map
+  d3.selectAll('.state-path')
+    .classed('selected', false)
+    .attr('stroke', function(d) {
+      return null;
+    })
+    .attr('stroke-width', function(d) {
+      return 0;
+    });
+  d3.selectAll('.state-path')
+    .filter(function(d) { return d.id === s.fips; })
+    .classed('selected', true)
+    .attr('stroke', '#FA4616')
+    .attr('stroke-width', 2.5);
+
+  const bar = document.getElementById('bottomBar');
+  const content = document.getElementById('detailContent');
+  const cc = classColor(s.classification);
+  const pKey25 = getPermitKey2025();
+  const pKey24 = getPermitKey2024();
+  const p25 = s[pKey25];
+  const p24 = s[pKey24];
+  const segYoy = p24 > 0 ? ((p25 - p24) / p24 * 100) : 0;
+  const yoyColor = segYoy >= 0 ? 'var(--positive)' : 'var(--negative)';
+  const segLabel = getSegmentLabel();
+  const permitLabel = activeSegment === 'all' ? '2025 Permits' : `${segLabel} Permits '25`;
+  const priorLabel = activeSegment === 'all' ? '2024' : `${segLabel} '24`;
+  const sstExposure = activeSegment === 'com' ? 4200 : 2800;
+  const sstNote = activeSegment === 'com' ? '~$4,200 avg. commercial exposure' : '~$2,800 avg. Simpson product exposure per housing unit';
+
+  content.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-state-name">${s.name}</div>
+      <div class="detail-classification">
+        <span class="detail-class-dot" style="background:${cc}"></span>
+        ${s.classification.toUpperCase()} &middot; PVS ${s.pvs >= 0 ? '+' : ''}${s.pvs.toFixed(1)}
+      </div>
+    </div>
+    <div class="detail-metrics">
+      <div class="detail-metric">
+        <span class="detail-metric-label">${permitLabel}</span>
+        <span class="detail-metric-value">${p25.toFixed(1)}K</span>
+      </div>
+      <div class="detail-metric">
+        <span class="detail-metric-label">${priorLabel}</span>
+        <span class="detail-metric-value" style="color:var(--text-secondary)">${p24.toFixed(1)}K</span>
+      </div>
+      <div class="detail-metric">
+        <span class="detail-metric-label">2023</span>
+        <span class="detail-metric-value" style="color:var(--text-secondary)">${s.permits_2023.toFixed(1)}K</span>
+      </div>
+      <div class="detail-metric">
+        <span class="detail-metric-label">YoY Change</span>
+        <span class="detail-metric-value" style="color:${yoyColor}">${segYoy >= 0 ? '+' : ''}${segYoy.toFixed(1)}%</span>
+      </div>
+      <div class="detail-metric">
+        <span class="detail-metric-label">Emp. Growth</span>
+        <span class="detail-metric-value">${s.employment_growth >= 0 ? '+' : ''}${s.employment_growth.toFixed(1)}%</span>
+      </div>
+      <div class="detail-metric">
+        <span class="detail-metric-label">Disasters</span>
+        <span class="detail-metric-value">${s.disaster_events}</span>
+      </div>
+    </div>
+    <div class="detail-chart-wrap"><canvas id="detailBarChart"></canvas></div>
+    <div class="detail-sst">
+      <div class="detail-sst-label">SST Impact Estimate</div>
+      <div class="detail-sst-text">${sstNote} &middot; ${p25.toFixed(1)}K permits = ~$${(p25 * sstExposure / 1000).toFixed(0)}M addressable</div>
+    </div>
+  `;
+
+  bar.classList.add('open');
+
+  // Mini bar chart
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('detailBarChart');
+    if (!canvas) return;
+    if (detailChart) detailChart.destroy();
+    detailChart = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['2023', '2024', '2025'],
+        datasets: [{
+          data: [s.permits_2023, p24, p25],
+          backgroundColor: [
+            'rgba(184,165,212,0.4)',
+            'rgba(184,165,212,0.6)',
+            cc + 'cc'
+          ],
+          borderRadius: 3,
+          barThickness: 16
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: {
+            display: true,
+            ticks: { color: '#8875a8', font: { size: 9, family: 'JetBrains Mono' } },
+            grid: { display: false },
+            border: { display: false }
+          },
+          y: { display: false }
+        },
+        animation: { duration: 500 }
+      }
+    });
+  });
+}
+
+function closeDetail() {
+  document.getElementById('bottomBar').classList.remove('open');
+  selectedState = null;
+  // Clear selection styling
+  d3.selectAll('.state-path')
+    .classed('selected', false)
+    .attr('stroke', 'none')
+    .attr('stroke-width', 0);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// LIVE SIMULATION
+// ═══════════════════════════════════════════════════════════════════════
+function updateTimestamp() {
+  const now = new Date();
+  document.getElementById('headerTime').textContent = now.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  });
+}
+
+function simulateLive() {
+  DATA.states.forEach(s => {
+    s.pvs += (Math.random() - 0.5) * 1.0;
+    if (s.pvs >= 20) s.classification = 'surge';
+    else if (s.pvs >= 5) s.classification = 'heating';
+    else if (s.pvs >= -5) s.classification = 'stable';
+    else if (s.pvs >= -15) s.classification = 'cooling';
+    else s.classification = 'freeze';
+  });
+  updateMapColors();
+  buildPVSLegend();
+  buildMovers();
+  updateTimestamp();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  computeSegments();
+  buildKPIs();
+  buildPVSLegend();
+  buildMovers();
+  rotateAlert();
+  initD3Map();
+  updateTimestamp();
+
+  // Timers
+  setInterval(rotateAlert, 8000);
+  setInterval(simulateLive, 5000);
+  setInterval(updateTimestamp, 1000);
+});
+</script>
+</body>
+</html>
