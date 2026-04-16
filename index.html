@@ -659,6 +659,7 @@ html, body {
     <div class="header-right">
       <div class="live-badge"><span class="live-dot"></span> LIVE</div>
       <div class="header-time" id="headerTime">—</div>
+      <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-left:6px; white-space:nowrap;">Data as of: Apr 2026</div>
     </div>
   </header>
 
@@ -719,7 +720,7 @@ html, body {
 
   <!-- ─── FOOTER ─── -->
   <footer class="footer">
-    <span>Data: Census Bureau BPS &middot; FRED &middot; BLS &middot; NAHB &middot; Freddie Mac &middot; FEMA &middot; NOAA</span>
+    <span>Data: Census Bureau &middot; FRED &middot; BLS &middot; NAHB &middot; Freddie Mac &middot; FEMA &middot; Dodge &middot; Zonda &middot; NAHB HMI Apr 2026</span>
     <span style="color:var(--accent); font-weight:600;">Simpson Strong-Tie &middot; Permit Pulse</span>
   </footer>
 </div>
@@ -731,18 +732,19 @@ html, body {
 const DATA = {
   national: {
     mortgage_rate_30yr: {
-      current: 6.59, prior_month: 6.71, year_ago: 6.95,
-      source: "Freddie Mac PMMS",
+      current: 6.40, prior_month: 6.30, year_ago: 6.73,
+      source: "Bankrate/WSJ",
       history: [
         {date:"2025-01",value:6.96},{date:"2025-02",value:6.85},{date:"2025-03",value:6.73},
         {date:"2025-04",value:6.81},{date:"2025-05",value:6.78},{date:"2025-06",value:6.72},
         {date:"2025-07",value:6.68},{date:"2025-08",value:6.61},{date:"2025-09",value:6.55},
-        {date:"2025-10",value:6.48},{date:"2025-11",value:6.53},{date:"2025-12",value:6.59},
-        {date:"2026-01",value:6.06},{date:"2026-02",value:6.42},{date:"2026-03",value:6.59}
+        {date:"2025-10",value:6.48},{date:"2025-11",value:6.25},{date:"2025-12",value:6.19},
+        {date:"2026-01",value:6.15},{date:"2026-02",value:6.05},{date:"2026-03",value:6.30},
+        {date:"2026-04",value:6.40}
       ]
     },
     total_permits_saar: {
-      current: 1376, prior_month: 1455, year_ago: 1411, unit: "thousands",
+      current: 1376, prior_month: 1455, year_ago: 1460, unit: "thousands",
       history: [
         {date:"2025-01",value:1473},{date:"2025-02",value:1456},{date:"2025-03",value:1467},
         {date:"2025-04",value:1440},{date:"2025-05",value:1386},{date:"2025-06",value:1454},
@@ -752,33 +754,47 @@ const DATA = {
       ]
     },
     housing_starts_saar: {
-      current: 1250, prior_month: 1311, year_ago: 1354, unit: "thousands",
+      current: 1487, prior_month: 1387, year_ago: 1358, unit: "thousands",
       history: [
         {date:"2025-01",value:1366},{date:"2025-02",value:1494},{date:"2025-03",value:1324},
-        {date:"2025-04",value:1352},{date:"2025-05",value:1341},{date:"2025-06",value:1353},
-        {date:"2025-07",value:1238},{date:"2025-08",value:1361},{date:"2025-09",value:1354},
-        {date:"2025-10",value:1250},{date:"2025-11",value:1289},{date:"2025-12",value:1311},
-        {date:"2026-01",value:1250}
+        {date:"2025-04",value:1398},{date:"2025-05",value:1282},{date:"2025-06",value:1353},
+        {date:"2025-07",value:1238},{date:"2025-08",value:1361},{date:"2025-09",value:1328},
+        {date:"2025-10",value:1272},{date:"2025-11",value:1324},{date:"2025-12",value:1387},
+        {date:"2026-01",value:1487}
       ]
     },
     builder_confidence_hmi: {
-      current: 42, prior_month: 46, year_ago: 44,
+      current: 34, prior_month: 38, year_ago: 40,
       history: [
         {date:"2025-01",value:47},{date:"2025-02",value:42},{date:"2025-03",value:39},
         {date:"2025-04",value:40},{date:"2025-05",value:34},{date:"2025-06",value:42},
         {date:"2025-07",value:42},{date:"2025-08",value:39},{date:"2025-09",value:41},
         {date:"2025-10",value:43},{date:"2025-11",value:46},{date:"2025-12",value:46},
-        {date:"2026-01",value:42}
+        {date:"2026-01",value:37},{date:"2026-02",value:37},{date:"2026-03",value:38},
+        {date:"2026-04",value:34}
       ]
     },
     unemployment_rate: {
-      current: 4.1, prior_month: 4.0, year_ago: 4.0,
+      current: 4.4, prior_month: 4.3, year_ago: 4.2,
       history: [
         {date:"2025-01",value:4.0},{date:"2025-02",value:4.1},{date:"2025-03",value:4.2},
-        {date:"2025-04",value:4.2},{date:"2025-05",value:4.0},{date:"2025-06",value:4.1},
-        {date:"2025-07",value:4.3},{date:"2025-08",value:4.2},{date:"2025-09",value:4.1},
-        {date:"2025-10",value:4.1},{date:"2025-11",value:4.2},{date:"2025-12",value:4.1},
-        {date:"2026-01",value:4.0},{date:"2026-02",value:4.1}
+        {date:"2025-04",value:4.2},{date:"2025-05",value:4.2},{date:"2025-06",value:4.2},
+        {date:"2025-07",value:4.3},{date:"2025-08",value:4.2},{date:"2025-09",value:4.3},
+        {date:"2025-10",value:4.3},{date:"2025-11",value:4.5},{date:"2025-12",value:4.4},
+        {date:"2026-01",value:4.3},{date:"2026-02",value:4.4}
+      ]
+    },
+    tariff_impact: {
+      current: 10.9, prior_month: 10.9, year_ago: 0,
+      unit: "$K/home",
+      source: "NAHB",
+      history: [
+        {date:"2025-01",value:0},{date:"2025-02",value:0},{date:"2025-03",value:2.5},
+        {date:"2025-04",value:4.1},{date:"2025-05",value:5.8},{date:"2025-06",value:6.2},
+        {date:"2025-07",value:7.1},{date:"2025-08",value:7.5},{date:"2025-09",value:8.3},
+        {date:"2025-10",value:9.5},{date:"2025-11",value:10.2},{date:"2025-12",value:10.5},
+        {date:"2026-01",value:10.7},{date:"2026-02",value:10.8},{date:"2026-03",value:10.9},
+        {date:"2026-04",value:10.9}
       ]
     }
   },
@@ -963,6 +979,7 @@ function formatKpiValue(key, val) {
   if (key === 'mortgage_rate_30yr') return val.toFixed(2) + '%';
   if (key === 'unemployment_rate') return val.toFixed(1) + '%';
   if (key === 'builder_confidence_hmi') return val.toString();
+  if (key === 'tariff_impact') return '$' + val.toFixed(1) + 'K';
   return val.toLocaleString() + 'K';
 }
 
@@ -1031,6 +1048,22 @@ function buildKPIs() {
     `;
     grid.appendChild(card);
   });
+
+  // Tariff Impact card (6th card — risk metric, red-tinted)
+  const tariffData = DATA.national.tariff_impact;
+  const tariffCard = document.createElement('div');
+  tariffCard.className = 'kpi-card';
+  tariffCard.style.cssText = 'border-color: rgba(251,113,133,0.5); background: linear-gradient(135deg, rgba(251,113,133,0.08) 0%, var(--bg-card) 100%);';
+  tariffCard.innerHTML = `
+    <div class="kpi-label" style="color:#fb7185;">TARIFF COST</div>
+    <div class="kpi-row">
+      <span class="kpi-value" style="color:#fb7185;">$10.9K</span>
+      <span class="kpi-change down">▲ +$10.9K/home</span>
+    </div>
+    <div class="kpi-sparkline"><canvas id="spark-tariff_impact"></canvas></div>
+  `;
+  grid.appendChild(tariffCard);
+
   requestAnimationFrame(() => {
     cfgs.forEach(cfg => {
       const d = DATA.national[cfg.key];
@@ -1078,6 +1111,41 @@ function buildKPIs() {
         }
       });
     });
+
+    // Tariff sparkline — always red
+    const tariffCanvas = document.getElementById('spark-tariff_impact');
+    if (tariffCanvas) {
+      const tariffCtx = tariffCanvas.getContext('2d');
+      const tariffValues = tariffData.history.map(h => h.value);
+      sparkCharts['tariff_impact'] = new Chart(tariffCtx, {
+        type: 'line',
+        data: {
+          labels: tariffData.history.map(h => h.date),
+          datasets: [{
+            data: tariffValues,
+            borderColor: '#fb7185',
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.3,
+            fill: {
+              target: 'origin',
+              above: '#fb718520',
+              below: '#fb718520'
+            }
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            x: { display: false },
+            y: { display: false }
+          },
+          animation: { duration: 800 }
+        }
+      });
+    }
   });
 }
 
@@ -1141,7 +1209,12 @@ const ALERTS = [
   { text: '<strong>HI:</strong> Permit surge +10.5% YoY — only state with accelerating permits' },
   { text: '<strong>DC:</strong> Sharpest contraction -16.7% YoY — federal employment uncertainty' },
   { text: '<strong>FL:</strong> Permits -5.7% from 2024 peak, still 2nd largest market nationally' },
-  { text: '<strong>Mortgage:</strong> Rates down to 6.06% in Jan 2026 — lowest in 3 years (Freddie Mac)' }
+  { text: '<strong>Mortgage:</strong> Rates at 6.40% Apr 2026 — Bankrate/WSJ' },
+  { text: '<strong>TARIFF ALERT:</strong> NAHB estimates $10,900 added cost per home — 60%+ of builders reporting higher costs' },
+  { text: '<strong>LUMBER:</strong> Canadian softwood duties now ~45% (was 14.5%) — cabinet/vanity tariffs at 50%' },
+  { text: '<strong>HMI CRASH:</strong> Builder confidence fell to 34 in April — 6-month outlook dropped 7 points on tariff fears' },
+  { text: '<strong>STARTS SURGE:</strong> January 2026 at 1,487K SAAR — strongest month in over a year, up 9.5% YoY' },
+  { text: '<strong>WEST REBOUND:</strong> Full-year 2025 West region only -0.8%, not -5.8% as Oct TTM suggested' }
 ];
 let alertIndex = 0;
 function rotateAlert() {
