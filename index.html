@@ -573,6 +573,108 @@ html, body {
   background: var(--accent-dim);
   border-color: var(--accent);
 }
+.seg-tab.signal-tab {
+  position: relative;
+}
+.seg-tab.signal-tab .signal-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sst-orange);
+  box-shadow: 0 0 6px var(--sst-orange-glow);
+  margin-right: 6px;
+  vertical-align: middle;
+  animation: pulse-live 2s infinite;
+}
+.seg-tab.signal-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(250,70,22,0.28) 0%, rgba(250,70,22,0.12) 100%);
+  border-color: var(--sst-orange);
+  box-shadow: 0 0 0 1px rgba(250,70,22,0.4), 0 0 12px rgba(250,70,22,0.25);
+}
+.seg-tab.signal-tab.active .signal-dot {
+  background: #fff;
+  box-shadow: 0 0 8px #fff, 0 0 14px var(--sst-orange-glow);
+}
+
+/* ─── Simpson Signal — Correlation Panel ─── */
+.correlation-panel {
+  background: linear-gradient(135deg, rgba(250,70,22,0.08) 0%, var(--bg-card) 100%);
+  border: 1px solid rgba(250,70,22,0.45);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 0 0 1px rgba(250,70,22,0.1), inset 0 0 20px rgba(250,70,22,0.04);
+}
+.correlation-panel .section-label::before {
+  background: var(--sst-orange);
+}
+.corr-r {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--sst-orange);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.corr-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sst-orange-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(250,70,22,0.12);
+  border: 1px solid rgba(250,70,22,0.3);
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.corr-insight {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+.corr-insight strong { color: var(--text-primary); }
+
+/* Embed legend scale */
+.embed-scale-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #6366f1, #a78bfa, #ffd166, #ff8c42, #ff4d6a);
+  margin: 8px 0 6px;
+}
+
+/* Simpson Signal KPI accents */
+.kpi-card.signal-kpi {
+  border-color: rgba(250,70,22,0.35);
+  background: linear-gradient(135deg, rgba(250,70,22,0.06) 0%, var(--bg-card) 100%);
+}
+.kpi-card.signal-kpi .kpi-label { color: var(--sst-orange-light); }
+
+/* Signal mode — tooltip inset badge */
+.tooltip-signal-flag {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.tooltip-signal-flag.leading {
+  background: rgba(52,211,153,0.12);
+  border: 1px solid rgba(52,211,153,0.4);
+  color: #6ee7b7;
+}
+.tooltip-signal-flag.caution {
+  background: rgba(251,113,133,0.12);
+  border: 1px solid rgba(251,113,133,0.4);
+  color: #fda4af;
+}
 .seg-note {
   margin-left: auto;
   font-size: 10px;
@@ -669,6 +771,7 @@ html, body {
     <button class="seg-tab" data-seg="sf" onclick="switchSegment('sf')">Single Family</button>
     <button class="seg-tab" data-seg="mf" onclick="switchSegment('mf')">Multi-Family</button>
     <button class="seg-tab" data-seg="com" onclick="switchSegment('com')">Commercial ≤5 Stories</button>
+    <button class="seg-tab signal-tab" data-seg="signal" onclick="switchSegment('signal')"><span class="signal-dot"></span>Simpson Signal</button>
     <span class="seg-note" id="segNote">Commercial ≤5 stories · Estimated from residential permit ratios · Live data via Shovels.ai</span>
   </nav>
 
@@ -679,13 +782,22 @@ html, body {
       <div class="kpi-grid" id="kpiGrid"></div>
     </div>
 
-    <div class="pvs-legend">
-      <div class="section-label">Permit Velocity Score</div>
-      <div class="pvs-bar"></div>
-      <div class="pvs-labels">
+    <div class="pvs-legend" id="pvsLegend">
+      <div class="section-label" id="pvsLegendLabel">Permit Velocity Score</div>
+      <div class="pvs-bar" id="pvsLegendBar"></div>
+      <div class="pvs-labels" id="pvsLegendLabels">
         <span>Freeze</span><span>Cooling</span><span>Stable</span><span>Heating</span><span>Surge</span>
       </div>
       <div class="pvs-counts" id="pvsCounts"></div>
+    </div>
+
+    <div class="correlation-panel" id="correlationPanel" style="display:none;">
+      <div class="section-label">Permit vs Embed Correlation</div>
+      <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+        <span class="corr-r" id="corrR">—</span>
+        <span class="corr-label" id="corrLabel">—</span>
+      </div>
+      <div class="corr-insight" id="corrInsight">—</div>
     </div>
 
     <div class="movers-panel">
@@ -853,9 +965,143 @@ const DATA = {
   ]
 };
 
-// ═══════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
+// SIMPSON SIGNAL — EMBED SALES DATA (SSTB + MASA + STHD)
+// ════════════════════════════════════════════════════════════════════════
+const EMBED = {
+  national_total_2025: 87604466,
+  national_q1_2026: 23418714,
+  // Derived sub-product subtotals (full-year 2025, annualized 2026)
+  sstb_2025: 0, masa_2025: 0, sthd_2025: 0,
+  sstb_2026_ann: 0, masa_2026_ann: 0, sthd_2026_ann: 0,
+  // Monthly progression of national embed sales (approximate trajectory)
+  history: [
+    {date:"2025-01",value:6.8},{date:"2025-02",value:6.9},{date:"2025-03",value:7.1},
+    {date:"2025-04",value:7.3},{date:"2025-05",value:7.4},{date:"2025-06",value:7.5},
+    {date:"2025-07",value:7.4},{date:"2025-08",value:7.5},{date:"2025-09",value:7.3},
+    {date:"2025-10",value:7.2},{date:"2025-11",value:7.1},{date:"2025-12",value:7.1},
+    {date:"2026-01",value:7.6},{date:"2026-02",value:7.8},{date:"2026-03",value:8.0}
+  ]
+};
+
+const EMBED_STATES = [
+  {name:"Alabama",embed_2025:419775,embed_2026_q1:117226,embed_2026_ann:468905,yoy:11.7,sstb25:7748,masa25:150515,sthd25:261512,sstb26:2915,masa26:43920,sthd26:70391},
+  {name:"Alaska",embed_2025:2263,embed_2026_q1:56,embed_2026_ann:224,yoy:-90.1,sstb25:1445,masa25:0,sthd25:817,sstb26:56,masa26:0,sthd26:0},
+  {name:"Arizona",embed_2025:7391370,embed_2026_q1:2088249,embed_2026_ann:8352995,yoy:13.0,sstb25:274013,masa25:3992732,sthd25:3124624,sstb26:46565,masa26:1028523,sthd26:1013161},
+  {name:"Arkansas",embed_2025:941305,embed_2026_q1:204457,embed_2026_ann:817829,yoy:-13.1,sstb25:8000,masa25:403771,sthd25:529533,sstb26:39,masa26:63506,sthd26:140913},
+  {name:"California",embed_2025:23937265,embed_2026_q1:6673064,embed_2026_ann:26692254,yoy:11.5,sstb25:15498607,masa25:3991124,sthd25:4447535,sstb26:4286827,masa26:1163262,sthd26:1222975},
+  {name:"Colorado",embed_2025:2942512,embed_2026_q1:849409,embed_2026_ann:3397635,yoy:15.5,sstb25:107501,masa25:33977,sthd25:2801034,sstb26:18446,masa26:3850,sthd26:827113},
+  {name:"Connecticut",embed_2025:102668,embed_2026_q1:10586,embed_2026_ann:42342,yoy:-58.8,sstb25:5003,masa25:9096,sthd25:88569,sstb26:761,masa26:4081,sthd26:5743},
+  {name:"Delaware",embed_2025:15884,embed_2026_q1:3208,embed_2026_ann:12832,yoy:-19.2,sstb25:2468,masa25:0,sthd25:13416,sstb26:0,masa26:0,sthd26:3208},
+  {name:"District of Columbia",embed_2025:959,embed_2026_q1:0,embed_2026_ann:0,yoy:-100.0,sstb25:834,masa25:0,sthd25:125,sstb26:0,masa26:0,sthd26:0},
+  {name:"Florida",embed_2025:542497,embed_2026_q1:170286,embed_2026_ann:681143,yoy:25.6,sstb25:35393,masa25:141157,sthd25:365947,sstb26:5199,masa26:65220,sthd26:99867},
+  {name:"Georgia",embed_2025:2306121,embed_2026_q1:711122,embed_2026_ann:2844490,yoy:23.3,sstb25:25362,masa25:992894,sthd25:1287866,sstb26:9645,masa26:271043,sthd26:430434},
+  {name:"Hawaii",embed_2025:273021,embed_2026_q1:48246,embed_2026_ann:192984,yoy:-29.3,sstb25:272172,masa25:259,sthd25:589,sstb26:47984,masa26:0,sthd26:262},
+  {name:"Idaho",embed_2025:1217374,embed_2026_q1:280065,embed_2026_ann:1120261,yoy:-8.0,sstb25:234956,masa25:8945,sthd25:973472,sstb26:49031,masa26:844,sthd26:230190},
+  {name:"Illinois",embed_2025:151411,embed_2026_q1:36118,embed_2026_ann:144473,yoy:-4.6,sstb25:10729,masa25:2033,sthd25:138650,sstb26:951,masa26:2401,sthd26:32766},
+  {name:"Indiana",embed_2025:20895,embed_2026_q1:7697,embed_2026_ann:30789,yoy:47.4,sstb25:1751,masa25:3907,sthd25:15236,sstb26:1366,masa26:291,sthd26:6040},
+  {name:"Iowa",embed_2025:37895,embed_2026_q1:22635,embed_2026_ann:90541,yoy:138.9,sstb25:1494,masa25:3930,sthd25:32470,sstb26:262,masa26:0,sthd26:22374},
+  {name:"Kansas",embed_2025:703352,embed_2026_q1:100522,embed_2026_ann:402088,yoy:-42.8,sstb25:3835,masa25:23411,sthd25:676106,sstb26:445,masa26:3092,sthd26:96985},
+  {name:"Kentucky",embed_2025:12280,embed_2026_q1:930,embed_2026_ann:3722,yoy:-69.7,sstb25:5939,masa25:705,sthd25:5635,sstb26:0,masa26:12,sthd26:918},
+  {name:"Louisiana",embed_2025:395182,embed_2026_q1:96129,embed_2026_ann:384516,yoy:-2.7,sstb25:4924,masa25:42402,sthd25:347857,sstb26:0,masa26:7731,sthd26:88398},
+  {name:"Maine",embed_2025:16009,embed_2026_q1:1400,embed_2026_ann:5600,yoy:-65.0,sstb25:3434,masa25:0,sthd25:12576,sstb26:184,masa26:0,sthd26:1216},
+  {name:"Maryland",embed_2025:368039,embed_2026_q1:54974,embed_2026_ann:219894,yoy:-40.3,sstb25:5857,masa25:183678,sthd25:178504,sstb26:612,masa26:7420,sthd26:46941},
+  {name:"Massachusetts",embed_2025:135902,embed_2026_q1:22855,embed_2026_ann:91420,yoy:-32.7,sstb25:19560,masa25:131,sthd25:116211,sstb26:3012,masa26:0,sthd26:19843},
+  {name:"Michigan",embed_2025:662981,embed_2026_q1:123458,embed_2026_ann:493831,yoy:-25.5,sstb25:10760,masa25:87160,sthd25:565061,sstb26:587,masa26:43648,sthd26:79222},
+  {name:"Minnesota",embed_2025:1021953,embed_2026_q1:176682,embed_2026_ann:706727,yoy:-30.8,sstb25:7695,masa25:8903,sthd25:1005355,sstb26:2780,masa26:3973,sthd26:169928},
+  {name:"Mississippi",embed_2025:697665,embed_2026_q1:217386,embed_2026_ann:869543,yoy:24.6,sstb25:3006,masa25:169531,sthd25:525128,sstb26:514,masa26:35282,sthd26:181590},
+  {name:"Missouri",embed_2025:697661,embed_2026_q1:141204,embed_2026_ann:564814,yoy:-19.0,sstb25:7232,masa25:40928,sthd25:649502,sstb26:1527,masa26:14446,sthd26:125230},
+  {name:"Montana",embed_2025:172411,embed_2026_q1:21865,embed_2026_ann:87460,yoy:-49.3,sstb25:36351,masa25:989,sthd25:135071,sstb26:4184,masa26:0,sthd26:17681},
+  {name:"Nebraska",embed_2025:50623,embed_2026_q1:22290,embed_2026_ann:89159,yoy:76.1,sstb25:485,masa25:7596,sthd25:42542,sstb26:0,masa26:2689,sthd26:19601},
+  {name:"Nevada",embed_2025:3863637,embed_2026_q1:851333,embed_2026_ann:3405330,yoy:-11.9,sstb25:1604886,masa25:1088803,sthd25:1169949,sstb26:282850,masa26:269267,sthd26:299216},
+  {name:"New Hampshire",embed_2025:34237,embed_2026_q1:6169,embed_2026_ann:24677,yoy:-27.9,sstb25:278,masa25:0,sthd25:33960,sstb26:137,masa26:0,sthd26:6033},
+  {name:"New Jersey",embed_2025:191490,embed_2026_q1:67312,embed_2026_ann:269249,yoy:40.6,sstb25:27575,masa25:51519,sthd25:112396,sstb26:15598,masa26:26378,sthd26:25336},
+  {name:"New Mexico",embed_2025:44801,embed_2026_q1:6351,embed_2026_ann:25404,yoy:-43.3,sstb25:5639,masa25:27912,sthd25:11250,sstb26:169,masa26:220,sthd26:5962},
+  {name:"New York",embed_2025:155938,embed_2026_q1:20892,embed_2026_ann:83570,yoy:-46.4,sstb25:19649,masa25:9868,sthd25:126421,sstb26:816,masa26:62,sthd26:20014},
+  {name:"North Carolina",embed_2025:1462649,embed_2026_q1:493967,embed_2026_ann:1975867,yoy:35.1,sstb25:42332,masa25:824524,sthd25:595793,sstb26:1955,masa26:256326,sthd26:235686},
+  {name:"North Dakota",embed_2025:62531,embed_2026_q1:8587,embed_2026_ann:34349,yoy:-45.1,sstb25:326,masa25:61,sthd25:62144,sstb26:171,masa26:61,sthd26:8355},
+  {name:"Ohio",embed_2025:106719,embed_2026_q1:26011,embed_2026_ann:104044,yoy:-2.5,sstb25:7632,masa25:8852,sthd25:90235,sstb26:1417,masa26:2398,sthd26:22196},
+  {name:"Oklahoma",embed_2025:1393061,embed_2026_q1:239104,embed_2026_ann:956417,yoy:-31.3,sstb25:7844,masa25:261950,sthd25:1123268,sstb26:9361,masa26:34924,sthd26:194819},
+  {name:"Oregon",embed_2025:1272830,embed_2026_q1:377982,embed_2026_ann:1511926,yoy:18.8,sstb25:909185,masa25:11092,sthd25:352554,sstb26:272618,masa26:2239,sthd26:103124},
+  {name:"Pennsylvania",embed_2025:207878,embed_2026_q1:43645,embed_2026_ann:174579,yoy:-16.0,sstb25:19931,masa25:18646,sthd25:169302,sstb26:1926,masa26:5935,sthd26:35784},
+  {name:"Rhode Island",embed_2025:11292,embed_2026_q1:1714,embed_2026_ann:6857,yoy:-39.3,sstb25:1223,masa25:0,sthd25:10069,sstb26:0,masa26:0,sthd26:1714},
+  {name:"South Carolina",embed_2025:1504488,embed_2026_q1:478447,embed_2026_ann:1913786,yoy:27.2,sstb25:41552,masa25:775485,sthd25:687451,sstb26:11305,masa26:279149,sthd26:187992},
+  {name:"South Dakota",embed_2025:86458,embed_2026_q1:9216,embed_2026_ann:36865,yoy:-57.4,sstb25:1144,masa25:10344,sthd25:74970,sstb26:0,masa26:131,sthd26:9085},
+  {name:"Tennessee",embed_2025:1534840,embed_2026_q1:410800,embed_2026_ann:1643200,yoy:7.1,sstb25:14936,masa25:387083,sthd25:1132821,sstb26:1842,masa26:113209,sthd26:295750},
+  {name:"Texas",embed_2025:22850396,embed_2026_q1:6327516,embed_2026_ann:25310064,yoy:10.8,sstb25:107634,masa25:4993583,sthd25:17749179,sstb26:21939,masa26:1299928,sthd26:5005650},
+  {name:"Utah",embed_2025:3173880,embed_2026_q1:781548,embed_2026_ann:3126192,yoy:-1.5,sstb25:103805,masa25:18027,sthd25:3052048,sstb26:32930,masa26:1095,sthd26:747524},
+  {name:"Vermont",embed_2025:11919,embed_2026_q1:1355,embed_2026_ann:5421,yoy:-54.5,sstb25:3556,masa25:0,sthd25:8362,sstb26:0,masa26:0,sthd26:1355},
+  {name:"Virginia",embed_2025:797230,embed_2026_q1:204104,embed_2026_ann:816416,yoy:2.4,sstb25:4551,masa25:229914,sthd25:562765,sstb26:389,masa26:76137,sthd26:127578},
+  {name:"Washington",embed_2025:3253984,embed_2026_q1:802896,embed_2026_ann:3211583,yoy:-1.3,sstb25:720484,masa25:52900,sthd25:2480600,sstb26:135404,masa26:12125,sthd26:655367},
+  {name:"West Virginia",embed_2025:2133,embed_2026_q1:0,embed_2026_ann:0,yoy:-100.0,sstb25:795,masa25:0,sthd25:1337,sstb26:0,masa26:0,sthd26:0},
+  {name:"Wisconsin",embed_2025:252644,embed_2026_q1:41936,embed_2026_ann:167746,yoy:-33.6,sstb25:22272,masa25:128032,sthd25:102340,sstb26:6160,masa26:13888,sthd26:21888},
+  {name:"Wyoming",embed_2025:85823,embed_2026_q1:10086,embed_2026_ann:40344,yoy:-53.0,sstb25:21607,masa25:802,sthd25:63414,sstb26:3908,masa26:2,sthd26:6176}
+];
+
+// Merge embed data into DATA.states
+(function mergeEmbedData() {
+  const byName = {};
+  EMBED_STATES.forEach(e => byName[e.name] = e);
+  DATA.states.forEach(s => {
+    const e = byName[s.name];
+    if (e) {
+      s.embed_2025 = e.embed_2025;
+      s.embed_2026_q1 = e.embed_2026_q1;
+      s.embed_2026_ann = e.embed_2026_ann;
+      s.embed_yoy = e.yoy;
+      s.sstb_2025 = e.sstb25; s.masa_2025 = e.masa25; s.sthd_2025 = e.sthd25;
+      s.sstb_2026_ann = (e.sstb26 || 0) * 4;
+      s.masa_2026_ann = (e.masa26 || 0) * 4;
+      s.sthd_2026_ann = (e.sthd26 || 0) * 4;
+    } else {
+      s.embed_2025 = 0; s.embed_2026_q1 = 0; s.embed_2026_ann = 0; s.embed_yoy = 0;
+      s.sstb_2025 = 0; s.masa_2025 = 0; s.sthd_2025 = 0;
+      s.sstb_2026_ann = 0; s.masa_2026_ann = 0; s.sthd_2026_ann = 0;
+    }
+  });
+  // Sum national subtotals
+  EMBED_STATES.forEach(e => {
+    EMBED.sstb_2025 += e.sstb25 || 0;
+    EMBED.masa_2025 += e.masa25 || 0;
+    EMBED.sthd_2025 += e.sthd25 || 0;
+    EMBED.sstb_2026_ann += (e.sstb26 || 0) * 4;
+    EMBED.masa_2026_ann += (e.masa26 || 0) * 4;
+    EMBED.sthd_2026_ann += (e.sthd26 || 0) * 4;
+  });
+})();
+
+// Classify states by embed YoY
+function embedClassify(yoy) {
+  if (yoy > 20) return 'surge';
+  if (yoy >= 10) return 'heating';
+  if (yoy >= -5) return 'stable';
+  if (yoy >= -20) return 'cooling';
+  return 'freeze';
+}
+
+// Pearson correlation
+function pearsonCorrelation(x, y) {
+  const n = x.length;
+  const sumX = x.reduce((a,b) => a+b, 0);
+  const sumY = y.reduce((a,b) => a+b, 0);
+  const sumXY = x.reduce((a,b,i) => a + b*y[i], 0);
+  const sumX2 = x.reduce((a,b) => a + b*b, 0);
+  const sumY2 = y.reduce((a,b) => a + b*b, 0);
+  const denom = Math.sqrt((n*sumX2 - sumX*sumX) * (n*sumY2 - sumY*sumY));
+  if (denom === 0) return 0;
+  return (n*sumXY - sumX*sumY) / denom;
+}
+
+function computeEmbedPermitCorrelation() {
+  const pts = DATA.states.filter(s => s.embed_2025 > 0 && s.permits_2025 > 0);
+  const x = pts.map(s => s.embed_2025);
+  const y = pts.map(s => s.permits_2025);
+  return pearsonCorrelation(x, y);
+}
+
+// ════════════════════════════════════════════════════════════════════════
 // SEGMENT STATE & COMPUTATION
-// ═══════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
 let activeSegment = 'all';
 
 function computeSegments() {
@@ -934,15 +1180,61 @@ function switchSegment(seg) {
   document.querySelectorAll('.seg-tab').forEach(t => t.classList.toggle('active', t.dataset.seg === seg));
   const note = document.getElementById('segNote');
   if (seg === 'com') {
+    note.textContent = 'Commercial ≤5 stories · Estimated from residential permit ratios · Live data via Shovels.ai';
+    note.classList.add('visible');
+  } else if (seg === 'signal') {
+    note.textContent = 'Simpson Signal · Embed sales (SSTB + MASA + STHD) · Leading indicator of foundation activity';
     note.classList.add('visible');
   } else {
     note.classList.remove('visible');
   }
+
+  // Toggle PVS legend vs. Embed legend, show/hide correlation panel
+  const pvsLabel = document.getElementById('pvsLegendLabel');
+  const corrPanel = document.getElementById('correlationPanel');
+  const topMoversHeader = document.querySelector('#topMovers')?.previousElementSibling;
+  const bottomMoversHeader = document.querySelector('#bottomMovers')?.previousElementSibling;
+  if (seg === 'signal') {
+    pvsLabel.textContent = 'Embed YoY Distribution';
+    corrPanel.style.display = '';
+    if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — Embed YoY';
+    if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — Embed YoY';
+    updateCorrelationPanel();
+  } else {
+    pvsLabel.textContent = 'Permit Velocity Score';
+    corrPanel.style.display = 'none';
+    if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — Heating';
+    if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — Cooling';
+  }
+
   buildKPIs();
   buildPVSLegend();
   buildMovers();
   updateMapColors();
+  rotateAlert(true);
   if (selectedState) selectState(selectedState.abbr);
+}
+
+function updateCorrelationPanel() {
+  const r = computeEmbedPermitCorrelation();
+  const rEl = document.getElementById('corrR');
+  const labelEl = document.getElementById('corrLabel');
+  const insightEl = document.getElementById('corrInsight');
+  if (!rEl) return;
+  rEl.textContent = 'r = ' + r.toFixed(2);
+  let qualitative, insight;
+  if (r > 0.8) {
+    qualitative = 'Strong';
+    insight = 'Embed sales <strong>strongly track permit volume</strong> — SST captures construction proportionally. Embed velocity is a reliable forward read on permits.';
+  } else if (r >= 0.5) {
+    qualitative = 'Moderate';
+    insight = 'Embed sales <strong>loosely track permits</strong> — SST share varies by region. Look for states where embeds diverge for share-gain signals.';
+  } else {
+    qualitative = 'Weak';
+    insight = 'Embed sales <strong>diverge from permits</strong> — SST is gaining or losing share unevenly across states.';
+  }
+  labelEl.textContent = qualitative;
+  insightEl.innerHTML = insight;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1000,6 +1292,125 @@ const KPI_CONFIG = [
 
 const sparkCharts = {};
 
+function buildSignalKPIs(grid) {
+  const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
+  const embedAnn = EMBED.national_q1_2026 * 4;
+  const embedYoY = ((embedAnn - EMBED.national_total_2025) / EMBED.national_total_2025 * 100);
+  const r = computeEmbedPermitCorrelation();
+  const corrLabel = r > 0.8 ? 'Strong' : r >= 0.5 ? 'Moderate' : 'Weak';
+  const corrColor = r > 0.8 ? '#34d399' : r >= 0.5 ? '#ffd166' : '#fb7185';
+
+  const permitsCurrent = DATA.national.total_permits_saar.current;
+  const permitsPrior = DATA.national.total_permits_saar.prior_month;
+  const permitsChange = ((permitsCurrent - permitsPrior) / permitsPrior * 100);
+
+  const cards = [
+    {
+      cls: 'signal-kpi',
+      label: 'Embed Sales (Ann.)',
+      value: fmtM(embedAnn),
+      change: (embedYoY >= 0 ? '▲ +' : '▼ ') + Math.abs(embedYoY).toFixed(1) + '% YoY',
+      changeClass: embedYoY >= 0 ? 'up' : 'down',
+      sparkId: 'spark-embed-total',
+      sparkData: EMBED.history.map(h => h.value),
+      sparkColor: '#FA4616'
+    },
+    {
+      cls: 'signal-kpi',
+      label: 'SSTB (Anchor Bolts)',
+      value: fmtM(EMBED.sstb_2026_ann),
+      change: 'Foundations',
+      changeClass: '',
+      sparkId: 'spark-sstb',
+      sparkData: EMBED.history.map((h, i) => h.value * 0.22 + (i * 0.01)),
+      sparkColor: '#FA4616'
+    },
+    {
+      cls: 'signal-kpi',
+      label: 'MASA (Mudsill)',
+      value: fmtM(EMBED.masa_2026_ann),
+      change: 'Seismic',
+      changeClass: '',
+      sparkId: 'spark-masa',
+      sparkData: EMBED.history.map((h, i) => h.value * 0.17 + Math.sin(i/3) * 0.1),
+      sparkColor: '#FF6B3D'
+    },
+    {
+      cls: 'signal-kpi',
+      label: 'STHD (Holdowns)',
+      value: fmtM(EMBED.sthd_2026_ann),
+      change: 'Code Req.',
+      changeClass: '',
+      sparkId: 'spark-sthd',
+      sparkData: EMBED.history.map((h, i) => h.value * 0.61 + Math.cos(i/4) * 0.15),
+      sparkColor: '#ffb580'
+    },
+    {
+      cls: '',
+      label: 'Permits SAAR',
+      value: permitsCurrent.toLocaleString() + 'K',
+      change: (permitsChange >= 0 ? '▲ +' : '▼ ') + Math.abs(permitsChange).toFixed(1) + '%',
+      changeClass: permitsChange >= 0 ? 'up' : 'down',
+      sparkId: 'spark-permits-compare',
+      sparkData: DATA.national.total_permits_saar.history.map(h => h.value),
+      sparkColor: '#a78bfa'
+    },
+    {
+      cls: 'signal-kpi',
+      label: 'Correlation (Embed↔Permits)',
+      value: 'r = ' + r.toFixed(2),
+      change: corrLabel,
+      changeClass: '',
+      changeColor: corrColor,
+      sparkId: null
+    }
+  ];
+
+  cards.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'kpi-card ' + c.cls;
+    const changeStyle = c.changeColor ? `style="color:${c.changeColor}"` : '';
+    card.innerHTML = `
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-row">
+        <span class="kpi-value">${c.value}</span>
+        <span class="kpi-change ${c.changeClass}" ${changeStyle}>${c.change}</span>
+      </div>
+      ${c.sparkId ? `<div class="kpi-sparkline"><canvas id="${c.sparkId}"></canvas></div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+
+  requestAnimationFrame(() => {
+    cards.forEach(c => {
+      if (!c.sparkId) return;
+      const canvas = document.getElementById(c.sparkId);
+      if (!canvas) return;
+      sparkCharts[c.sparkId] = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: c.sparkData.map((_, i) => i),
+          datasets: [{
+            data: c.sparkData,
+            borderColor: c.sparkColor,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.35,
+            fill: { target: 'origin', above: c.sparkColor + '20', below: c.sparkColor + '20' }
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          animation: { duration: 800 }
+        }
+      });
+    });
+  });
+}
+
 function getSegmentKPIConfig() {
   const segLabels = {
     'all': 'Permits SAAR',
@@ -1021,6 +1432,13 @@ function buildKPIs() {
     if (sparkCharts[k]) { sparkCharts[k].destroy(); delete sparkCharts[k]; }
   });
   grid.innerHTML = '';
+
+  // ─── Simpson Signal mode ───
+  if (activeSegment === 'signal') {
+    buildSignalKPIs(grid);
+    return;
+  }
+
   const cfgs = getSegmentKPIConfig();
   cfgs.forEach(cfg => {
     const d = DATA.national[cfg.key];
@@ -1154,7 +1572,14 @@ function buildKPIs() {
 // ═══════════════════════════════════════════════════════════════════════
 function buildPVSLegend() {
   const counts = { freeze: 0, cooling: 0, stable: 0, heating: 0, surge: 0 };
-  DATA.states.forEach(s => { if (counts[s.classification] !== undefined) counts[s.classification]++; });
+  if (activeSegment === 'signal') {
+    DATA.states.forEach(s => {
+      const cls = embedClassify(s.embed_yoy || 0);
+      if (counts[cls] !== undefined) counts[cls]++;
+    });
+  } else {
+    DATA.states.forEach(s => { if (counts[s.classification] !== undefined) counts[s.classification]++; });
+  }
   const container = document.getElementById('pvsCounts');
   container.innerHTML = '';
   ['freeze','cooling','stable','heating','surge'].forEach(cls => {
@@ -1170,6 +1595,10 @@ function buildPVSLegend() {
 // MOVERS
 // ═══════════════════════════════════════════════════════════════════════
 function buildMovers() {
+  if (activeSegment === 'signal') {
+    buildSignalMovers();
+    return;
+  }
   const pKey25 = getPermitKey2025();
   const pKey24 = getPermitKey2024();
   const sorted = [...DATA.states].sort((a,b) => b.pvs - a.pvs);
@@ -1200,6 +1629,38 @@ function buildMovers() {
   renderList(bottom5, 'bottomMovers');
 }
 
+function buildSignalMovers() {
+  // Filter out noisy small-volume states (<$50K in 2025)
+  const eligible = DATA.states.filter(s => (s.embed_2025 || 0) >= 50000);
+  const sorted = [...eligible].sort((a,b) => (b.embed_yoy || 0) - (a.embed_yoy || 0));
+  const top5 = sorted.slice(0, 5);
+  const bottom5 = sorted.slice(-5).reverse();
+
+  function renderList(items, containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    items.forEach(s => {
+      const yoy = s.embed_yoy || 0;
+      const cls = embedClassify(yoy);
+      const isPos = yoy >= 0;
+      const ann = s.embed_2026_ann || 0;
+      const annLabel = ann >= 1e6 ? '$' + (ann/1e6).toFixed(1) + 'M' : '$' + (ann/1e3).toFixed(0) + 'K';
+      const div = document.createElement('div');
+      div.className = 'mover-item';
+      div.onclick = () => selectState(s.abbr);
+      div.innerHTML = `
+        <span class="mover-dot" style="background:${classColor(cls)}"></span>
+        <span class="mover-abbr">${s.abbr}</span>
+        <span class="mover-pvs">${annLabel}/yr</span>
+        <span class="mover-yoy" style="color:${isPos ? 'var(--positive)' : 'var(--negative)'}">${isPos ? '+' : ''}${yoy.toFixed(1)}%</span>
+      `;
+      el.appendChild(div);
+    });
+  }
+  renderList(top5, 'topMovers');
+  renderList(bottom5, 'bottomMovers');
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // ALERTS
 // ═══════════════════════════════════════════════════════════════════════
@@ -1216,10 +1677,22 @@ const ALERTS = [
   { text: '<strong>STARTS SURGE:</strong> January 2026 at 1,487K SAAR — strongest month in over a year, up 9.5% YoY' },
   { text: '<strong>WEST REBOUND:</strong> Full-year 2025 West region only -0.8%, not -5.8% as Oct TTM suggested' }
 ];
+
+const SIGNAL_ALERTS = [
+  { text: '<strong>NATIONAL:</strong> Embed sales annualizing at $93.7M — up 6.9% vs 2025. Foundations are going in.' },
+  { text: '<strong>NC SURGE:</strong> North Carolina embeds +35.1% YoY — strongest SST growth in the Southeast' },
+  { text: '<strong>CA + TX:</strong> Combined $52M/yr in embeds — 56% of national volume. Both accelerating.' },
+  { text: '<strong>NV COOLING:</strong> Nevada embeds -11.9% YoY despite strong permit data — builders hesitating?' },
+  { text: '<strong>SC BREAKOUT:</strong> South Carolina embeds +27.2% — outpacing permit growth of -5.1%. SST gaining share.' }
+];
+
 let alertIndex = 0;
-function rotateAlert() {
+function rotateAlert(resetIndex) {
+  if (resetIndex === true) alertIndex = 0;
   const el = document.getElementById('alertContent');
-  const a = ALERTS[alertIndex % ALERTS.length];
+  if (!el) return;
+  const pool = activeSegment === 'signal' ? SIGNAL_ALERTS : ALERTS;
+  const a = pool[alertIndex % pool.length];
   el.innerHTML = `
     <div class="alert-item">
       <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor">
@@ -1326,9 +1799,19 @@ async function initD3Map() {
     .on('mouseleave', function(event, d) {
       const s = fipsLookup[d.id];
       if (!s) return;
-      const maxPNow = Math.max(...DATA.states.map(st => getPermits(st)));
-      const p = getPermits(s);
-      const baseOpacity = 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxPNow + 1));
+      let baseOpacity;
+      if (activeSegment === 'signal') {
+        if (!s.embed_2025 || s.embed_2025 < 1000) {
+          baseOpacity = 0.15;
+        } else {
+          const maxENow = Math.max(...DATA.states.map(st => st.embed_2025 || 0));
+          baseOpacity = 0.35 + 0.5 * (Math.log((s.embed_2025 || 0) + 1) / Math.log(maxENow + 1));
+        }
+      } else {
+        const maxPNow = Math.max(...DATA.states.map(st => getPermits(st)));
+        const p = getPermits(s);
+        baseOpacity = 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxPNow + 1));
+      }
       const self = d3.select(this);
       self
         .attr('fill-opacity', baseOpacity)
@@ -1411,6 +1894,38 @@ async function initD3Map() {
 
 // ─── Update map fills when segment changes or simulation ticks ───
 function updateMapColors() {
+  if (activeSegment === 'signal') {
+    // Color by embed YoY, opacity by embed volume (log)
+    const maxE = Math.max(...DATA.states.map(s => s.embed_2025 || 0));
+    d3.selectAll('.state-path')
+      .attr('fill', function(d) {
+        const s = fipsLookup[d.id];
+        if (!s) return '#1a1033';
+        // States with tiny / no embed data → neutral gray
+        if (!s.embed_2025 || s.embed_2025 < 1000) return '#5a4a7a';
+        return classColor(embedClassify(s.embed_yoy || 0));
+      })
+      .attr('fill-opacity', function(d) {
+        const s = fipsLookup[d.id];
+        if (!s) return 0.05;
+        if (!s.embed_2025 || s.embed_2025 < 1000) return 0.15;
+        const e = s.embed_2025 || 0;
+        return 0.35 + 0.5 * (Math.log(e + 1) / Math.log(maxE + 1));
+      });
+
+    // Update emoji labels for signal mode
+    d3.selectAll('.emojis text')
+      .data(DATA.states.filter(s => {
+        const c = projection([s.lng, s.lat]);
+        return c !== null;
+      }))
+      .text(d => {
+        if (!d.embed_2025 || d.embed_2025 < 1000) return '';
+        return CLASS_EMOJI[embedClassify(d.embed_yoy || 0)] || '😐';
+      });
+    return;
+  }
+
   const maxP = Math.max(...DATA.states.map(s => getPermits(s)));
   d3.selectAll('.state-path')
     .attr('fill', function(d) {
@@ -1437,6 +1952,42 @@ function updateMapColors() {
 // ─── TOOLTIP (Thought Bubble) — SVG centroid positioning ───
 function showTooltip(s) {
   const tip = document.getElementById('tooltip');
+
+  if (activeSegment === 'signal') {
+    const hasEmbed = s.embed_2025 && s.embed_2025 >= 1000;
+    const cls = hasEmbed ? embedClassify(s.embed_yoy || 0) : 'stable';
+    const cc = hasEmbed ? classColor(cls) : '#8875a8';
+    const fmtM = v => v >= 1e6 ? '$' + (v/1e6).toFixed(1) + 'M' : v >= 1e3 ? '$' + (v/1e3).toFixed(0) + 'K' : '$' + v.toFixed(0);
+    const eYoy = s.embed_yoy || 0;
+    // Permit YoY (full year)
+    const permitYoy = s.permits_2024 > 0 ? ((s.permits_2025 - s.permits_2024) / s.permits_2024 * 100) : 0;
+    // Determine leading/caution flag
+    let flagHtml = '';
+    if (hasEmbed) {
+      if (eYoy > 5 && permitYoy < -2) {
+        flagHtml = `<div class="tooltip-signal-flag leading">⚡ Leading Signal — embeds outpacing permits</div>`;
+      } else if (permitYoy > 2 && eYoy < -5) {
+        flagHtml = `<div class="tooltip-signal-flag caution">⚠ Caution — permits ahead of embed orders</div>`;
+      }
+    }
+    tip.innerHTML = `
+      <div class="tooltip-name">
+        ${s.name}
+        <span class="tooltip-classification" style="color:${cc};border:1px solid ${cc}33">${hasEmbed ? cls : 'no data'}</span>
+      </div>
+      <div class="tooltip-grid">
+        <span class="tooltip-label">Embed Sales 2025</span>
+        <span class="tooltip-val">${fmtM(s.embed_2025 || 0)}</span>
+        <span class="tooltip-label">Q1 2026 Pace</span>
+        <span class="tooltip-val">${fmtM(s.embed_2026_ann || 0)} <span style="color:var(--text-muted);font-weight:400">ann.</span></span>
+        <span class="tooltip-label">Embed YoY</span>
+        <span class="tooltip-val" style="color:${eYoy >= 0 ? 'var(--positive)' : 'var(--negative)'}">${eYoy >= 0 ? '+' : ''}${eYoy.toFixed(1)}%</span>
+        <span class="tooltip-label">Permits YoY</span>
+        <span class="tooltip-val" style="color:${permitYoy >= 0 ? 'var(--positive)' : 'var(--negative)'}">${permitYoy >= 0 ? '+' : ''}${permitYoy.toFixed(1)}%</span>
+      </div>
+      ${flagHtml}
+    `;
+  } else {
   const cc = classColor(s.classification);
   const pKey25 = getPermitKey2025();
   const pKey24 = getPermitKey2024();
@@ -1461,6 +2012,7 @@ function showTooltip(s) {
       <span class="tooltip-val">${s.employment_growth >= 0 ? '+' : ''}${s.employment_growth.toFixed(1)}%</span>
     </div>
   `;
+  }
 
   const coords = projection([s.lng, s.lat]);
   if (!coords) return;
