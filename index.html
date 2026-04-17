@@ -761,7 +761,7 @@ html, body {
     <div class="header-right">
       <div class="live-badge"><span class="live-dot"></span> LIVE</div>
       <div class="header-time" id="headerTime">—</div>
-      <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-left:6px; white-space:nowrap;">Data as of: Apr 2026</div>
+      <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-left:6px; white-space:nowrap;">Data as of: Apr 17, 2026</div>
     </div>
   </header>
 
@@ -844,14 +844,14 @@ html, body {
 const DATA = {
   national: {
     mortgage_rate_30yr: {
-      current: 6.40, prior_month: 6.30, year_ago: 6.73,
+      current: 6.40, prior_month: 6.18, year_ago: 6.73,
       source: "Bankrate/WSJ",
       history: [
         {date:"2025-01",value:6.96},{date:"2025-02",value:6.85},{date:"2025-03",value:6.73},
         {date:"2025-04",value:6.81},{date:"2025-05",value:6.78},{date:"2025-06",value:6.72},
         {date:"2025-07",value:6.68},{date:"2025-08",value:6.61},{date:"2025-09",value:6.55},
         {date:"2025-10",value:6.48},{date:"2025-11",value:6.25},{date:"2025-12",value:6.19},
-        {date:"2026-01",value:6.15},{date:"2026-02",value:6.05},{date:"2026-03",value:6.30},
+        {date:"2026-01",value:6.15},{date:"2026-02",value:6.05},{date:"2026-03",value:6.18},
         {date:"2026-04",value:6.40}
       ]
     },
@@ -887,13 +887,13 @@ const DATA = {
       ]
     },
     unemployment_rate: {
-      current: 4.4, prior_month: 4.3, year_ago: 4.2,
+      current: 4.3, prior_month: 4.4, year_ago: 4.2,
       history: [
         {date:"2025-01",value:4.0},{date:"2025-02",value:4.1},{date:"2025-03",value:4.2},
         {date:"2025-04",value:4.2},{date:"2025-05",value:4.2},{date:"2025-06",value:4.2},
         {date:"2025-07",value:4.3},{date:"2025-08",value:4.2},{date:"2025-09",value:4.3},
         {date:"2025-10",value:4.3},{date:"2025-11",value:4.5},{date:"2025-12",value:4.4},
-        {date:"2026-01",value:4.3},{date:"2026-02",value:4.4}
+        {date:"2026-01",value:4.3},{date:"2026-02",value:4.4},{date:"2026-03",value:4.3}
       ]
     },
     tariff_impact: {
@@ -1676,7 +1676,11 @@ const ALERTS = [
   { text: '<strong>LUMBER:</strong> Canadian softwood duties now ~45% (was 14.5%) — cabinet/vanity tariffs at 50%' },
   { text: '<strong>HMI CRASH:</strong> Builder confidence fell to 34 in April — 6-month outlook dropped 7 points on tariff fears' },
   { text: '<strong>STARTS SURGE:</strong> January 2026 at 1,487K SAAR — strongest month in over a year, up 9.5% YoY' },
-  { text: '<strong>WEST REBOUND:</strong> Full-year 2025 West region only -0.8%, not -5.8% as Oct TTM suggested' }
+  { text: '<strong>WEST REBOUND:</strong> Full-year 2025 West region only -0.8%, not -5.8% as Oct TTM suggested' },
+  { text: '<strong>Q1 REPORT:</strong> SST underperforming market by -110 bps — residential -3% vs flat market' },
+  { text: '<strong>ZONDA REVISED:</strong> 2026 forecast now -3.6% (was -0.1% in Q4) — fifth consecutive year of decline' },
+  { text: '<strong>GDP DECEL:</strong> Q4 2025 GDP +0.7% — sharp slowdown from Q3\'s +4.4%' },
+  { text: '<strong>OEM BRIGHT SPOT:</strong> SST OEM segment +13% vs market +1% — outperforming by 12 points' }
 ];
 
 const SIGNAL_ALERTS = [
