@@ -1213,6 +1213,7 @@ function switchSegment(seg) {
   updateMapColors();
   rotateAlert(true);
   if (selectedState) selectState(selectedState.abbr);
+  renderSignalIcons();
 }
 
 function updateCorrelationPanel() {
@@ -1733,8 +1734,17 @@ async function initD3Map() {
     .style('width', '100%')
     .style('height', '100%');
 
-  // SVG Defs — glow filter
+  // SVG Defs — glow filter + crystal ball gradient
   const defs = svg.append('defs');
+
+  // Crystal ball radial gradient for Simpson Signal icons
+  const crystalGrad = defs.append('radialGradient')
+    .attr('id', 'crystalGrad')
+    .attr('cx', '35%').attr('cy', '35%').attr('r', '65%');
+  crystalGrad.append('stop').attr('offset', '0%').attr('stop-color', '#c4b5fd');
+  crystalGrad.append('stop').attr('offset', '50%').attr('stop-color', '#7c3aed');
+  crystalGrad.append('stop').attr('offset', '100%').attr('stop-color', '#3b0764');
+
   const glowFilter = defs.append('filter')
     .attr('id', 'glow')
     .attr('x', '-50%').attr('y', '-50%')
@@ -1892,6 +1902,94 @@ async function initD3Map() {
     .text(d => CLASS_EMOJI[d.classification] || '😐');
 }
 
+// ─── Signal Icons: Crystal Balls & Smoke Clouds ───
+function renderSignalIcons() {
+  // Always remove stale icons first
+  d3.select('#map svg .signal-icons').remove();
+
+  if (activeSegment !== 'signal') return;
+
+  const g = d3.select('#map svg').append('g').attr('class', 'signal-icons');
+
+  DATA.states.forEach(s => {
+    if (!s.embed_yoy || !s.embed_2025 || s.embed_2025 < 1000) return;
+    const coords = projection([s.lng, s.lat]);
+    if (!coords) return;
+
+    const x = coords[0] + 14; // offset right of state abbreviation
+    const y = coords[1] - 2;
+
+    if (s.embed_yoy > 0) {
+      // Crystal ball — spinning for positive YoY embed growth
+      const opacity = Math.min(1.0, 0.5 + (s.embed_yoy / 40));
+
+      const ball = g.append('g')
+        .attr('class', 'signal-crystal')
+        .attr('opacity', opacity);
+
+      // Ball sphere with gradient
+      ball.append('circle')
+        .attr('cx', x).attr('cy', y).attr('r', 7)
+        .attr('fill', 'url(#crystalGrad)')
+        .attr('stroke', '#a78bfa').attr('stroke-width', 0.5);
+
+      // Shine highlight (rotated ellipse)
+      ball.append('ellipse')
+        .attr('cx', x - 2).attr('cy', y - 2)
+        .attr('rx', 2.5).attr('ry', 1.5)
+        .attr('fill', 'rgba(255,255,255,0.4)')
+        .attr('transform', `rotate(-30, ${x - 2}, ${y - 2})`);
+
+      // Stand / base
+      ball.append('path')
+        .attr('d', `M${x - 4},${y + 7} L${x - 5},${y + 10} L${x + 5},${y + 10} L${x + 4},${y + 7}`)
+        .attr('fill', '#6366f1').attr('opacity', 0.7);
+
+      // Spin animation on the ball group
+      ball.append('animateTransform')
+        .attr('attributeName', 'transform')
+        .attr('type', 'rotate')
+        .attr('from', `0 ${x} ${y}`)
+        .attr('to', `360 ${x} ${y}`)
+        .attr('dur', '8s')
+        .attr('repeatCount', 'indefinite');
+
+    } else if (s.embed_yoy < -5) {
+      // Smoke cloud — floating for negative YoY embed decline
+      const severity = Math.min(1, Math.abs(s.embed_yoy) / 50);
+      const size = 0.6 + severity * 0.6;
+      const baseOpacity = 0.3 + severity * 0.4;
+      const dur = (3 + (Math.abs(s.embed_yoy) % 2)).toFixed(1) + 's';
+
+      const smoke = g.append('g').attr('class', 'signal-smoke');
+
+      // Cloud puffs (3 overlapping circles)
+      const puff = smoke.append('g')
+        .attr('transform', `translate(${x}, ${y}) scale(${size})`)
+        .attr('opacity', baseOpacity);
+
+      puff.append('circle').attr('cx', -3).attr('cy', 0).attr('r', 4).attr('fill', '#888');
+      puff.append('circle').attr('cx', 2).attr('cy', -1).attr('r', 5).attr('fill', '#777');
+      puff.append('circle').attr('cx', 5).attr('cy', 1).attr('r', 3.5).attr('fill', '#999');
+
+      // Float upward animation on the wrapper group
+      smoke.append('animateTransform')
+        .attr('attributeName', 'transform')
+        .attr('type', 'translate')
+        .attr('values', `0 0; 0 -5; 0 0`)
+        .attr('dur', dur)
+        .attr('repeatCount', 'indefinite');
+
+      // Fade animation on the puff group
+      puff.append('animate')
+        .attr('attributeName', 'opacity')
+        .attr('values', `${baseOpacity}; ${(baseOpacity * 0.4).toFixed(2)}; ${baseOpacity}`)
+        .attr('dur', dur)
+        .attr('repeatCount', 'indefinite');
+    }
+  });
+}
+
 // ─── Update map fills when segment changes or simulation ticks ───
 function updateMapColors() {
   if (activeSegment === 'signal') {
@@ -1923,8 +2021,12 @@ function updateMapColors() {
         if (!d.embed_2025 || d.embed_2025 < 1000) return '';
         return CLASS_EMOJI[embedClassify(d.embed_yoy || 0)] || '😐';
       });
+    renderSignalIcons();
     return;
   }
+
+  // When not in signal mode, clear any leftover icons
+  renderSignalIcons();
 
   const maxP = Math.max(...DATA.states.map(s => getPermits(s)));
   d3.selectAll('.state-path')
