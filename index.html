@@ -2395,13 +2395,22 @@ async function initD3Map() {
   // SVG Defs — glow filter + crystal ball gradient
   const defs = svg.append('defs');
 
-  // Crystal ball radial gradient for Simpson Signal icons
+  // Crystal ball radial gradient — dramatic glassy purple sphere
   const crystalGrad = defs.append('radialGradient')
     .attr('id', 'crystalGrad')
-    .attr('cx', '35%').attr('cy', '35%').attr('r', '65%');
-  crystalGrad.append('stop').attr('offset', '0%').attr('stop-color', '#c4b5fd');
-  crystalGrad.append('stop').attr('offset', '50%').attr('stop-color', '#7c3aed');
-  crystalGrad.append('stop').attr('offset', '100%').attr('stop-color', '#3b0764');
+    .attr('cx', '35%').attr('cy', '30%').attr('r', '70%');
+  crystalGrad.append('stop').attr('offset', '0%').attr('stop-color', '#e9d5ff');
+  crystalGrad.append('stop').attr('offset', '20%').attr('stop-color', '#c4b5fd');
+  crystalGrad.append('stop').attr('offset', '50%').attr('stop-color', '#8b5cf6');
+  crystalGrad.append('stop').attr('offset', '80%').attr('stop-color', '#6d28d9');
+  crystalGrad.append('stop').attr('offset', '100%').attr('stop-color', '#2e1065');
+
+  // Crystal ball OUTER GLOW gradient (purple halo)
+  const crystalGlow = defs.append('radialGradient')
+    .attr('id', 'crystalGlow')
+    .attr('cx', '50%').attr('cy', '50%').attr('r', '50%');
+  crystalGlow.append('stop').attr('offset', '0%').attr('stop-color', '#a78bfa').attr('stop-opacity', 0.5);
+  crystalGlow.append('stop').attr('offset', '100%').attr('stop-color', '#a78bfa').attr('stop-opacity', 0);
 
   const glowFilter = defs.append('filter')
     .attr('id', 'glow')
@@ -2561,6 +2570,176 @@ async function initD3Map() {
 }
 
 // ─── Signal Icons: Crystal Balls & Smoke Clouds ───
+
+// Draw a dramatic, 3D crystal ball at the given map coordinate.
+function drawCrystalBall(g, x, y, opacity, yoy) {
+  // Size scales with growth — bigger for bigger growth (10-18px radius)
+  const size = 10 + Math.min(8, Math.max(0, yoy) / 4);
+
+  const ball = g.append('g')
+    .attr('class', 'signal-crystal')
+    .attr('transform', `translate(${x}, ${y})`)
+    .attr('opacity', opacity);
+
+  // BASE — wooden/gold stand (two tiers)
+  // Lower base (wider)
+  ball.append('ellipse')
+    .attr('cx', 0).attr('cy', size * 1.1).attr('rx', size * 0.9).attr('ry', size * 0.15)
+    .attr('fill', '#8b5a2b').attr('opacity', 0.9);
+  // Upper base neck
+  ball.append('path')
+    .attr('d', `M${-size*0.5},${size*0.8} L${-size*0.7},${size*1.1} L${size*0.7},${size*1.1} L${size*0.5},${size*0.8} Z`)
+    .attr('fill', '#6b4423').attr('opacity', 0.9);
+
+  // GLOW HALO behind ball
+  ball.append('circle')
+    .attr('cx', 0).attr('cy', 0).attr('r', size * 1.4)
+    .attr('fill', 'url(#crystalGlow)')
+    .attr('opacity', 0.6);
+
+  // BALL — main sphere with radial gradient (purple glassy)
+  ball.append('circle')
+    .attr('cx', 0).attr('cy', 0).attr('r', size)
+    .attr('fill', 'url(#crystalGrad)')
+    .attr('stroke', '#a78bfa').attr('stroke-width', 0.8)
+    .attr('stroke-opacity', 0.5);
+
+  // INNER SWIRL — animated mystical energy rings
+  const swirlGroup = ball.append('g');
+  swirlGroup.append('ellipse')
+    .attr('cx', 0).attr('cy', 0)
+    .attr('rx', size * 0.7).attr('ry', size * 0.3)
+    .attr('fill', 'none')
+    .attr('stroke', '#fbbf24').attr('stroke-width', 1.2)
+    .attr('stroke-opacity', 0.5)
+    .attr('transform', 'rotate(30)');
+  swirlGroup.append('ellipse')
+    .attr('cx', 0).attr('cy', 0)
+    .attr('rx', size * 0.8).attr('ry', size * 0.2)
+    .attr('fill', 'none')
+    .attr('stroke', '#ec4899').attr('stroke-width', 1)
+    .attr('stroke-opacity', 0.4)
+    .attr('transform', 'rotate(-20)');
+
+  // Rotate the swirl continuously (the "crystal ball energy")
+  swirlGroup.append('animateTransform')
+    .attr('attributeName', 'transform')
+    .attr('type', 'rotate')
+    .attr('from', '0')
+    .attr('to', '360')
+    .attr('dur', '6s')
+    .attr('repeatCount', 'indefinite');
+
+  // HIGHLIGHT — white shine at top-left (makes it look glassy)
+  ball.append('ellipse')
+    .attr('cx', -size * 0.35).attr('cy', -size * 0.4)
+    .attr('rx', size * 0.3).attr('ry', size * 0.2)
+    .attr('fill', 'white').attr('opacity', 0.7)
+    .attr('transform', `rotate(-30 ${-size*0.35} ${-size*0.4})`);
+
+  // Small secondary highlight
+  ball.append('circle')
+    .attr('cx', size * 0.3).attr('cy', size * 0.2)
+    .attr('r', size * 0.1)
+    .attr('fill', 'white').attr('opacity', 0.3);
+
+  // SPARKLES around the ball for magic effect
+  for (let i = 0; i < 3; i++) {
+    const angle = (i * 120 + Math.random() * 60) * Math.PI / 180;
+    const dist = size * 1.5;
+    const sx = Math.cos(angle) * dist;
+    const sy = Math.sin(angle) * dist;
+    const sparkle = ball.append('g')
+      .attr('transform', `translate(${sx}, ${sy})`);
+    // 4-point star
+    sparkle.append('path')
+      .attr('d', 'M0,-3 L0.8,-0.8 L3,0 L0.8,0.8 L0,3 L-0.8,0.8 L-3,0 L-0.8,-0.8 Z')
+      .attr('fill', '#fbbf24')
+      .attr('opacity', 0.8);
+    sparkle.append('animate')
+      .attr('attributeName', 'opacity')
+      .attr('values', '0.2;1;0.2')
+      .attr('dur', `${1.5 + Math.random()}s`)
+      .attr('repeatCount', 'indefinite');
+  }
+}
+
+// Draw a puffy, rising smoke cloud with ember at the base.
+function drawSmoke(g, x, y, severity) {
+  // severity 0-1. Bigger/darker for worse declines.
+  const baseSize = 8 + severity * 8; // 8-16px puffs
+
+  const smoke = g.append('g')
+    .attr('class', 'signal-smoke')
+    .attr('transform', `translate(${x}, ${y})`);
+
+  // Draw 3 CLOUDS rising at different times
+  for (let i = 0; i < 3; i++) {
+    const delay = i * 0.9; // stagger
+    const cloudSize = baseSize * (0.7 + i * 0.15); // clouds grow as they rise
+    const cloud = smoke.append('g')
+      .attr('opacity', 0);
+
+    // Multi-puff cloud (5 overlapping circles for proper cloud shape)
+    const puffs = [
+      {cx: -cloudSize*0.3, cy: 0, r: cloudSize*0.35},
+      {cx: 0, cy: -cloudSize*0.15, r: cloudSize*0.45},
+      {cx: cloudSize*0.3, cy: -cloudSize*0.1, r: cloudSize*0.4},
+      {cx: cloudSize*0.5, cy: cloudSize*0.1, r: cloudSize*0.3},
+      {cx: -cloudSize*0.1, cy: cloudSize*0.15, r: cloudSize*0.28},
+    ];
+
+    // Darker grey outer (the shadow)
+    puffs.forEach(p => {
+      cloud.append('circle')
+        .attr('cx', p.cx + 1).attr('cy', p.cy + 1).attr('r', p.r)
+        .attr('fill', '#1a1033').attr('opacity', 0.4);
+    });
+    // Main grey body
+    puffs.forEach(p => {
+      cloud.append('circle')
+        .attr('cx', p.cx).attr('cy', p.cy).attr('r', p.r)
+        .attr('fill', '#6b7280').attr('opacity', 0.85);
+    });
+    // Lighter highlights
+    puffs.forEach(p => {
+      cloud.append('circle')
+        .attr('cx', p.cx - p.r*0.2).attr('cy', p.cy - p.r*0.3).attr('r', p.r * 0.5)
+        .attr('fill', '#9ca3af').attr('opacity', 0.6);
+    });
+
+    // RISING ANIMATION with fade
+    cloud.append('animateTransform')
+      .attr('attributeName', 'transform')
+      .attr('type', 'translate')
+      .attr('values', `0 ${cloudSize*0.5};0 ${-cloudSize*1.5}`)
+      .attr('dur', '2.7s')
+      .attr('begin', `${delay}s`)
+      .attr('repeatCount', 'indefinite');
+
+    // Fade: invisible, grow to full, fade out
+    cloud.append('animate')
+      .attr('attributeName', 'opacity')
+      .attr('values', '0;0.9;0.7;0')
+      .attr('keyTimes', '0;0.25;0.7;1')
+      .attr('dur', '2.7s')
+      .attr('begin', `${delay}s`)
+      .attr('repeatCount', 'indefinite');
+  }
+
+  // Small flame/ember at base (source of smoke)
+  const ember = smoke.append('g');
+  ember.append('ellipse')
+    .attr('cx', 0).attr('cy', baseSize * 0.6)
+    .attr('rx', baseSize * 0.3).attr('ry', baseSize * 0.15)
+    .attr('fill', '#fb923c').attr('opacity', 0.7);
+  ember.append('animate')
+    .attr('attributeName', 'opacity')
+    .attr('values', '0.4;0.9;0.4')
+    .attr('dur', '0.8s')
+    .attr('repeatCount', 'indefinite');
+}
+
 function renderSignalIcons() {
   // Always remove stale icons first
   d3.select('#map svg .signal-icons').remove();
@@ -2574,85 +2753,32 @@ function renderSignalIcons() {
 
   DATA.states.forEach(s => {
     const yoy = useSegments ? segYoY(s) : (s.embed_yoy || 0);
-    const volume = useSegments ? segVal2025(s) : (s.embed_2025 || 0);
-    const volThreshold = useSegments ? 1e6 : 1000; // $1M for segments, $1K for embeds
-    if (!yoy || !volume || volume < volThreshold) return;
+    // Gate rendering on real data for the active tab
+    if (useSegments) {
+      const segVol = segVal2025(s);
+      if (!segVol || segVol <= 0) return;
+    } else {
+      if (!s.embed_2025 || s.embed_2025 <= 1000) return;
+    }
+    if (!yoy) return;
     const coords = projection([s.lng, s.lat]);
     if (!coords) return;
 
-    const x = coords[0] + 14; // offset right of state abbreviation
-    const y = coords[1] - 2;
+    const cx = coords[0];
+    const cy = coords[1];
 
     if (yoy > 0) {
-      // Crystal ball — spinning for positive YoY embed growth
-      const opacity = Math.min(1.0, 0.5 + (s.embed_yoy / 40));
-
-      const ball = g.append('g')
-        .attr('class', 'signal-crystal')
-        .attr('opacity', opacity);
-
-      // Ball sphere with gradient
-      ball.append('circle')
-        .attr('cx', x).attr('cy', y).attr('r', 7)
-        .attr('fill', 'url(#crystalGrad)')
-        .attr('stroke', '#a78bfa').attr('stroke-width', 0.5);
-      // Compute opacity using the local yoy
-      const opacityLocal = Math.min(1.0, 0.5 + (yoy / 40));
-      ball.attr('opacity', opacityLocal);
-
-      // Shine highlight (rotated ellipse)
-      ball.append('ellipse')
-        .attr('cx', x - 2).attr('cy', y - 2)
-        .attr('rx', 2.5).attr('ry', 1.5)
-        .attr('fill', 'rgba(255,255,255,0.4)')
-        .attr('transform', `rotate(-30, ${x - 2}, ${y - 2})`);
-
-      // Stand / base
-      ball.append('path')
-        .attr('d', `M${x - 4},${y + 7} L${x - 5},${y + 10} L${x + 5},${y + 10} L${x + 4},${y + 7}`)
-        .attr('fill', '#6366f1').attr('opacity', 0.7);
-
-      // Spin animation on the ball group
-      ball.append('animateTransform')
-        .attr('attributeName', 'transform')
-        .attr('type', 'rotate')
-        .attr('from', `0 ${x} ${y}`)
-        .attr('to', `360 ${x} ${y}`)
-        .attr('dur', '8s')
-        .attr('repeatCount', 'indefinite');
-
+      // Crystal ball — positioned to the right, slightly below the label
+      const x = cx + 20;
+      const y = cy + 2;
+      const opacity = Math.min(1.0, 0.6 + (yoy / 50));
+      drawCrystalBall(g, x, y, opacity, yoy);
     } else if (yoy < -5) {
-      // Smoke cloud — floating for negative YoY decline
+      // Smoke cloud — positioned to the left of label so smoke rises into empty space
+      const x = cx - 18;
+      const y = cy + 4;
       const severity = Math.min(1, Math.abs(yoy) / 50);
-      const size = 0.6 + severity * 0.6;
-      const baseOpacity = 0.3 + severity * 0.4;
-      const dur = (3 + (Math.abs(yoy) % 2)).toFixed(1) + 's';
-
-      const smoke = g.append('g').attr('class', 'signal-smoke');
-
-      // Cloud puffs (3 overlapping circles)
-      const puff = smoke.append('g')
-        .attr('transform', `translate(${x}, ${y}) scale(${size})`)
-        .attr('opacity', baseOpacity);
-
-      puff.append('circle').attr('cx', -3).attr('cy', 0).attr('r', 4).attr('fill', '#888');
-      puff.append('circle').attr('cx', 2).attr('cy', -1).attr('r', 5).attr('fill', '#777');
-      puff.append('circle').attr('cx', 5).attr('cy', 1).attr('r', 3.5).attr('fill', '#999');
-
-      // Float upward animation on the wrapper group
-      smoke.append('animateTransform')
-        .attr('attributeName', 'transform')
-        .attr('type', 'translate')
-        .attr('values', `0 0; 0 -5; 0 0`)
-        .attr('dur', dur)
-        .attr('repeatCount', 'indefinite');
-
-      // Fade animation on the puff group
-      puff.append('animate')
-        .attr('attributeName', 'opacity')
-        .attr('values', `${baseOpacity}; ${(baseOpacity * 0.4).toFixed(2)}; ${baseOpacity}`)
-        .attr('dur', dur)
-        .attr('repeatCount', 'indefinite');
+      drawSmoke(g, x, y, severity);
     }
   });
 }
