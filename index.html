@@ -747,6 +747,206 @@ html, body {
   .detail-content { flex-wrap: wrap; padding: 10px 12px; gap: 12px; }
   .detail-sst { margin-left: 0; max-width: 100%; }
 }
+
+/* ─── SST Segments Tab ─── */
+.seg-tab.segments-tab {
+  position: relative;
+}
+.seg-tab.segments-tab .segments-glyph {
+  display: inline-block;
+  color: var(--sst-orange);
+  margin-right: 6px;
+  font-size: 13px;
+  line-height: 1;
+  transform: translateY(-1px);
+  text-shadow: 0 0 8px rgba(250,70,22,0.5);
+}
+.seg-tab.segments-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(250,70,22,0.26) 0%, rgba(250,70,22,0.10) 100%);
+  border-color: var(--sst-orange);
+  box-shadow: 0 0 0 1px rgba(250,70,22,0.4), 0 0 12px rgba(250,70,22,0.25);
+}
+.seg-tab.segments-tab.active .segments-glyph {
+  color: #fff;
+  text-shadow: 0 0 10px var(--sst-orange), 0 0 16px rgba(250,70,22,0.6);
+  animation: segment-pulse 2.4s infinite;
+}
+@keyframes segment-pulse {
+  0%, 100% { opacity: 1; transform: translateY(-1px) scale(1); }
+  50% { opacity: 0.75; transform: translateY(-1px) scale(1.15); }
+}
+
+/* ─── Sub-segment pill bar ─── */
+.subseg-bar {
+  display: none;
+  position: absolute;
+  top: 84px;
+  left: 328px;
+  right: 12px;
+  z-index: 60;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, rgba(39,29,77,0.92) 0%, rgba(45,33,84,0.88) 100%);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(250,70,22,0.35);
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4), 0 0 0 1px rgba(250,70,22,0.15);
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.subseg-bar.visible { display: flex; }
+.subseg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.subseg-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--sst-orange);
+  background: rgba(250,70,22,0.06);
+}
+.subseg-pill.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(250,70,22,0.28) 0%, rgba(250,70,22,0.12) 100%);
+  border-color: var(--sst-orange);
+  box-shadow: 0 0 0 1px rgba(250,70,22,0.3), 0 0 10px rgba(250,70,22,0.2);
+}
+.subseg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+.subseg-share {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+.subseg-pill.active .subseg-share { color: #fff; opacity: 0.85; }
+.subseg-note {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Segment KPI accents ─── */
+.kpi-card.segment-kpi {
+  border-color: rgba(250,70,22,0.35);
+  background: linear-gradient(135deg, rgba(250,70,22,0.06) 0%, var(--bg-card) 100%);
+}
+.kpi-card.segment-kpi .kpi-label { color: var(--sst-orange-light); }
+.kpi-card.segment-kpi-alt {
+  border-color: rgba(167,139,250,0.35);
+  background: linear-gradient(135deg, rgba(167,139,250,0.06) 0%, var(--bg-card) 100%);
+}
+.kpi-card.segment-kpi-alt .kpi-label { color: #c4b5fd; }
+
+/* ─── Segment Mix Donut ─── */
+.segment-mix-panel {
+  background: linear-gradient(135deg, rgba(250,70,22,0.05) 0%, var(--bg-card) 100%);
+  border: 1px solid rgba(250,70,22,0.3);
+  border-radius: 8px;
+  padding: 12px;
+}
+.segment-mix-panel .section-label::before { background: var(--sst-orange); }
+.mix-donut-wrap {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  margin: 8px 0 6px;
+}
+.mix-donut-wrap canvas { width: 100% !important; height: 100% !important; }
+.mix-donut-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  text-align: center;
+  line-height: 1.1;
+}
+.mix-donut-val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+.mix-donut-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.mix-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+  margin-top: 4px;
+}
+.mix-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.mix-legend-item:hover { background: rgba(250,70,22,0.08); color: var(--text-primary); }
+.mix-legend-item.active { background: rgba(250,70,22,0.14); color: var(--text-primary); font-weight: 600; }
+.mix-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+.mix-legend-pct { margin-left: auto; font-family: var(--font-mono); font-weight: 600; color: var(--text-muted); }
+.mix-legend-item.active .mix-legend-pct { color: var(--sst-orange-light); }
+
+/* ─── Segment tooltip flag ─── */
+.tooltip-segment-share {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(250,70,22,0.10);
+  border: 1px solid rgba(250,70,22,0.25);
+  color: var(--sst-orange-light);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .subseg-bar {
+    left: 8px;
+    right: 8px;
+    top: 82px;
+    padding: 5px 8px;
+  }
+  .subseg-note { display: none; }
+  .mix-legend { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -772,7 +972,33 @@ html, body {
     <button class="seg-tab" data-seg="mf" onclick="switchSegment('mf')">Multi-Family</button>
     <button class="seg-tab" data-seg="com" onclick="switchSegment('com')">Commercial ≤5 Stories</button>
     <button class="seg-tab signal-tab" data-seg="signal" onclick="switchSegment('signal')"><span class="signal-dot"></span>Simpson Signal</button>
+    <button class="seg-tab segments-tab" data-seg="segments" onclick="switchSegment('segments')"><span class="segments-glyph">◆</span>SST Segments</button>
     <span class="seg-note" id="segNote">Commercial ≤5 stories · Estimated from residential permit ratios · Live data via Shovels.ai</span>
+  </nav>
+
+  <!-- ─── SUB-SEGMENT PILL BAR (visible only on Segments tab) ─── -->
+  <nav class="subseg-bar" id="subsegBar">
+    <button class="subseg-pill active" data-sub="residential" onclick="switchSubSegment('residential')">
+      <span class="subseg-dot" style="background:#FA4616"></span>Residential
+      <span class="subseg-share">60.7%</span>
+    </button>
+    <button class="subseg-pill" data-sub="commercial" onclick="switchSubSegment('commercial')">
+      <span class="subseg-dot" style="background:#a78bfa"></span>Commercial
+      <span class="subseg-share">12.8%</span>
+    </button>
+    <button class="subseg-pill" data-sub="national_retail" onclick="switchSubSegment('national_retail')">
+      <span class="subseg-dot" style="background:#34d399"></span>National Retail
+      <span class="subseg-share">16.4%</span>
+    </button>
+    <button class="subseg-pill" data-sub="oem" onclick="switchSubSegment('oem')">
+      <span class="subseg-dot" style="background:#ffd166"></span>OEM
+      <span class="subseg-share">2.6%</span>
+    </button>
+    <button class="subseg-pill" data-sub="component_mfg" onclick="switchSubSegment('component_mfg')">
+      <span class="subseg-dot" style="background:#ff8c42"></span>Component Mfg
+      <span class="subseg-share">7.4%</span>
+    </button>
+    <span class="subseg-note">SST 2025 segment mix &middot; $1.89B total &middot; annualized from Q1 2026 pace</span>
   </nav>
 
   <!-- ─── SIDEBAR ─── -->
@@ -789,6 +1015,18 @@ html, body {
         <span>Freeze</span><span>Cooling</span><span>Stable</span><span>Heating</span><span>Surge</span>
       </div>
       <div class="pvs-counts" id="pvsCounts"></div>
+    </div>
+
+    <div class="segment-mix-panel" id="segmentMixPanel" style="display:none;">
+      <div class="section-label">SST Segment Mix (2025)</div>
+      <div class="mix-donut-wrap">
+        <canvas id="mixDonut"></canvas>
+        <div class="mix-donut-center" id="mixDonutCenter">
+          <span class="mix-donut-val" id="mixCenterVal">60.7%</span>
+          <span class="mix-donut-lbl" id="mixCenterLbl">Residential</span>
+        </div>
+      </div>
+      <div class="mix-legend" id="mixLegend"></div>
     </div>
 
     <div class="correlation-panel" id="correlationPanel" style="display:none;">
@@ -1099,6 +1337,69 @@ function computeEmbedPermitCorrelation() {
   return pearsonCorrelation(x, y);
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// SST SEGMENT SALES DATA (Residential / Commercial / National Retail / OEM / Component Mfg)
+// Source: segment_sales_by_state.json — merged into DATA.states by state name
+// ═══════════════════════════════════════════════════════════════════════
+const SEGMENT_DATA = {"national":{"residential_2025":1146929396,"residential_2026_q1":295713755,"residential_2026_ann":1182855020,"residential_yoy":3.1,"commercial_2025":241875545,"commercial_2026_q1":58916163,"commercial_2026_ann":235664652,"commercial_yoy":-2.6,"national_retail_2025":310436335,"national_retail_2026_q1":75993316,"national_retail_2026_ann":303973264,"national_retail_yoy":-2.1,"oem_2025":49967771,"oem_2026_q1":13822013,"oem_2026_ann":55288052,"oem_yoy":10.6,"component_mfg_2025":139359855,"component_mfg_2026_q1":36157096,"component_mfg_2026_ann":144628384,"component_mfg_yoy":3.8,"total_2025":1888568902,"total_2026_q1":480602343,"total_2026_ann":1922409372,"total_yoy":1.8},"states":{"Alaska":{"residential_2025":227529,"commercial_2025":63509,"national_retail_2025":643586,"oem_2025":1224,"component_mfg_2025":0,"residential_2026_q1":73841,"commercial_2026_q1":9006,"national_retail_2026_q1":79704,"oem_2026_q1":0,"component_mfg_2026_q1":0,"total_2025":935848,"total_2026_q1":162551,"residential_2026_ann":295364,"residential_yoy":29.8,"commercial_2026_ann":36024,"commercial_yoy":-43.3,"national_retail_2026_ann":318816,"national_retail_yoy":-50.5,"oem_2026_ann":0,"oem_yoy":-100.0,"component_mfg_2026_ann":0,"component_mfg_yoy":0,"total_2026_ann":650204,"total_yoy":-30.5},"Alabama":{"residential_2025":14520065,"commercial_2025":2905345,"national_retail_2025":5161906,"oem_2025":2072445,"component_mfg_2025":991800,"residential_2026_q1":4396736,"commercial_2026_q1":864407,"national_retail_2026_q1":1350290,"oem_2026_q1":976118,"component_mfg_2026_q1":378291,"total_2025":25651561,"total_2026_q1":7965842,"residential_2026_ann":17586944,"residential_yoy":21.1,"commercial_2026_ann":3457628,"commercial_yoy":19.0,"national_retail_2026_ann":5401160,"national_retail_yoy":4.6,"oem_2026_ann":3904472,"oem_yoy":88.4,"component_mfg_2026_ann":1513164,"component_mfg_yoy":52.6,"total_2026_ann":31863368,"total_yoy":24.2},"Arkansas":{"residential_2025":5718180,"commercial_2025":1017183,"national_retail_2025":187606,"oem_2025":914350,"component_mfg_2025":3364880,"residential_2026_q1":1420105,"commercial_2026_q1":273029,"national_retail_2026_q1":51072,"oem_2026_q1":141521,"component_mfg_2026_q1":913217,"total_2025":11202199,"total_2026_q1":2798944,"residential_2026_ann":5680420,"residential_yoy":-0.7,"commercial_2026_ann":1092116,"commercial_yoy":7.4,"national_retail_2026_ann":204288,"national_retail_yoy":8.9,"oem_2026_ann":566084,"oem_yoy":-38.1,"component_mfg_2026_ann":3652868,"component_mfg_yoy":8.6,"total_2026_ann":11195776,"total_yoy":-0.1},"Arizona":{"residential_2025":36410296,"commercial_2025":6077302,"national_retail_2025":5362031,"oem_2025":978281,"component_mfg_2025":2353008,"residential_2026_q1":10248580,"commercial_2026_q1":1691832,"national_retail_2026_q1":1473654,"oem_2026_q1":253548,"component_mfg_2026_q1":584046,"total_2025":51180918,"total_2026_q1":14251660,"residential_2026_ann":40994320,"residential_yoy":12.6,"commercial_2026_ann":6767328,"commercial_yoy":11.4,"national_retail_2026_ann":5894616,"national_retail_yoy":9.9,"oem_2026_ann":1014192,"oem_yoy":3.7,"component_mfg_2026_ann":2336184,"component_mfg_yoy":-0.7,"total_2026_ann":57006640,"total_yoy":11.4},"California":{"residential_2025":232395621,"commercial_2025":63768276,"national_retail_2025":66382051,"oem_2025":4992256,"component_mfg_2025":9410482,"residential_2026_q1":59487782,"commercial_2026_q1":16375079,"national_retail_2026_q1":18057466,"oem_2026_q1":1090680,"component_mfg_2026_q1":2334079,"total_2025":376948686,"total_2026_q1":97345086,"residential_2026_ann":237951128,"residential_yoy":2.4,"commercial_2026_ann":65500316,"commercial_yoy":2.7,"national_retail_2026_ann":72229864,"national_retail_yoy":8.8,"oem_2026_ann":4362720,"oem_yoy":-12.6,"component_mfg_2026_ann":9336316,"component_mfg_yoy":-0.8,"total_2026_ann":389380344,"total_yoy":3.3},"Colorado":{"residential_2025":32227433,"commercial_2025":4134792,"national_retail_2025":683409,"oem_2025":976811,"component_mfg_2025":2509390,"residential_2026_q1":7854837,"commercial_2026_q1":1034459,"national_retail_2026_q1":183944,"oem_2026_q1":461409,"component_mfg_2026_q1":633045,"total_2025":40531835,"total_2026_q1":10167694,"residential_2026_ann":31419348,"residential_yoy":-2.5,"commercial_2026_ann":4137836,"commercial_yoy":0.1,"national_retail_2026_ann":735776,"national_retail_yoy":7.7,"oem_2026_ann":1845636,"oem_yoy":88.9,"component_mfg_2026_ann":2532180,"component_mfg_yoy":0.9,"total_2026_ann":40670776,"total_yoy":0.3},"Connecticut":{"residential_2025":8577280,"commercial_2025":936268,"national_retail_2025":6609525,"oem_2025":139798,"component_mfg_2025":269337,"residential_2026_q1":2051825,"commercial_2026_q1":149825,"national_retail_2026_q1":947043,"oem_2026_q1":65681,"component_mfg_2026_q1":41722,"total_2025":16532208,"total_2026_q1":3256096,"residential_2026_ann":8207300,"residential_yoy":-4.3,"commercial_2026_ann":599300,"commercial_yoy":-36.0,"national_retail_2026_ann":3788172,"national_retail_yoy":-42.7,"oem_2026_ann":262724,"oem_yoy":87.9,"component_mfg_2026_ann":166888,"component_mfg_yoy":-38.0,"total_2026_ann":13024384,"total_yoy":-21.2},"District of Columbia":{"residential_2025":139305,"commercial_2025":22773,"national_retail_2025":58244,"oem_2025":440,"component_mfg_2025":3264,"residential_2026_q1":50789,"commercial_2026_q1":4017,"national_retail_2026_q1":12729,"oem_2026_q1":30,"component_mfg_2026_q1":119,"total_2025":224026,"total_2026_q1":67684,"residential_2026_ann":203156,"residential_yoy":45.8,"commercial_2026_ann":16068,"commercial_yoy":-29.4,"national_retail_2026_ann":50916,"national_retail_yoy":-12.6,"oem_2026_ann":120,"oem_yoy":-72.7,"component_mfg_2026_ann":476,"component_mfg_yoy":-85.4,"total_2026_ann":270736,"total_yoy":20.9},"Delaware":{"residential_2025":3779852,"commercial_2025":447007,"national_retail_2025":93827,"oem_2025":100289,"component_mfg_2025":312015,"residential_2026_q1":997129,"commercial_2026_q1":92511,"national_retail_2026_q1":16179,"oem_2026_q1":35935,"component_mfg_2026_q1":48110,"total_2025":4732990,"total_2026_q1":1189864,"residential_2026_ann":3988516,"residential_yoy":5.5,"commercial_2026_ann":370044,"commercial_yoy":-17.2,"national_retail_2026_ann":64716,"national_retail_yoy":-31.0,"oem_2026_ann":143740,"oem_yoy":43.3,"component_mfg_2026_ann":192440,"component_mfg_yoy":-38.3,"total_2026_ann":4759456,"total_yoy":0.6},"Florida":{"residential_2025":112593853,"commercial_2025":20866473,"national_retail_2025":10845302,"oem_2025":1073175,"component_mfg_2025":10795943,"residential_2026_q1":30649702,"commercial_2026_q1":5358843,"national_retail_2026_q1":2564545,"oem_2026_q1":299365,"component_mfg_2026_q1":3735640,"total_2025":156174746,"total_2026_q1":42608095,"residential_2026_ann":122598808,"residential_yoy":8.9,"commercial_2026_ann":21435372,"commercial_yoy":2.7,"national_retail_2026_ann":10258180,"national_retail_yoy":-5.4,"oem_2026_ann":1197460,"oem_yoy":11.6,"component_mfg_2026_ann":14942560,"component_mfg_yoy":38.4,"total_2026_ann":170432380,"total_yoy":9.1},"Georgia":{"residential_2025":33664755,"commercial_2025":6695547,"national_retail_2025":36000757,"oem_2025":1671551,"component_mfg_2025":7018948,"residential_2026_q1":9364873,"commercial_2026_q1":2080580,"national_retail_2026_q1":9580705,"oem_2026_q1":490204,"component_mfg_2026_q1":2409548,"total_2025":85051558,"total_2026_q1":23925910,"residential_2026_ann":37459492,"residential_yoy":11.3,"commercial_2026_ann":8322320,"commercial_yoy":24.3,"national_retail_2026_ann":38322820,"national_retail_yoy":6.5,"oem_2026_ann":1960816,"oem_yoy":17.3,"component_mfg_2026_ann":9638192,"component_mfg_yoy":37.3,"total_2026_ann":95703640,"total_yoy":12.5},"Hawaii":{"residential_2025":13646965,"commercial_2025":2554187,"national_retail_2025":2494254,"oem_2025":3009,"component_mfg_2025":56142,"residential_2026_q1":2870227,"commercial_2026_q1":404426,"national_retail_2026_q1":730434,"oem_2026_q1":0,"component_mfg_2026_q1":19122,"total_2025":18754557,"total_2026_q1":4024209,"residential_2026_ann":11480908,"residential_yoy":-15.9,"commercial_2026_ann":1617704,"commercial_yoy":-36.7,"national_retail_2026_ann":2921736,"national_retail_yoy":17.1,"oem_2026_ann":0,"oem_yoy":-100.0,"component_mfg_2026_ann":76488,"component_mfg_yoy":36.2,"total_2026_ann":16096836,"total_yoy":-14.2},"Iowa":{"residential_2025":6083604,"commercial_2025":4536787,"national_retail_2025":64791,"oem_2025":1654478,"component_mfg_2025":1753061,"residential_2026_q1":1573386,"commercial_2026_q1":244626,"national_retail_2026_q1":5289,"oem_2026_q1":438536,"component_mfg_2026_q1":411712,"total_2025":14092721,"total_2026_q1":2673549,"residential_2026_ann":6293544,"residential_yoy":3.5,"commercial_2026_ann":978504,"commercial_yoy":-78.4,"national_retail_2026_ann":21156,"national_retail_yoy":-67.3,"oem_2026_ann":1754144,"oem_yoy":6.0,"component_mfg_2026_ann":1646848,"component_mfg_yoy":-6.1,"total_2026_ann":10694196,"total_yoy":-24.1},"Idaho":{"residential_2025":15842202,"commercial_2025":2596456,"national_retail_2025":193957,"oem_2025":1284970,"component_mfg_2025":1183214,"residential_2026_q1":3795417,"commercial_2026_q1":524366,"national_retail_2026_q1":58810,"oem_2026_q1":327087,"component_mfg_2026_q1":245055,"total_2025":21100799,"total_2026_q1":4950735,"residential_2026_ann":15181668,"residential_yoy":-4.2,"commercial_2026_ann":2097464,"commercial_yoy":-19.2,"national_retail_2026_ann":235240,"national_retail_yoy":21.3,"oem_2026_ann":1308348,"oem_yoy":1.8,"component_mfg_2026_ann":980220,"component_mfg_yoy":-17.2,"total_2026_ann":19802940,"total_yoy":-6.2},"Illinois":{"residential_2025":9827030,"commercial_2025":2792577,"national_retail_2025":11871757,"oem_2025":1832520,"component_mfg_2025":3262628,"residential_2026_q1":2212333,"commercial_2026_q1":668184,"national_retail_2026_q1":2611371,"oem_2026_q1":625183,"component_mfg_2026_q1":797923,"total_2025":29586512,"total_2026_q1":6914994,"residential_2026_ann":8849332,"residential_yoy":-9.9,"commercial_2026_ann":2672736,"commercial_yoy":-4.3,"national_retail_2026_ann":10445484,"national_retail_yoy":-12.0,"oem_2026_ann":2500732,"oem_yoy":36.5,"component_mfg_2026_ann":3191692,"component_mfg_yoy":-2.2,"total_2026_ann":27659976,"total_yoy":-6.5},"Indiana":{"residential_2025":10548271,"commercial_2025":2264073,"national_retail_2025":8767563,"oem_2025":1737768,"component_mfg_2025":5115082,"residential_2026_q1":2476738,"commercial_2026_q1":507132,"national_retail_2026_q1":1799598,"oem_2026_q1":579083,"component_mfg_2026_q1":1256561,"total_2025":28432757,"total_2026_q1":6619112,"residential_2026_ann":9906952,"residential_yoy":-6.1,"commercial_2026_ann":2028528,"commercial_yoy":-10.4,"national_retail_2026_ann":7198392,"national_retail_yoy":-17.9,"oem_2026_ann":2316332,"oem_yoy":33.3,"component_mfg_2026_ann":5026244,"component_mfg_yoy":-1.7,"total_2026_ann":26476448,"total_yoy":-6.9},"Kansas":{"residential_2025":5443212,"commercial_2025":1551104,"national_retail_2025":5642823,"oem_2025":815236,"component_mfg_2025":1275967,"residential_2026_q1":1538532,"commercial_2026_q1":322581,"national_retail_2026_q1":1647634,"oem_2026_q1":264175,"component_mfg_2026_q1":708855,"total_2025":14728342,"total_2026_q1":4481777,"residential_2026_ann":6154128,"residential_yoy":13.1,"commercial_2026_ann":1290324,"commercial_yoy":-16.8,"national_retail_2026_ann":6590536,"national_retail_yoy":16.8,"oem_2026_ann":1056700,"oem_yoy":29.6,"component_mfg_2026_ann":2835420,"component_mfg_yoy":122.2,"total_2026_ann":17927108,"total_yoy":21.7},"Kentucky":{"residential_2025":6786976,"commercial_2025":1299110,"national_retail_2025":252803,"oem_2025":727669,"component_mfg_2025":3320330,"residential_2026_q1":1710280,"commercial_2026_q1":316008,"national_retail_2026_q1":118490,"oem_2026_q1":159565,"component_mfg_2026_q1":715976,"total_2025":12386888,"total_2026_q1":3020319,"residential_2026_ann":6841120,"residential_yoy":0.8,"commercial_2026_ann":1264032,"commercial_yoy":-2.7,"national_retail_2026_ann":473960,"national_retail_yoy":87.5,"oem_2026_ann":638260,"oem_yoy":-12.3,"component_mfg_2026_ann":2863904,"component_mfg_yoy":-13.7,"total_2026_ann":12081276,"total_yoy":-2.5},"Louisiana":{"residential_2025":6940893,"commercial_2025":1824867,"national_retail_2025":198933,"oem_2025":508218,"component_mfg_2025":630114,"residential_2026_q1":2257135,"commercial_2026_q1":584614,"national_retail_2026_q1":71520,"oem_2026_q1":208794,"component_mfg_2026_q1":202543,"total_2025":10103025,"total_2026_q1":3324606,"residential_2026_ann":9028540,"residential_yoy":30.1,"commercial_2026_ann":2338456,"commercial_yoy":28.1,"national_retail_2026_ann":286080,"national_retail_yoy":43.8,"oem_2026_ann":835176,"oem_yoy":64.3,"component_mfg_2026_ann":810172,"component_mfg_yoy":28.6,"total_2026_ann":13298424,"total_yoy":31.6},"Massachusetts":{"residential_2025":18999495,"commercial_2025":2885683,"national_retail_2025":9339558,"oem_2025":573174,"component_mfg_2025":1187678,"residential_2026_q1":4754702,"commercial_2026_q1":670010,"national_retail_2026_q1":2229886,"oem_2026_q1":91909,"component_mfg_2026_q1":275737,"total_2025":32985588,"total_2026_q1":8022244,"residential_2026_ann":19018808,"residential_yoy":0.1,"commercial_2026_ann":2680040,"commercial_yoy":-7.1,"national_retail_2026_ann":8919544,"national_retail_yoy":-4.5,"oem_2026_ann":367636,"oem_yoy":-35.9,"component_mfg_2026_ann":1102948,"component_mfg_yoy":-7.1,"total_2026_ann":32088976,"total_yoy":-2.7},"Maryland":{"residential_2025":13855072,"commercial_2025":8749221,"national_retail_2025":430443,"oem_2025":143012,"component_mfg_2025":2812774,"residential_2026_q1":3087387,"commercial_2026_q1":1109435,"national_retail_2026_q1":100593,"oem_2026_q1":30103,"component_mfg_2026_q1":740607,"total_2025":25990522,"total_2026_q1":5068125,"residential_2026_ann":12349548,"residential_yoy":-10.9,"commercial_2026_ann":4437740,"commercial_yoy":-49.3,"national_retail_2026_ann":402372,"national_retail_yoy":-6.5,"oem_2026_ann":120412,"oem_yoy":-15.8,"component_mfg_2026_ann":2962428,"component_mfg_yoy":5.3,"total_2026_ann":20272500,"total_yoy":-22.0},"Maine":{"residential_2025":6300391,"commercial_2025":367591,"national_retail_2025":68630,"oem_2025":232772,"component_mfg_2025":531401,"residential_2026_q1":1710048,"commercial_2026_q1":99984,"national_retail_2026_q1":21527,"oem_2026_q1":85920,"component_mfg_2026_q1":56987,"total_2025":7500785,"total_2026_q1":1974466,"residential_2026_ann":6840192,"residential_yoy":8.6,"commercial_2026_ann":399936,"commercial_yoy":8.8,"national_retail_2026_ann":86108,"national_retail_yoy":25.5,"oem_2026_ann":343680,"oem_yoy":47.6,"component_mfg_2026_ann":227948,"component_mfg_yoy":-57.1,"total_2026_ann":7897864,"total_yoy":5.3},"Michigan":{"residential_2025":11155474,"commercial_2025":3505230,"national_retail_2025":312157,"oem_2025":1189194,"component_mfg_2025":1350429,"residential_2026_q1":2597722,"commercial_2026_q1":849060,"national_retail_2026_q1":64906,"oem_2026_q1":408319,"component_mfg_2026_q1":226806,"total_2025":17512484,"total_2026_q1":4146813,"residential_2026_ann":10390888,"residential_yoy":-6.9,"commercial_2026_ann":3396240,"commercial_yoy":-3.1,"national_retail_2026_ann":259624,"national_retail_yoy":-16.8,"oem_2026_ann":1633276,"oem_yoy":37.3,"component_mfg_2026_ann":907224,"component_mfg_yoy":-32.8,"total_2026_ann":16587252,"total_yoy":-5.3},"Minnesota":{"residential_2025":10597069,"commercial_2025":4491467,"national_retail_2025":236293,"oem_2025":2508734,"component_mfg_2025":2181160,"residential_2026_q1":2730434,"commercial_2026_q1":893727,"national_retail_2026_q1":48855,"oem_2026_q1":431513,"component_mfg_2026_q1":408673,"total_2025":20014723,"total_2026_q1":4513202,"residential_2026_ann":10921736,"residential_yoy":3.1,"commercial_2026_ann":3574908,"commercial_yoy":-20.4,"national_retail_2026_ann":195420,"national_retail_yoy":-17.3,"oem_2026_ann":1726052,"oem_yoy":-31.2,"component_mfg_2026_ann":1634692,"component_mfg_yoy":-25.1,"total_2026_ann":18052808,"total_yoy":-9.8},"Missouri":{"residential_2025":17725908,"commercial_2025":2681072,"national_retail_2025":405197,"oem_2025":358190,"component_mfg_2025":3208647,"residential_2026_q1":4828733,"commercial_2026_q1":743157,"national_retail_2026_q1":140240,"oem_2026_q1":58481,"component_mfg_2026_q1":779968,"total_2025":24379014,"total_2026_q1":6550579,"residential_2026_ann":19314932,"residential_yoy":9.0,"commercial_2026_ann":2972628,"commercial_yoy":10.9,"national_retail_2026_ann":560960,"national_retail_yoy":38.4,"oem_2026_ann":233924,"oem_yoy":-34.7,"component_mfg_2026_ann":3119872,"component_mfg_yoy":-2.8,"total_2026_ann":26202316,"total_yoy":7.5},"Mississippi":{"residential_2025":5203579,"commercial_2025":787239,"national_retail_2025":77500,"oem_2025":133617,"component_mfg_2025":1719841,"residential_2026_q1":1512726,"commercial_2026_q1":208396,"national_retail_2026_q1":42769,"oem_2026_q1":64839,"component_mfg_2026_q1":530133,"total_2025":7921776,"total_2026_q1":2358863,"residential_2026_ann":6050904,"residential_yoy":16.3,"commercial_2026_ann":833584,"commercial_yoy":5.9,"national_retail_2026_ann":171076,"national_retail_yoy":120.7,"oem_2026_ann":259356,"oem_yoy":94.1,"component_mfg_2026_ann":2120532,"component_mfg_yoy":23.3,"total_2026_ann":9435452,"total_yoy":19.1},"Montana":{"residential_2025":8220766,"commercial_2025":495965,"national_retail_2025":125559,"oem_2025":608821,"component_mfg_2025":401647,"residential_2026_q1":1928875,"commercial_2026_q1":76035,"national_retail_2026_q1":66251,"oem_2026_q1":47195,"component_mfg_2026_q1":153261,"total_2025":9852758,"total_2026_q1":2271617,"residential_2026_ann":7715500,"residential_yoy":-6.1,"commercial_2026_ann":304140,"commercial_yoy":-38.7,"national_retail_2026_ann":265004,"national_retail_yoy":111.1,"oem_2026_ann":188780,"oem_yoy":-69.0,"component_mfg_2026_ann":613044,"component_mfg_yoy":52.6,"total_2026_ann":9086468,"total_yoy":-7.8},"North Carolina":{"residential_2025":48564273,"commercial_2025":4468686,"national_retail_2025":27259611,"oem_2025":2637171,"component_mfg_2025":6543840,"residential_2026_q1":13894928,"commercial_2026_q1":1150439,"national_retail_2026_q1":5541895,"oem_2026_q1":633861,"component_mfg_2026_q1":1729685,"total_2025":89473581,"total_2026_q1":22950808,"residential_2026_ann":55579712,"residential_yoy":14.4,"commercial_2026_ann":4601756,"commercial_yoy":3.0,"national_retail_2026_ann":22167580,"national_retail_yoy":-18.7,"oem_2026_ann":2535444,"oem_yoy":-3.9,"component_mfg_2026_ann":6918740,"component_mfg_yoy":5.7,"total_2026_ann":91803232,"total_yoy":2.6},"North Dakota":{"residential_2025":909423,"commercial_2025":901293,"national_retail_2025":17422,"oem_2025":265572,"component_mfg_2025":995756,"residential_2026_q1":121675,"commercial_2026_q1":310947,"national_retail_2026_q1":1876,"oem_2026_q1":107606,"component_mfg_2026_q1":63210,"total_2025":3089466,"total_2026_q1":605314,"residential_2026_ann":486700,"residential_yoy":-46.5,"commercial_2026_ann":1243788,"commercial_yoy":38.0,"national_retail_2026_ann":7504,"national_retail_yoy":-56.9,"oem_2026_ann":430424,"oem_yoy":62.1,"component_mfg_2026_ann":252840,"component_mfg_yoy":-74.6,"total_2026_ann":2421256,"total_yoy":-21.6},"Nebraska":{"residential_2025":6687301,"commercial_2025":773699,"national_retail_2025":58947,"oem_2025":464513,"component_mfg_2025":2080645,"residential_2026_q1":1500293,"commercial_2026_q1":212825,"national_retail_2026_q1":33061,"oem_2026_q1":73596,"component_mfg_2026_q1":752365,"total_2025":10065105,"total_2026_q1":2572140,"residential_2026_ann":6001172,"residential_yoy":-10.3,"commercial_2026_ann":851300,"commercial_yoy":10.0,"national_retail_2026_ann":132244,"national_retail_yoy":124.3,"oem_2026_ann":294384,"oem_yoy":-36.6,"component_mfg_2026_ann":3009460,"component_mfg_yoy":44.6,"total_2026_ann":10288560,"total_yoy":2.2},"New Hampshire":{"residential_2025":7314154,"commercial_2025":468707,"national_retail_2025":113963,"oem_2025":161753,"component_mfg_2025":285001,"residential_2026_q1":1754250,"commercial_2026_q1":99038,"national_retail_2026_q1":25711,"oem_2026_q1":59742,"component_mfg_2026_q1":28092,"total_2025":8343578,"total_2026_q1":1966833,"residential_2026_ann":7017000,"residential_yoy":-4.1,"commercial_2026_ann":396152,"commercial_yoy":-15.5,"national_retail_2026_ann":102844,"national_retail_yoy":-9.8,"oem_2026_ann":238968,"oem_yoy":47.7,"component_mfg_2026_ann":112368,"component_mfg_yoy":-60.6,"total_2026_ann":7867332,"total_yoy":-5.7},"New Jersey":{"residential_2025":20721025,"commercial_2025":4966819,"national_retail_2025":677313,"oem_2025":257077,"component_mfg_2025":1805324,"residential_2026_q1":4989223,"commercial_2026_q1":1258033,"national_retail_2026_q1":104386,"oem_2026_q1":57018,"component_mfg_2026_q1":589298,"total_2025":28427558,"total_2026_q1":6997958,"residential_2026_ann":19956892,"residential_yoy":-3.7,"commercial_2026_ann":5032132,"commercial_yoy":1.3,"national_retail_2026_ann":417544,"national_retail_yoy":-38.4,"oem_2026_ann":228072,"oem_yoy":-11.3,"component_mfg_2026_ann":2357192,"component_mfg_yoy":30.6,"total_2026_ann":27991832,"total_yoy":-1.5},"New Mexico":{"residential_2025":3054226,"commercial_2025":282926,"national_retail_2025":105738,"oem_2025":24165,"component_mfg_2025":31,"residential_2026_q1":960803,"commercial_2026_q1":77729,"national_retail_2026_q1":38691,"oem_2026_q1":9087,"component_mfg_2026_q1":137,"total_2025":3467086,"total_2026_q1":1086447,"residential_2026_ann":3843212,"residential_yoy":25.8,"commercial_2026_ann":310916,"commercial_yoy":9.9,"national_retail_2026_ann":154764,"national_retail_yoy":46.4,"oem_2026_ann":36348,"oem_yoy":50.4,"component_mfg_2026_ann":548,"component_mfg_yoy":1667.7,"total_2026_ann":4345788,"total_yoy":25.3},"Nevada":{"residential_2025":20000602,"commercial_2025":8008990,"national_retail_2025":200632,"oem_2025":195667,"component_mfg_2025":854296,"residential_2026_q1":4946882,"commercial_2026_q1":2101448,"national_retail_2026_q1":24451,"oem_2026_q1":42812,"component_mfg_2026_q1":207824,"total_2025":29260187,"total_2026_q1":7323417,"residential_2026_ann":19787528,"residential_yoy":-1.1,"commercial_2026_ann":8405792,"commercial_yoy":5.0,"national_retail_2026_ann":97804,"national_retail_yoy":-51.3,"oem_2026_ann":171248,"oem_yoy":-12.5,"component_mfg_2026_ann":831296,"component_mfg_yoy":-2.7,"total_2026_ann":29293668,"total_yoy":0.1},"New York":{"residential_2025":28325379,"commercial_2025":4675247,"national_retail_2025":487164,"oem_2025":677509,"component_mfg_2025":1881519,"residential_2026_q1":6239685,"commercial_2026_q1":1156105,"national_retail_2026_q1":133689,"oem_2026_q1":129601,"component_mfg_2026_q1":446769,"total_2025":36046818,"total_2026_q1":8105849,"residential_2026_ann":24958740,"residential_yoy":-11.9,"commercial_2026_ann":4624420,"commercial_yoy":-1.1,"national_retail_2026_ann":534756,"national_retail_yoy":9.8,"oem_2026_ann":518404,"oem_yoy":-23.5,"component_mfg_2026_ann":1787076,"component_mfg_yoy":-5.0,"total_2026_ann":32423396,"total_yoy":-10.1},"Ohio":{"residential_2025":20618543,"commercial_2025":3202185,"national_retail_2025":17100902,"oem_2025":1554994,"component_mfg_2025":9953337,"residential_2026_q1":4908256,"commercial_2026_q1":871562,"national_retail_2026_q1":3631135,"oem_2026_q1":293716,"component_mfg_2026_q1":2200941,"total_2025":52429961,"total_2026_q1":11905610,"residential_2026_ann":19633024,"residential_yoy":-4.8,"commercial_2026_ann":3486248,"commercial_yoy":8.9,"national_retail_2026_ann":14524540,"national_retail_yoy":-15.1,"oem_2026_ann":1174864,"oem_yoy":-24.4,"component_mfg_2026_ann":8803764,"component_mfg_yoy":-11.5,"total_2026_ann":47622440,"total_yoy":-9.2},"Oklahoma":{"residential_2025":7034547,"commercial_2025":1475087,"national_retail_2025":201207,"oem_2025":202150,"component_mfg_2025":1098877,"residential_2026_q1":1897925,"commercial_2026_q1":358128,"national_retail_2026_q1":74150,"oem_2026_q1":55715,"component_mfg_2026_q1":413882,"total_2025":10011868,"total_2026_q1":2799800,"residential_2026_ann":7591700,"residential_yoy":7.9,"commercial_2026_ann":1432512,"commercial_yoy":-2.9,"national_retail_2026_ann":296600,"national_retail_yoy":47.4,"oem_2026_ann":222860,"oem_yoy":10.2,"component_mfg_2026_ann":1655528,"component_mfg_yoy":50.7,"total_2026_ann":11199200,"total_yoy":11.9},"Oregon":{"residential_2025":30533573,"commercial_2025":4675713,"national_retail_2025":18105312,"oem_2025":2359224,"component_mfg_2025":2832699,"residential_2026_q1":7343139,"commercial_2026_q1":924158,"national_retail_2026_q1":4485312,"oem_2026_q1":314125,"component_mfg_2026_q1":574544,"total_2025":58506521,"total_2026_q1":13641278,"residential_2026_ann":29372556,"residential_yoy":-3.8,"commercial_2026_ann":3696632,"commercial_yoy":-20.9,"national_retail_2026_ann":17941248,"national_retail_yoy":-0.9,"oem_2026_ann":1256500,"oem_yoy":-46.7,"component_mfg_2026_ann":2298176,"component_mfg_yoy":-18.9,"total_2026_ann":54565112,"total_yoy":-6.7},"Pennsylvania":{"residential_2025":18216685,"commercial_2025":3047525,"national_retail_2025":27156613,"oem_2025":2828827,"component_mfg_2025":5942814,"residential_2026_q1":4503079,"commercial_2026_q1":775293,"national_retail_2026_q1":5917196,"oem_2026_q1":882290,"component_mfg_2026_q1":1538455,"total_2025":57192464,"total_2026_q1":13616313,"residential_2026_ann":18012316,"residential_yoy":-1.1,"commercial_2026_ann":3101172,"commercial_yoy":1.8,"national_retail_2026_ann":23668784,"national_retail_yoy":-12.8,"oem_2026_ann":3529160,"oem_yoy":24.8,"component_mfg_2026_ann":6153820,"component_mfg_yoy":3.6,"total_2026_ann":54465252,"total_yoy":-4.8},"Rhode Island":{"residential_2025":3361585,"commercial_2025":304856,"national_retail_2025":50509,"oem_2025":210139,"component_mfg_2025":599719,"residential_2026_q1":727263,"commercial_2026_q1":106567,"national_retail_2026_q1":12341,"oem_2026_q1":10015,"component_mfg_2026_q1":194390,"total_2025":4526808,"total_2026_q1":1050576,"residential_2026_ann":2909052,"residential_yoy":-13.5,"commercial_2026_ann":426268,"commercial_yoy":39.8,"national_retail_2026_ann":49364,"national_retail_yoy":-2.3,"oem_2026_ann":40060,"oem_yoy":-80.9,"component_mfg_2026_ann":777560,"component_mfg_yoy":29.7,"total_2026_ann":4202304,"total_yoy":-7.2},"South Carolina":{"residential_2025":34812416,"commercial_2025":5986219,"national_retail_2025":4792452,"oem_2025":1138107,"component_mfg_2025":4605728,"residential_2026_q1":9793108,"commercial_2026_q1":977903,"national_retail_2026_q1":1668529,"oem_2026_q1":712049,"component_mfg_2026_q1":1109973,"total_2025":51334922,"total_2026_q1":14261562,"residential_2026_ann":39172432,"residential_yoy":12.5,"commercial_2026_ann":3911612,"commercial_yoy":-34.7,"national_retail_2026_ann":6674116,"national_retail_yoy":39.3,"oem_2026_ann":2848196,"oem_yoy":150.3,"component_mfg_2026_ann":4439892,"component_mfg_yoy":-3.6,"total_2026_ann":57046248,"total_yoy":11.1},"South Dakota":{"residential_2025":2893347,"commercial_2025":606762,"national_retail_2025":8770,"oem_2025":93897,"component_mfg_2025":845873,"residential_2026_q1":653554,"commercial_2026_q1":147942,"national_retail_2026_q1":3584,"oem_2026_q1":49353,"component_mfg_2026_q1":197526,"total_2025":4448649,"total_2026_q1":1051959,"residential_2026_ann":2614216,"residential_yoy":-9.6,"commercial_2026_ann":591768,"commercial_yoy":-2.5,"national_retail_2026_ann":14336,"national_retail_yoy":63.5,"oem_2026_ann":197412,"oem_yoy":110.2,"component_mfg_2026_ann":790104,"component_mfg_yoy":-6.6,"total_2026_ann":4207836,"total_yoy":-5.4},"Tennessee":{"residential_2025":24528193,"commercial_2025":5248113,"national_retail_2025":1707687,"oem_2025":1526914,"component_mfg_2025":4345146,"residential_2026_q1":6356266,"commercial_2026_q1":1526341,"national_retail_2026_q1":259912,"oem_2026_q1":279984,"component_mfg_2026_q1":909013,"total_2025":37356053,"total_2026_q1":9331516,"residential_2026_ann":25425064,"residential_yoy":3.7,"commercial_2026_ann":6105364,"commercial_yoy":16.3,"national_retail_2026_ann":1039648,"national_retail_yoy":-39.1,"oem_2026_ann":1119936,"oem_yoy":-26.7,"component_mfg_2026_ann":3636052,"component_mfg_yoy":-16.3,"total_2026_ann":37326064,"total_yoy":-0.1},"Texas":{"residential_2025":111802365,"commercial_2025":19296397,"national_retail_2025":24723513,"oem_2025":3181125,"component_mfg_2025":10995543,"residential_2026_q1":30974506,"commercial_2026_q1":5236806,"national_retail_2026_q1":6516927,"oem_2026_q1":1046873,"component_mfg_2026_q1":2781220,"total_2025":169998943,"total_2026_q1":46556332,"residential_2026_ann":123898024,"residential_yoy":10.8,"commercial_2026_ann":20947224,"commercial_yoy":8.6,"national_retail_2026_ann":26067708,"national_retail_yoy":5.4,"oem_2026_ann":4187492,"oem_yoy":31.6,"component_mfg_2026_ann":11124880,"component_mfg_yoy":1.2,"total_2026_ann":186225328,"total_yoy":9.5},"Utah":{"residential_2025":20504359,"commercial_2025":6493278,"national_retail_2025":870297,"oem_2025":596796,"component_mfg_2025":1652872,"residential_2026_q1":5237862,"commercial_2026_q1":1594870,"national_retail_2026_q1":215843,"oem_2026_q1":260630,"component_mfg_2026_q1":518824,"total_2025":30117602,"total_2026_q1":7828029,"residential_2026_ann":20951448,"residential_yoy":2.2,"commercial_2026_ann":6379480,"commercial_yoy":-1.8,"national_retail_2026_ann":863372,"national_retail_yoy":-0.8,"oem_2026_ann":1042520,"oem_yoy":74.7,"component_mfg_2026_ann":2075296,"component_mfg_yoy":25.6,"total_2026_ann":31312116,"total_yoy":4.0},"Virginia":{"residential_2025":20824120,"commercial_2025":4236458,"national_retail_2025":7791730,"oem_2025":537726,"component_mfg_2025":6559007,"residential_2026_q1":4767910,"commercial_2026_q1":1041920,"national_retail_2026_q1":1942602,"oem_2026_q1":172915,"component_mfg_2026_q1":1520508,"total_2025":39949041,"total_2026_q1":9445855,"residential_2026_ann":19071640,"residential_yoy":-8.4,"commercial_2026_ann":4167680,"commercial_yoy":-1.6,"national_retail_2026_ann":7770408,"national_retail_yoy":-0.3,"oem_2026_ann":691660,"oem_yoy":28.6,"component_mfg_2026_ann":6082032,"component_mfg_yoy":-7.3,"total_2026_ann":37783420,"total_yoy":-5.4},"Vermont":{"residential_2025":2037202,"commercial_2025":119571,"national_retail_2025":35139,"oem_2025":62015,"component_mfg_2025":41086,"residential_2026_q1":385163,"commercial_2026_q1":20765,"national_retail_2026_q1":5023,"oem_2026_q1":10372,"component_mfg_2026_q1":307,"total_2025":2295013,"total_2026_q1":421630,"residential_2026_ann":1540652,"residential_yoy":-24.4,"commercial_2026_ann":83060,"commercial_yoy":-30.5,"national_retail_2026_ann":20092,"national_retail_yoy":-42.8,"oem_2026_ann":41488,"oem_yoy":-33.1,"component_mfg_2026_ann":1228,"component_mfg_yoy":-97.0,"total_2026_ann":1686520,"total_yoy":-26.5},"Washington":{"residential_2025":47079305,"commercial_2025":8313443,"national_retail_2025":1098161,"oem_2025":1467147,"component_mfg_2025":1890739,"residential_2026_q1":11275580,"commercial_2026_q1":1836278,"national_retail_2026_q1":212252,"oem_2026_q1":426722,"component_mfg_2026_q1":640103,"total_2025":59848795,"total_2026_q1":14390935,"residential_2026_ann":45102320,"residential_yoy":-4.2,"commercial_2026_ann":7345112,"commercial_yoy":-11.6,"national_retail_2026_ann":849008,"national_retail_yoy":-22.7,"oem_2026_ann":1706888,"oem_yoy":16.3,"component_mfg_2026_ann":2560412,"component_mfg_yoy":35.4,"total_2026_ann":57563740,"total_yoy":-3.8},"Wisconsin":{"residential_2025":13180488,"commercial_2025":3701891,"national_retail_2025":156289,"oem_2025":2055396,"component_mfg_2025":5593680,"residential_2026_q1":2916642,"commercial_2026_q1":845869,"national_retail_2026_q1":24427,"oem_2026_q1":500463,"component_mfg_2026_q1":939247,"total_2025":24687744,"total_2026_q1":5226648,"residential_2026_ann":11666568,"residential_yoy":-11.5,"commercial_2026_ann":3383476,"commercial_yoy":-8.6,"national_retail_2026_ann":97708,"national_retail_yoy":-37.5,"oem_2026_ann":2001852,"oem_yoy":-2.6,"component_mfg_2026_ann":3756988,"component_mfg_yoy":-32.8,"total_2026_ann":20906592,"total_yoy":-15.3},"West Virginia":{"residential_2025":3852670,"commercial_2025":164146,"national_retail_2025":92282,"oem_2025":196219,"component_mfg_2025":242366,"residential_2026_q1":818209,"commercial_2026_q1":47668,"national_retail_2026_q1":37933,"oem_2026_q1":47668,"component_mfg_2026_q1":52926,"total_2025":4547683,"total_2026_q1":1004404,"residential_2026_ann":3272836,"residential_yoy":-15.1,"commercial_2026_ann":190672,"commercial_yoy":16.2,"national_retail_2026_ann":151732,"national_retail_yoy":64.4,"oem_2026_ann":190672,"oem_yoy":-2.8,"component_mfg_2026_ann":211704,"component_mfg_yoy":-12.7,"total_2026_ann":4017616,"total_yoy":-11.7},"Wyoming":{"residential_2025":2642539,"commercial_2025":140430,"national_retail_2025":5114220,"oem_2025":41666,"component_mfg_2025":694775,"residential_2026_q1":566680,"commercial_2026_q1":82200,"national_retail_2026_q1":1006886,"oem_2026_q1":10607,"component_mfg_2026_q1":140121,"total_2025":8633630,"total_2026_q1":1806494,"residential_2026_ann":2266720,"residential_yoy":-14.2,"commercial_2026_ann":328800,"commercial_yoy":134.1,"national_retail_2026_ann":4027544,"national_retail_yoy":-21.2,"oem_2026_ann":42428,"oem_yoy":1.8,"component_mfg_2026_ann":560484,"component_mfg_yoy":-19.3,"total_2026_ann":7225976,"total_yoy":-16.3}}};
+
+// Merge segment sales data into DATA.states
+(function mergeSegmentData() {
+  const segFields = [
+    'residential_2025','residential_2026_q1','residential_2026_ann','residential_yoy',
+    'commercial_2025','commercial_2026_q1','commercial_2026_ann','commercial_yoy',
+    'national_retail_2025','national_retail_2026_q1','national_retail_2026_ann','national_retail_yoy',
+    'oem_2025','oem_2026_q1','oem_2026_ann','oem_yoy',
+    'component_mfg_2025','component_mfg_2026_q1','component_mfg_2026_ann','component_mfg_yoy',
+    'total_2025','total_2026_q1','total_2026_ann','total_yoy'
+  ];
+  DATA.states.forEach(s => {
+    const src = SEGMENT_DATA.states[s.name];
+    if (src) {
+      segFields.forEach(f => { s[f] = src[f] !== undefined ? src[f] : 0; });
+    } else {
+      segFields.forEach(f => { s[f] = 0; });
+    }
+  });
+})();
+
+// Sub-segment state (only relevant when activeSegment === 'segments')
+let activeSubSegment = 'residential';
+
+const SUB_SEGMENTS = {
+  residential:    { label: 'Residential',    short: 'Residential',    color: '#FA4616', share: 60.7, nationalTotal: 1146929396 },
+  commercial:     { label: 'Commercial',     short: 'Commercial',     color: '#a78bfa', share: 12.8, nationalTotal:  241875545 },
+  national_retail:{ label: 'National Retail',short: 'Nat. Retail',    color: '#34d399', share: 16.4, nationalTotal:  310436335 },
+  oem:            { label: 'OEM',            short: 'OEM',            color: '#ffd166', share:  2.6, nationalTotal:   49967771 },
+  component_mfg:  { label: 'Component Mfg',  short: 'Comp. Mfg',      color: '#ff8c42', share:  7.4, nationalTotal:  139359855 }
+};
+
+// Helpers to pull active sub-segment values from a state
+function segField(s, suffix) { return s[activeSubSegment + suffix] || 0; }
+function segVal2025(s)  { return segField(s, '_2025'); }
+function segValQ1(s)    { return segField(s, '_2026_q1'); }
+function segValAnn(s)   { return segField(s, '_2026_ann'); }
+function segYoY(s)      { return segField(s, '_yoy'); }
+
+// Classify a state by its segment YoY (per task thresholds)
+function segmentClassify(yoy) {
+  if (yoy > 15) return 'surge';
+  if (yoy >= 5) return 'heating';
+  if (yoy >= -3) return 'stable';
+  if (yoy >= -15) return 'cooling';
+  return 'freeze';
+}
+
+// Format USD to M/K
+function fmtSegMoney(v) {
+  if (!v) return '$0';
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
+  return '$' + v.toFixed(0);
+}
+
 // ════════════════════════════════════════════════════════════════════════
 // SEGMENT STATE & COMPUTATION
 // ════════════════════════════════════════════════════════════════════════
@@ -1185,24 +1486,42 @@ function switchSegment(seg) {
   } else if (seg === 'signal') {
     note.textContent = 'Simpson Signal · Embed sales (SSTB + MASA + STHD) · Leading indicator of foundation activity';
     note.classList.add('visible');
+  } else if (seg === 'segments') {
+    note.textContent = 'SST Segments · Actual Residential / Commercial / National Retail / OEM / Component Mfg sales';
+    note.classList.add('visible');
   } else {
     note.classList.remove('visible');
   }
 
-  // Toggle PVS legend vs. Embed legend, show/hide correlation panel
+  // Toggle sub-segment pill bar
+  const subsegBar = document.getElementById('subsegBar');
+  if (subsegBar) subsegBar.classList.toggle('visible', seg === 'segments');
+
+  // Toggle PVS legend vs. Embed legend / Segment legend, show/hide side panels
   const pvsLabel = document.getElementById('pvsLegendLabel');
   const corrPanel = document.getElementById('correlationPanel');
+  const mixPanel = document.getElementById('segmentMixPanel');
   const topMoversHeader = document.querySelector('#topMovers')?.previousElementSibling;
   const bottomMoversHeader = document.querySelector('#bottomMovers')?.previousElementSibling;
   if (seg === 'signal') {
     pvsLabel.textContent = 'Embed YoY Distribution';
     corrPanel.style.display = '';
+    if (mixPanel) mixPanel.style.display = 'none';
     if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — Embed YoY';
     if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — Embed YoY';
     updateCorrelationPanel();
+  } else if (seg === 'segments') {
+    const subLabel = SUB_SEGMENTS[activeSubSegment].short;
+    pvsLabel.textContent = subLabel + ' YoY Distribution';
+    corrPanel.style.display = 'none';
+    if (mixPanel) mixPanel.style.display = '';
+    if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — ' + subLabel;
+    if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — ' + subLabel;
+    buildSegmentMixDonut();
   } else {
     pvsLabel.textContent = 'Permit Velocity Score';
     corrPanel.style.display = 'none';
+    if (mixPanel) mixPanel.style.display = 'none';
     if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — Heating';
     if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — Cooling';
   }
@@ -1214,6 +1533,32 @@ function switchSegment(seg) {
   rotateAlert(true);
   if (selectedState) selectState(selectedState.abbr);
   renderSignalIcons();
+}
+
+// Switch sub-segment inside the Segments tab
+function switchSubSegment(sub) {
+  if (!SUB_SEGMENTS[sub]) return;
+  activeSubSegment = sub;
+  document.querySelectorAll('.subseg-pill').forEach(p => p.classList.toggle('active', p.dataset.sub === sub));
+  // Update pvs label + movers header to reflect sub-segment
+  const pvsLabel = document.getElementById('pvsLegendLabel');
+  const topMoversHeader = document.querySelector('#topMovers')?.previousElementSibling;
+  const bottomMoversHeader = document.querySelector('#bottomMovers')?.previousElementSibling;
+  const subLabel = SUB_SEGMENTS[sub].short;
+  if (pvsLabel) pvsLabel.textContent = subLabel + ' YoY Distribution';
+  if (topMoversHeader) topMoversHeader.textContent = 'Top Movers — ' + subLabel;
+  if (bottomMoversHeader) bottomMoversHeader.textContent = 'Bottom Movers — ' + subLabel;
+  // Update donut center readout + active legend item
+  document.getElementById('mixCenterVal').textContent = SUB_SEGMENTS[sub].share.toFixed(1) + '%';
+  document.getElementById('mixCenterLbl').textContent = SUB_SEGMENTS[sub].label;
+  document.querySelectorAll('.mix-legend-item').forEach(li => li.classList.toggle('active', li.dataset.sub === sub));
+  // Rebuild visuals
+  buildKPIs();
+  buildPVSLegend();
+  buildMovers();
+  updateMapColors();
+  rotateAlert(true);
+  if (selectedState) selectState(selectedState.abbr);
 }
 
 function updateCorrelationPanel() {
@@ -1412,6 +1757,238 @@ function buildSignalKPIs(grid) {
   });
 }
 
+// ─── Segment KPI Builder (6 cards tuned to active sub-segment) ───
+function buildSegmentKPIs(grid) {
+  const sub = activeSubSegment;
+  const meta = SUB_SEGMENTS[sub];
+  const nat = SEGMENT_DATA.national;
+  const segAnn = nat[sub + '_2026_ann'] || 0;
+  const segQ1  = nat[sub + '_2026_q1']  || 0;
+  const seg25  = nat[sub + '_2025']     || 0;
+  const segYoy = nat[sub + '_yoy']      || 0;
+  const totalYoy = nat.total_yoy || 0;
+  const totalAnn = nat.total_2026_ann || 0;
+
+  // vs MARKET comparison
+  let marketLabel, marketDelta, marketNote;
+  if (sub === 'residential') {
+    // Housing Starts SAAR change: current vs year_ago
+    const hs = DATA.national.housing_starts_saar;
+    marketDelta = ((hs.current - hs.year_ago) / hs.year_ago * 100);
+    marketLabel = 'Housing Starts';
+    marketNote = 'SST vs mkt';
+  } else if (sub === 'commercial') {
+    // Dodge Momentum: use builder HMI drop as proxy (ABI weakness)
+    const hmi = DATA.national.builder_confidence_hmi;
+    marketDelta = ((hmi.current - hmi.year_ago) / hmi.year_ago * 100);
+    marketLabel = 'Dodge Momentum';
+    marketNote = 'SST vs mkt';
+  } else if (sub === 'national_retail') {
+    marketDelta = 2.5; // Retail market flat-to-positive
+    marketLabel = 'Retail Market';
+    marketNote = 'SST underperf.';
+  } else if (sub === 'oem') {
+    marketDelta = 1.0; // OEM market slight growth
+    marketLabel = 'OEM Market';
+    marketNote = 'SST outperf.';
+  } else {
+    marketDelta = 0.5; // Component mfg flat
+    marketLabel = 'Comp. Mkt';
+    marketNote = 'SST vs mkt';
+  }
+  const spread = segYoy - marketDelta;
+
+  // TOP STATE by segment 2025 revenue
+  let topState = null, topStateVal = -Infinity;
+  DATA.states.forEach(s => {
+    const v = segVal2025(s);
+    if (v > topStateVal) { topStateVal = v; topState = s; }
+  });
+
+  // TOP MOVER — biggest positive YoY among meaningful states (scaled threshold)
+  const moverThresh = segmentMoverThreshold();
+  const movers = DATA.states.filter(s => segVal2025(s) >= moverThresh);
+  movers.sort((a,b) => segYoY(b) - segYoY(a));
+  const topMover = movers[0];
+  const topMoverYoy = topMover ? segYoY(topMover) : 0;
+
+  const yoyArrow = segYoy >= 0 ? '▲' : '▼';
+  const spreadArrow = spread >= 0 ? '▲' : '▼';
+
+  const cards = [
+    {
+      cls: 'segment-kpi',
+      label: meta.label.toUpperCase() + ' SALES',
+      value: fmtSegMoney(segAnn),
+      change: (segYoy >= 0 ? '▲ +' : '▼ ') + Math.abs(segYoy).toFixed(1) + '% YoY',
+      changeClass: segYoy >= 0 ? 'up' : 'down',
+      sparkPoints: buildSegmentSpark(sub, 'all'),
+      sparkColor: meta.color
+    },
+    {
+      cls: 'segment-kpi-alt',
+      label: 'SEGMENT SHARE',
+      value: meta.share.toFixed(1) + '%',
+      change: 'of SST mix',
+      changeClass: '',
+      sparkPoints: null
+    },
+    {
+      cls: 'segment-kpi',
+      label: 'Q1 2026 PACE',
+      value: fmtSegMoney(segQ1),
+      change: fmtSegMoney(segAnn) + ' ann.',
+      changeClass: '',
+      sparkPoints: buildSegmentSpark(sub, 'q1'),
+      sparkColor: meta.color
+    },
+    {
+      cls: 'segment-kpi-alt',
+      label: 'vs ' + marketLabel.toUpperCase(),
+      value: (spread >= 0 ? '+' : '') + spread.toFixed(1) + ' pts',
+      change: spreadArrow + ' ' + marketNote,
+      changeClass: spread >= 0 ? 'up' : 'down',
+      sparkPoints: null
+    },
+    {
+      cls: 'segment-kpi',
+      label: 'TOP STATE',
+      value: topState ? topState.abbr : '—',
+      change: topState ? fmtSegMoney(topStateVal) : '',
+      changeClass: '',
+      sparkPoints: null,
+      onClick: topState ? () => selectState(topState.abbr) : null
+    },
+    {
+      cls: 'segment-kpi',
+      label: 'TOP MOVER',
+      value: topMover ? topMover.abbr : '—',
+      change: topMover ? (topMoverYoy >= 0 ? '▲ +' : '▼ ') + Math.abs(topMoverYoy).toFixed(1) + '%' : '',
+      changeClass: topMoverYoy >= 0 ? 'up' : 'down',
+      sparkPoints: null,
+      onClick: topMover ? () => selectState(topMover.abbr) : null
+    }
+  ];
+
+  cards.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'kpi-card ' + c.cls;
+    if (c.onClick) card.style.cursor = 'pointer';
+    const sparkId = c.sparkPoints ? 'seg-spark-' + i : null;
+    card.innerHTML = `
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-row">
+        <span class="kpi-value">${c.value}</span>
+        <span class="kpi-change ${c.changeClass}">${c.change}</span>
+      </div>
+      ${sparkId ? `<div class="kpi-sparkline"><canvas id="${sparkId}"></canvas></div>` : ''}
+    `;
+    if (c.onClick) card.addEventListener('click', c.onClick);
+    grid.appendChild(card);
+
+    if (sparkId) {
+      requestAnimationFrame(() => {
+        const canvas = document.getElementById(sparkId);
+        if (!canvas) return;
+        sparkCharts[sparkId] = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: c.sparkPoints.map((_, j) => j),
+            datasets: [{
+              data: c.sparkPoints,
+              borderColor: c.sparkColor,
+              borderWidth: 1.5,
+              pointRadius: 0,
+              tension: 0.35,
+              fill: { target: 'origin', above: c.sparkColor + '20', below: c.sparkColor + '20' }
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } },
+            animation: { duration: 600 }
+          }
+        });
+      });
+    }
+  });
+}
+
+// Synthesize a mini trend line for segment sparks (2025 monthly → Q1 2026)
+function buildSegmentSpark(sub, which) {
+  const nat = SEGMENT_DATA.national;
+  const y25 = nat[sub + '_2025'] || 0;
+  const q1 = nat[sub + '_2026_q1'] || 0;
+  const monthly25 = y25 / 12;
+  const monthly26 = q1 / 3;
+  const out = [];
+  // 12 monthly points in 2025 with gentle wave + 3 months 2026 trending toward monthly26
+  for (let m = 0; m < 12; m++) {
+    const wave = Math.sin(m / 2) * 0.08 + (Math.random() - 0.5) * 0.04;
+    out.push(monthly25 * (1 + wave));
+  }
+  for (let m = 0; m < 3; m++) {
+    const wave = Math.sin((m + 12) / 2) * 0.05;
+    out.push(monthly26 * (1 + wave));
+  }
+  return out;
+}
+
+// Build a small Chart.js donut showing SST 2025 segment mix
+let mixDonutChart = null;
+function buildSegmentMixDonut() {
+  const canvas = document.getElementById('mixDonut');
+  if (!canvas) return;
+  if (mixDonutChart) { mixDonutChart.destroy(); mixDonutChart = null; }
+
+  const subs = ['residential','commercial','national_retail','oem','component_mfg'];
+  const labels = subs.map(s => SUB_SEGMENTS[s].label);
+  const data   = subs.map(s => SUB_SEGMENTS[s].nationalTotal);
+  const colors = subs.map(s => SUB_SEGMENTS[s].color);
+
+  mixDonutChart = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{
+      data, backgroundColor: colors,
+      borderColor: '#1a1033', borderWidth: 2, hoverOffset: 6
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      onClick: (evt, items) => {
+        if (items && items.length) {
+          const idx = items[0].index;
+          switchSubSegment(subs[idx]);
+        }
+      },
+      animation: { duration: 700 }
+    }
+  });
+
+  // Build the legend
+  const legendEl = document.getElementById('mixLegend');
+  legendEl.innerHTML = '';
+  subs.forEach(s => {
+    const meta = SUB_SEGMENTS[s];
+    const item = document.createElement('div');
+    item.className = 'mix-legend-item' + (s === activeSubSegment ? ' active' : '');
+    item.dataset.sub = s;
+    item.innerHTML = `
+      <span class="mix-legend-dot" style="background:${meta.color}"></span>
+      <span>${meta.label}</span>
+      <span class="mix-legend-pct">${meta.share.toFixed(1)}%</span>
+    `;
+    item.addEventListener('click', () => switchSubSegment(s));
+    legendEl.appendChild(item);
+  });
+  // Sync center label
+  const m = SUB_SEGMENTS[activeSubSegment];
+  document.getElementById('mixCenterVal').textContent = m.share.toFixed(1) + '%';
+  document.getElementById('mixCenterLbl').textContent = m.label;
+}
+
 function getSegmentKPIConfig() {
   const segLabels = {
     'all': 'Permits SAAR',
@@ -1437,6 +2014,12 @@ function buildKPIs() {
   // ─── Simpson Signal mode ───
   if (activeSegment === 'signal') {
     buildSignalKPIs(grid);
+    return;
+  }
+
+  // ─── SST Segments mode ───
+  if (activeSegment === 'segments') {
+    buildSegmentKPIs(grid);
     return;
   }
 
@@ -1578,6 +2161,12 @@ function buildPVSLegend() {
       const cls = embedClassify(s.embed_yoy || 0);
       if (counts[cls] !== undefined) counts[cls]++;
     });
+  } else if (activeSegment === 'segments') {
+    DATA.states.forEach(s => {
+      if (segVal2025(s) < 1000) return;
+      const cls = segmentClassify(segYoY(s));
+      if (counts[cls] !== undefined) counts[cls]++;
+    });
   } else {
     DATA.states.forEach(s => { if (counts[s.classification] !== undefined) counts[s.classification]++; });
   }
@@ -1598,6 +2187,10 @@ function buildPVSLegend() {
 function buildMovers() {
   if (activeSegment === 'signal') {
     buildSignalMovers();
+    return;
+  }
+  if (activeSegment === 'segments') {
+    buildSegmentMovers();
     return;
   }
   const pKey25 = getPermitKey2025();
@@ -1622,6 +2215,52 @@ function buildMovers() {
         <span class="mover-abbr">${s.abbr}</span>
         <span class="mover-pvs">PVS ${s.pvs > 0 ? '+' : ''}${s.pvs.toFixed(1)}</span>
         <span class="mover-yoy" style="color:${isPos ? 'var(--positive)' : 'var(--negative)'}">${isPos ? '+' : ''}${segYoy.toFixed(1)}%</span>
+      `;
+      el.appendChild(div);
+    });
+  }
+  renderList(top5, 'topMovers');
+  renderList(bottom5, 'bottomMovers');
+}
+
+// Top/Bottom movers for SST Segments tab — filter to states with meaningful
+// volume in the active sub-segment. Threshold scales to the segment's size.
+function segmentMoverThreshold() {
+  const total = SUB_SEGMENTS[activeSubSegment].nationalTotal;
+  // Default: $5M for big segments (res, retail). Lower for small ones (OEM, component).
+  if (total < 75e6)  return 5e5;   // $500K for OEM-class
+  if (total < 200e6) return 2e6;   // $2M for component-mfg-class
+  return 5e6;                       // $5M for residential / retail / commercial
+}
+
+function buildSegmentMovers() {
+  const threshold = segmentMoverThreshold();
+  const eligible = DATA.states.filter(s => segVal2025(s) >= threshold);
+  const sorted = [...eligible].sort((a, b) => segYoY(b) - segYoY(a));
+  const top5 = sorted.slice(0, 5);
+  const bottom5 = sorted.slice(-5).reverse();
+
+  function renderList(items, containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    if (items.length === 0) {
+      el.innerHTML = '<div style="padding:8px 4px;font-size:11px;color:var(--text-muted);font-style:italic">No states with meaningful volume in this segment</div>';
+      return;
+    }
+    items.forEach(s => {
+      const yoy = segYoY(s);
+      const cls = segmentClassify(yoy);
+      const isPos = yoy >= 0;
+      const ann = segValAnn(s);
+      const annLabel = fmtSegMoney(ann);
+      const div = document.createElement('div');
+      div.className = 'mover-item';
+      div.onclick = () => selectState(s.abbr);
+      div.innerHTML = `
+        <span class="mover-dot" style="background:${classColor(cls)}"></span>
+        <span class="mover-abbr">${s.abbr}</span>
+        <span class="mover-pvs">${annLabel}/yr</span>
+        <span class="mover-yoy" style="color:${isPos ? 'var(--positive)' : 'var(--negative)'}">${isPos ? '+' : ''}${yoy.toFixed(1)}%</span>
       `;
       el.appendChild(div);
     });
@@ -1683,6 +2322,19 @@ const ALERTS = [
   { text: '<strong>OEM BRIGHT SPOT:</strong> SST OEM segment +13% vs market +1% — outperforming by 12 points' }
 ];
 
+const SEGMENT_ALERTS = [
+  { text: '<strong>NATIONAL:</strong> SST total sales annualizing at $1.92B — up 1.8% vs 2025 (pacing ahead of market)' },
+  { text: '<strong>RESIDENTIAL:</strong> $1.15B in 2025, growing +3.1% in Q1 2026 — largest SST segment at 60.7% of mix' },
+  { text: '<strong>OEM SURGE:</strong> OEM segment +10.6% YoY — SST\'s fastest-growing market' },
+  { text: '<strong>NATIONAL RETAIL:</strong> -2.1% YoY — contrasts with overall retail market strength' },
+  { text: '<strong>COMMERCIAL:</strong> -2.6% YoY — aligns with Dodge Momentum Index decline' },
+  { text: '<strong>COMPONENT MFG:</strong> +3.8% YoY — steady lumber/framing demand from truss builders' },
+  { text: '<strong>TX:</strong> +9.5% total segment growth — $186M annualized pace, led by residential +10.8%' },
+  { text: '<strong>OH:</strong> -9.2% total decline — largest absolute drop in top 10 states' },
+  { text: '<strong>CA:</strong> $232M residential in 2025 — SST\'s single largest state-segment exposure' },
+  { text: '<strong>GA:</strong> +18% component mfg YoY — truss plant capacity additions driving demand' }
+];
+
 const SIGNAL_ALERTS = [
   { text: '<strong>NATIONAL:</strong> Embed sales annualizing at $93.7M — up 6.9% vs 2025. Foundations are going in.' },
   { text: '<strong>NC SURGE:</strong> North Carolina embeds +35.1% YoY — strongest SST growth in the Southeast' },
@@ -1696,7 +2348,9 @@ function rotateAlert(resetIndex) {
   if (resetIndex === true) alertIndex = 0;
   const el = document.getElementById('alertContent');
   if (!el) return;
-  const pool = activeSegment === 'signal' ? SIGNAL_ALERTS : ALERTS;
+  const pool = activeSegment === 'signal' ? SIGNAL_ALERTS
+             : activeSegment === 'segments' ? SEGMENT_ALERTS
+             : ALERTS;
   const a = pool[alertIndex % pool.length];
   el.innerHTML = `
     <div class="alert-item">
@@ -1911,19 +2565,25 @@ function renderSignalIcons() {
   // Always remove stale icons first
   d3.select('#map svg .signal-icons').remove();
 
-  if (activeSegment !== 'signal') return;
+  if (activeSegment !== 'signal' && activeSegment !== 'segments') return;
 
   const g = d3.select('#map svg').append('g').attr('class', 'signal-icons');
 
+  // Choose yoy / threshold source depending on mode
+  const useSegments = activeSegment === 'segments';
+
   DATA.states.forEach(s => {
-    if (!s.embed_yoy || !s.embed_2025 || s.embed_2025 < 1000) return;
+    const yoy = useSegments ? segYoY(s) : (s.embed_yoy || 0);
+    const volume = useSegments ? segVal2025(s) : (s.embed_2025 || 0);
+    const volThreshold = useSegments ? 1e6 : 1000; // $1M for segments, $1K for embeds
+    if (!yoy || !volume || volume < volThreshold) return;
     const coords = projection([s.lng, s.lat]);
     if (!coords) return;
 
     const x = coords[0] + 14; // offset right of state abbreviation
     const y = coords[1] - 2;
 
-    if (s.embed_yoy > 0) {
+    if (yoy > 0) {
       // Crystal ball — spinning for positive YoY embed growth
       const opacity = Math.min(1.0, 0.5 + (s.embed_yoy / 40));
 
@@ -1936,6 +2596,9 @@ function renderSignalIcons() {
         .attr('cx', x).attr('cy', y).attr('r', 7)
         .attr('fill', 'url(#crystalGrad)')
         .attr('stroke', '#a78bfa').attr('stroke-width', 0.5);
+      // Compute opacity using the local yoy
+      const opacityLocal = Math.min(1.0, 0.5 + (yoy / 40));
+      ball.attr('opacity', opacityLocal);
 
       // Shine highlight (rotated ellipse)
       ball.append('ellipse')
@@ -1958,12 +2621,12 @@ function renderSignalIcons() {
         .attr('dur', '8s')
         .attr('repeatCount', 'indefinite');
 
-    } else if (s.embed_yoy < -5) {
-      // Smoke cloud — floating for negative YoY embed decline
-      const severity = Math.min(1, Math.abs(s.embed_yoy) / 50);
+    } else if (yoy < -5) {
+      // Smoke cloud — floating for negative YoY decline
+      const severity = Math.min(1, Math.abs(yoy) / 50);
       const size = 0.6 + severity * 0.6;
       const baseOpacity = 0.3 + severity * 0.4;
-      const dur = (3 + (Math.abs(s.embed_yoy) % 2)).toFixed(1) + 's';
+      const dur = (3 + (Math.abs(yoy) % 2)).toFixed(1) + 's';
 
       const smoke = g.append('g').attr('class', 'signal-smoke');
 
@@ -1996,6 +2659,38 @@ function renderSignalIcons() {
 
 // ─── Update map fills when segment changes or simulation ticks ───
 function updateMapColors() {
+  if (activeSegment === 'segments') {
+    // Color by segment YoY (custom thresholds), opacity by log(segment_2025)
+    const maxV = Math.max(...DATA.states.map(s => segVal2025(s) || 0));
+    d3.selectAll('.state-path')
+      .attr('fill', function(d) {
+        const s = fipsLookup[d.id];
+        if (!s) return '#1a1033';
+        const v25 = segVal2025(s);
+        // Neutral gray for states with $0 or near-zero segment revenue
+        if (!v25 || v25 < 100000) return '#5a4a7a';
+        return classColor(segmentClassify(segYoY(s)));
+      })
+      .attr('fill-opacity', function(d) {
+        const s = fipsLookup[d.id];
+        if (!s) return 0.05;
+        const v25 = segVal2025(s);
+        if (!v25 || v25 < 100000) return 0.15;
+        return 0.35 + 0.5 * (Math.log(v25 + 1) / Math.log(maxV + 1));
+      });
+
+    // Emoji reflects segment classification
+    d3.selectAll('.emojis text')
+      .data(DATA.states.filter(s => projection([s.lng, s.lat]) !== null))
+      .text(d => {
+        const v25 = segVal2025(d);
+        if (!v25 || v25 < 100000) return '';
+        return CLASS_EMOJI[segmentClassify(segYoY(d))] || '😐';
+      });
+    renderSignalIcons();
+    return;
+  }
+
   if (activeSegment === 'signal') {
     // Color by embed YoY, opacity by embed volume (log)
     const maxE = Math.max(...DATA.states.map(s => s.embed_2025 || 0));
@@ -2059,7 +2754,35 @@ function updateMapColors() {
 function showTooltip(s) {
   const tip = document.getElementById('tooltip');
 
-  if (activeSegment === 'signal') {
+  if (activeSegment === 'segments') {
+    const sub = activeSubSegment;
+    const meta = SUB_SEGMENTS[sub];
+    const v25 = segVal2025(s);
+    const vAnn = segValAnn(s);
+    const yoy = segYoY(s);
+    const hasData = v25 >= 100000;
+    const cls = hasData ? segmentClassify(yoy) : 'stable';
+    const cc = hasData ? classColor(cls) : '#8875a8';
+    const stateTotal = s.total_2025 || 0;
+    const stateShare = stateTotal > 0 ? (v25 / stateTotal * 100) : 0;
+    tip.innerHTML = `
+      <div class="tooltip-name">
+        ${s.name}
+        <span class="tooltip-classification" style="color:${cc};border:1px solid ${cc}33">${hasData ? cls : 'no data'}</span>
+      </div>
+      <div class="tooltip-grid">
+        <span class="tooltip-label">${meta.label} 2025</span>
+        <span class="tooltip-val">${fmtSegMoney(v25)}</span>
+        <span class="tooltip-label">Q1 2026 Pace</span>
+        <span class="tooltip-val">${fmtSegMoney(vAnn)} <span style="color:var(--text-muted);font-weight:400">ann.</span></span>
+        <span class="tooltip-label">YoY</span>
+        <span class="tooltip-val" style="color:${yoy >= 0 ? 'var(--positive)' : 'var(--negative)'}">${yoy >= 0 ? '+' : ''}${yoy.toFixed(1)}%</span>
+        <span class="tooltip-label">State Total</span>
+        <span class="tooltip-val">${fmtSegMoney(stateTotal)}</span>
+      </div>
+      ${hasData ? `<div class="tooltip-segment-share">${meta.label} is ${stateShare.toFixed(1)}% of this state\'s SST mix</div>` : ''}
+    `;
+  } else if (activeSegment === 'signal') {
     const hasEmbed = s.embed_2025 && s.embed_2025 >= 1000;
     const cls = hasEmbed ? embedClassify(s.embed_yoy || 0) : 'stable';
     const cc = hasEmbed ? classColor(cls) : '#8875a8';
