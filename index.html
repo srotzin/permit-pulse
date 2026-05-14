@@ -961,7 +961,7 @@ html, body {
     <div class="header-right">
       <div class="live-badge"><span class="live-dot"></span> LIVE</div>
       <div class="header-time" id="headerTime">—</div>
-      <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-left:6px; white-space:nowrap;">Data as of: Apr 17, 2026</div>
+      <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-left:6px; white-space:nowrap;">Embed: YTD May 13, 2026</div>
     </div>
   </header>
 
@@ -1207,105 +1207,109 @@ const DATA = {
 // SIMPSON SIGNAL — EMBED SALES DATA (SSTB + MASA + STHD)
 // ════════════════════════════════════════════════════════════════════════
 const EMBED = {
-  national_total_2025: 87604466,
-  national_q1_2026: 23418714,
+  national_total_2025: 43795104,
+  national_ytd_2026: 17716189,
+  national_ann_2026: 48619616,
+  national_yoy: 11.0,
   // Derived sub-product subtotals (full-year 2025, annualized 2026)
   sstb_2025: 0, masa_2025: 0, sthd_2025: 0,
   sstb_2026_ann: 0, masa_2026_ann: 0, sthd_2026_ann: 0,
   // Monthly progression of national embed sales (approximate trajectory)
   history: [
-    {date:"2025-01",value:6.8},{date:"2025-02",value:6.9},{date:"2025-03",value:7.1},
-    {date:"2025-04",value:7.3},{date:"2025-05",value:7.4},{date:"2025-06",value:7.5},
-    {date:"2025-07",value:7.4},{date:"2025-08",value:7.5},{date:"2025-09",value:7.3},
-    {date:"2025-10",value:7.2},{date:"2025-11",value:7.1},{date:"2025-12",value:7.1},
-    {date:"2026-01",value:7.6},{date:"2026-02",value:7.8},{date:"2026-03",value:8.0}
+    {date:"2025-01",value:3.3},{date:"2025-02",value:3.5},{date:"2025-03",value:3.8},
+    {date:"2025-04",value:3.7},{date:"2025-05",value:3.6},{date:"2025-06",value:3.7},
+    {date:"2025-07",value:3.7},{date:"2025-08",value:3.7},{date:"2025-09",value:3.6},
+    {date:"2025-10",value:3.5},{date:"2025-11",value:3.5},{date:"2025-12",value:3.5},
+    {date:"2026-01",value:3.8},{date:"2026-02",value:3.9},{date:"2026-03",value:4.0},
+    {date:"2026-04",value:4.1},{date:"2026-05",value:4.0}
   ]
 };
 
 const EMBED_STATES = [
-  {name:"Alabama",embed_2025:419775,embed_2026_q1:117226,embed_2026_ann:468905,yoy:11.7,sstb25:7748,masa25:150515,sthd25:261512,sstb26:2915,masa26:43920,sthd26:70391},
-  {name:"Alaska",embed_2025:2263,embed_2026_q1:56,embed_2026_ann:224,yoy:-90.1,sstb25:1445,masa25:0,sthd25:817,sstb26:56,masa26:0,sthd26:0},
-  {name:"Arizona",embed_2025:7391370,embed_2026_q1:2088249,embed_2026_ann:8352995,yoy:13.0,sstb25:274013,masa25:3992732,sthd25:3124624,sstb26:46565,masa26:1028523,sthd26:1013161},
-  {name:"Arkansas",embed_2025:941305,embed_2026_q1:204457,embed_2026_ann:817829,yoy:-13.1,sstb25:8000,masa25:403771,sthd25:529533,sstb26:39,masa26:63506,sthd26:140913},
-  {name:"California",embed_2025:23937265,embed_2026_q1:6673064,embed_2026_ann:26692254,yoy:11.5,sstb25:15498607,masa25:3991124,sthd25:4447535,sstb26:4286827,masa26:1163262,sthd26:1222975},
-  {name:"Colorado",embed_2025:2942512,embed_2026_q1:849409,embed_2026_ann:3397635,yoy:15.5,sstb25:107501,masa25:33977,sthd25:2801034,sstb26:18446,masa26:3850,sthd26:827113},
-  {name:"Connecticut",embed_2025:102668,embed_2026_q1:10586,embed_2026_ann:42342,yoy:-58.8,sstb25:5003,masa25:9096,sthd25:88569,sstb26:761,masa26:4081,sthd26:5743},
-  {name:"Delaware",embed_2025:15884,embed_2026_q1:3208,embed_2026_ann:12832,yoy:-19.2,sstb25:2468,masa25:0,sthd25:13416,sstb26:0,masa26:0,sthd26:3208},
-  {name:"District of Columbia",embed_2025:959,embed_2026_q1:0,embed_2026_ann:0,yoy:-100.0,sstb25:834,masa25:0,sthd25:125,sstb26:0,masa26:0,sthd26:0},
-  {name:"Florida",embed_2025:542497,embed_2026_q1:170286,embed_2026_ann:681143,yoy:25.6,sstb25:35393,masa25:141157,sthd25:365947,sstb26:5199,masa26:65220,sthd26:99867},
-  {name:"Georgia",embed_2025:2306121,embed_2026_q1:711122,embed_2026_ann:2844490,yoy:23.3,sstb25:25362,masa25:992894,sthd25:1287866,sstb26:9645,masa26:271043,sthd26:430434},
-  {name:"Hawaii",embed_2025:273021,embed_2026_q1:48246,embed_2026_ann:192984,yoy:-29.3,sstb25:272172,masa25:259,sthd25:589,sstb26:47984,masa26:0,sthd26:262},
-  {name:"Idaho",embed_2025:1217374,embed_2026_q1:280065,embed_2026_ann:1120261,yoy:-8.0,sstb25:234956,masa25:8945,sthd25:973472,sstb26:49031,masa26:844,sthd26:230190},
-  {name:"Illinois",embed_2025:151411,embed_2026_q1:36118,embed_2026_ann:144473,yoy:-4.6,sstb25:10729,masa25:2033,sthd25:138650,sstb26:951,masa26:2401,sthd26:32766},
-  {name:"Indiana",embed_2025:20895,embed_2026_q1:7697,embed_2026_ann:30789,yoy:47.4,sstb25:1751,masa25:3907,sthd25:15236,sstb26:1366,masa26:291,sthd26:6040},
-  {name:"Iowa",embed_2025:37895,embed_2026_q1:22635,embed_2026_ann:90541,yoy:138.9,sstb25:1494,masa25:3930,sthd25:32470,sstb26:262,masa26:0,sthd26:22374},
-  {name:"Kansas",embed_2025:703352,embed_2026_q1:100522,embed_2026_ann:402088,yoy:-42.8,sstb25:3835,masa25:23411,sthd25:676106,sstb26:445,masa26:3092,sthd26:96985},
-  {name:"Kentucky",embed_2025:12280,embed_2026_q1:930,embed_2026_ann:3722,yoy:-69.7,sstb25:5939,masa25:705,sthd25:5635,sstb26:0,masa26:12,sthd26:918},
-  {name:"Louisiana",embed_2025:395182,embed_2026_q1:96129,embed_2026_ann:384516,yoy:-2.7,sstb25:4924,masa25:42402,sthd25:347857,sstb26:0,masa26:7731,sthd26:88398},
-  {name:"Maine",embed_2025:16009,embed_2026_q1:1400,embed_2026_ann:5600,yoy:-65.0,sstb25:3434,masa25:0,sthd25:12576,sstb26:184,masa26:0,sthd26:1216},
-  {name:"Maryland",embed_2025:368039,embed_2026_q1:54974,embed_2026_ann:219894,yoy:-40.3,sstb25:5857,masa25:183678,sthd25:178504,sstb26:612,masa26:7420,sthd26:46941},
-  {name:"Massachusetts",embed_2025:135902,embed_2026_q1:22855,embed_2026_ann:91420,yoy:-32.7,sstb25:19560,masa25:131,sthd25:116211,sstb26:3012,masa26:0,sthd26:19843},
-  {name:"Michigan",embed_2025:662981,embed_2026_q1:123458,embed_2026_ann:493831,yoy:-25.5,sstb25:10760,masa25:87160,sthd25:565061,sstb26:587,masa26:43648,sthd26:79222},
-  {name:"Minnesota",embed_2025:1021953,embed_2026_q1:176682,embed_2026_ann:706727,yoy:-30.8,sstb25:7695,masa25:8903,sthd25:1005355,sstb26:2780,masa26:3973,sthd26:169928},
-  {name:"Mississippi",embed_2025:697665,embed_2026_q1:217386,embed_2026_ann:869543,yoy:24.6,sstb25:3006,masa25:169531,sthd25:525128,sstb26:514,masa26:35282,sthd26:181590},
-  {name:"Missouri",embed_2025:697661,embed_2026_q1:141204,embed_2026_ann:564814,yoy:-19.0,sstb25:7232,masa25:40928,sthd25:649502,sstb26:1527,masa26:14446,sthd26:125230},
-  {name:"Montana",embed_2025:172411,embed_2026_q1:21865,embed_2026_ann:87460,yoy:-49.3,sstb25:36351,masa25:989,sthd25:135071,sstb26:4184,masa26:0,sthd26:17681},
-  {name:"Nebraska",embed_2025:50623,embed_2026_q1:22290,embed_2026_ann:89159,yoy:76.1,sstb25:485,masa25:7596,sthd25:42542,sstb26:0,masa26:2689,sthd26:19601},
-  {name:"Nevada",embed_2025:3863637,embed_2026_q1:851333,embed_2026_ann:3405330,yoy:-11.9,sstb25:1604886,masa25:1088803,sthd25:1169949,sstb26:282850,masa26:269267,sthd26:299216},
-  {name:"New Hampshire",embed_2025:34237,embed_2026_q1:6169,embed_2026_ann:24677,yoy:-27.9,sstb25:278,masa25:0,sthd25:33960,sstb26:137,masa26:0,sthd26:6033},
-  {name:"New Jersey",embed_2025:191490,embed_2026_q1:67312,embed_2026_ann:269249,yoy:40.6,sstb25:27575,masa25:51519,sthd25:112396,sstb26:15598,masa26:26378,sthd26:25336},
-  {name:"New Mexico",embed_2025:44801,embed_2026_q1:6351,embed_2026_ann:25404,yoy:-43.3,sstb25:5639,masa25:27912,sthd25:11250,sstb26:169,masa26:220,sthd26:5962},
-  {name:"New York",embed_2025:155938,embed_2026_q1:20892,embed_2026_ann:83570,yoy:-46.4,sstb25:19649,masa25:9868,sthd25:126421,sstb26:816,masa26:62,sthd26:20014},
-  {name:"North Carolina",embed_2025:1462649,embed_2026_q1:493967,embed_2026_ann:1975867,yoy:35.1,sstb25:42332,masa25:824524,sthd25:595793,sstb26:1955,masa26:256326,sthd26:235686},
-  {name:"North Dakota",embed_2025:62531,embed_2026_q1:8587,embed_2026_ann:34349,yoy:-45.1,sstb25:326,masa25:61,sthd25:62144,sstb26:171,masa26:61,sthd26:8355},
-  {name:"Ohio",embed_2025:106719,embed_2026_q1:26011,embed_2026_ann:104044,yoy:-2.5,sstb25:7632,masa25:8852,sthd25:90235,sstb26:1417,masa26:2398,sthd26:22196},
-  {name:"Oklahoma",embed_2025:1393061,embed_2026_q1:239104,embed_2026_ann:956417,yoy:-31.3,sstb25:7844,masa25:261950,sthd25:1123268,sstb26:9361,masa26:34924,sthd26:194819},
-  {name:"Oregon",embed_2025:1272830,embed_2026_q1:377982,embed_2026_ann:1511926,yoy:18.8,sstb25:909185,masa25:11092,sthd25:352554,sstb26:272618,masa26:2239,sthd26:103124},
-  {name:"Pennsylvania",embed_2025:207878,embed_2026_q1:43645,embed_2026_ann:174579,yoy:-16.0,sstb25:19931,masa25:18646,sthd25:169302,sstb26:1926,masa26:5935,sthd26:35784},
-  {name:"Rhode Island",embed_2025:11292,embed_2026_q1:1714,embed_2026_ann:6857,yoy:-39.3,sstb25:1223,masa25:0,sthd25:10069,sstb26:0,masa26:0,sthd26:1714},
-  {name:"South Carolina",embed_2025:1504488,embed_2026_q1:478447,embed_2026_ann:1913786,yoy:27.2,sstb25:41552,masa25:775485,sthd25:687451,sstb26:11305,masa26:279149,sthd26:187992},
-  {name:"South Dakota",embed_2025:86458,embed_2026_q1:9216,embed_2026_ann:36865,yoy:-57.4,sstb25:1144,masa25:10344,sthd25:74970,sstb26:0,masa26:131,sthd26:9085},
-  {name:"Tennessee",embed_2025:1534840,embed_2026_q1:410800,embed_2026_ann:1643200,yoy:7.1,sstb25:14936,masa25:387083,sthd25:1132821,sstb26:1842,masa26:113209,sthd26:295750},
-  {name:"Texas",embed_2025:22850396,embed_2026_q1:6327516,embed_2026_ann:25310064,yoy:10.8,sstb25:107634,masa25:4993583,sthd25:17749179,sstb26:21939,masa26:1299928,sthd26:5005650},
-  {name:"Utah",embed_2025:3173880,embed_2026_q1:781548,embed_2026_ann:3126192,yoy:-1.5,sstb25:103805,masa25:18027,sthd25:3052048,sstb26:32930,masa26:1095,sthd26:747524},
-  {name:"Vermont",embed_2025:11919,embed_2026_q1:1355,embed_2026_ann:5421,yoy:-54.5,sstb25:3556,masa25:0,sthd25:8362,sstb26:0,masa26:0,sthd26:1355},
-  {name:"Virginia",embed_2025:797230,embed_2026_q1:204104,embed_2026_ann:816416,yoy:2.4,sstb25:4551,masa25:229914,sthd25:562765,sstb26:389,masa26:76137,sthd26:127578},
-  {name:"Washington",embed_2025:3253984,embed_2026_q1:802896,embed_2026_ann:3211583,yoy:-1.3,sstb25:720484,masa25:52900,sthd25:2480600,sstb26:135404,masa26:12125,sthd26:655367},
-  {name:"West Virginia",embed_2025:2133,embed_2026_q1:0,embed_2026_ann:0,yoy:-100.0,sstb25:795,masa25:0,sthd25:1337,sstb26:0,masa26:0,sthd26:0},
-  {name:"Wisconsin",embed_2025:252644,embed_2026_q1:41936,embed_2026_ann:167746,yoy:-33.6,sstb25:22272,masa25:128032,sthd25:102340,sstb26:6160,masa26:13888,sthd26:21888},
-  {name:"Wyoming",embed_2025:85823,embed_2026_q1:10086,embed_2026_ann:40344,yoy:-53.0,sstb25:21607,masa25:802,sthd25:63414,sstb26:3908,masa26:2,sthd26:6176}
+  {name:"Alabama",embed_2025:209869,embed_2026_ytd:86562,embed_2026_ann:237557,yoy:13.2,sstb26ytd:1457,masa26ytd:37541,sthd26ytd:47564},
+  {name:"Alaska",embed_2025:1131,embed_2026_ytd:400,embed_2026_ann:1098,yoy:-3.0,sstb26ytd:400,masa26ytd:0,sthd26ytd:0},
+  {name:"Arizona",embed_2025:3695685,embed_2026_ytd:1498546,embed_2026_ann:4112551,yoy:11.3,sstb26ytd:45120,masa26ytd:750810,sthd26ytd:702615},
+  {name:"Arkansas",embed_2025:470351,embed_2026_ytd:151079,embed_2026_ann:414615,yoy:-11.8,sstb26ytd:460,masa26ytd:49445,sthd26ytd:101174},
+  {name:"California",embed_2025:11968633,embed_2026_ytd:5149328,embed_2026_ann:14131614,yoy:18.1,sstb26ytd:3161176,masa26ytd:954564,sthd26ytd:1033588},
+  {name:"Colorado",embed_2025:1471256,embed_2026_ytd:581182,embed_2026_ann:1594973,yoy:8.4,sstb26ytd:15179,masa26ytd:2050,sthd26ytd:563953},
+  {name:"Connecticut",embed_2025:51231,embed_2026_ytd:13471,embed_2026_ann:36969,yoy:-27.8,sstb26ytd:773,masa26ytd:3621,sthd26ytd:9077},
+  {name:"Delaware",embed_2025:7942,embed_2026_ytd:1731,embed_2026_ann:4750,yoy:-40.2,sstb26ytd:0,masa26ytd:0,sthd26ytd:1731},
+  {name:"Florida",embed_2025:270973,embed_2026_ytd:126978,embed_2026_ann:348473,yoy:28.6,sstb26ytd:4149,masa26ytd:51917,sthd26ytd:70913},
+  {name:"Georgia",embed_2025:1153060,embed_2026_ytd:524607,embed_2026_ann:1439711,yoy:24.9,sstb26ytd:7088,masa26ytd:223387,sthd26ytd:294132},
+  {name:"Hawaii",embed_2025:136379,embed_2026_ytd:35945,embed_2026_ann:98646,yoy:-27.7,sstb26ytd:35683,masa26ytd:0,sthd26ytd:262},
+  {name:"Idaho",embed_2025:608674,embed_2026_ytd:249637,embed_2026_ann:685094,yoy:12.6,sstb26ytd:50481,masa26ytd:1108,sthd26ytd:198047},
+  {name:"Illinois",embed_2025:75522,embed_2026_ytd:34268,embed_2026_ann:94044,yoy:24.5,sstb26ytd:805,masa26ytd:1348,sthd26ytd:32114},
+  {name:"Indiana",embed_2025:10447,embed_2026_ytd:5672,embed_2026_ann:15566,yoy:49.0,sstb26ytd:832,masa26ytd:194,sthd26ytd:4647},
+  {name:"Iowa",embed_2025:18902,embed_2026_ytd:11799,embed_2026_ann:32381,yoy:71.3,sstb26ytd:176,masa26ytd:0,sthd26ytd:11623},
+  {name:"Kansas",embed_2025:351676,embed_2026_ytd:71991,embed_2026_ann:197569,yoy:-43.8,sstb26ytd:469,masa26ytd:2479,sthd26ytd:69044},
+  {name:"Kentucky",embed_2025:6134,embed_2026_ytd:1146,embed_2026_ann:3145,yoy:-48.7,sstb26ytd:661,masa26ytd:25,sthd26ytd:459},
+  {name:"Louisiana",embed_2025:197591,embed_2026_ytd:81080,embed_2026_ann:222513,yoy:12.6,sstb26ytd:0,masa26ytd:8120,sthd26ytd:72960},
+  {name:"Maine",embed_2025:7953,embed_2026_ytd:1291,embed_2026_ann:3543,yoy:-55.5,sstb26ytd:143,masa26ytd:0,sthd26ytd:1148},
+  {name:"Maryland",embed_2025:183932,embed_2026_ytd:71932,embed_2026_ann:197407,yoy:7.3,sstb26ytd:627,masa26ytd:20457,sthd26ytd:50848},
+  {name:"Massachusetts",embed_2025:67933,embed_2026_ytd:23158,embed_2026_ann:63554,yoy:-6.4,sstb26ytd:2884,masa26ytd:82,sthd26ytd:20191},
+  {name:"Michigan",embed_2025:331441,embed_2026_ytd:93428,embed_2026_ann:256400,yoy:-22.6,sstb26ytd:1068,masa26ytd:21824,sthd26ytd:70536},
+  {name:"Minnesota",embed_2025:510977,embed_2026_ytd:172099,embed_2026_ann:472302,yoy:-7.6,sstb26ytd:1587,masa26ytd:2427,sthd26ytd:168085},
+  {name:"Mississippi",embed_2025:348833,embed_2026_ytd:139502,embed_2026_ann:382844,yoy:9.7,sstb26ytd:289,masa26ytd:24032,sthd26ytd:115181},
+  {name:"Missouri",embed_2025:348814,embed_2026_ytd:135660,embed_2026_ann:372300,yoy:6.7,sstb26ytd:780,masa26ytd:11931,sthd26ytd:122949},
+  {name:"Montana",embed_2025:86205,embed_2026_ytd:31921,embed_2026_ann:87603,yoy:1.6,sstb26ytd:2922,masa26ytd:287,sthd26ytd:28712},
+  {name:"Nebraska",embed_2025:25253,embed_2026_ytd:12750,embed_2026_ann:34991,yoy:38.6,sstb26ytd:0,masa26ytd:1647,sthd26ytd:11103},
+  {name:"Nevada",embed_2025:1931819,embed_2026_ytd:668034,embed_2026_ann:1833326,yoy:-5.1,sstb26ytd:241883,masa26ytd:197443,sthd26ytd:228708},
+  {name:"New Hampshire",embed_2025:16854,embed_2026_ytd:4699,embed_2026_ann:12896,yoy:-23.5,sstb26ytd:68,masa26ytd:0,sthd26ytd:4630},
+  {name:"New Jersey",embed_2025:95745,embed_2026_ytd:59103,embed_2026_ann:162200,yoy:69.4,sstb26ytd:8811,masa26ytd:23837,sthd26ytd:26455},
+  {name:"New Mexico",embed_2025:22400,embed_2026_ytd:3317,embed_2026_ann:9103,yoy:-59.4,sstb26ytd:84,masa26ytd:110,sthd26ytd:3123},
+  {name:"New York",embed_2025:77864,embed_2026_ytd:20962,embed_2026_ann:57527,yoy:-26.1,sstb26ytd:912,masa26ytd:62,sthd26ytd:19988},
+  {name:"North Carolina",embed_2025:731168,embed_2026_ytd:366518,embed_2026_ann:1005858,yoy:37.6,sstb26ytd:1224,masa26ytd:198785,sthd26ytd:166508},
+  {name:"North Dakota",embed_2025:31235,embed_2026_ytd:5074,embed_2026_ann:13925,yoy:-55.4,sstb26ytd:86,masa26ytd:61,sthd26ytd:4927},
+  {name:"Ohio",embed_2025:53208,embed_2026_ytd:21225,embed_2026_ann:58249,yoy:9.5,sstb26ytd:1949,masa26ytd:1331,sthd26ytd:17945},
+  {name:"Oklahoma",embed_2025:696113,embed_2026_ytd:190218,embed_2026_ann:522027,yoy:-25.0,sstb26ytd:2441,masa26ytd:34694,sthd26ytd:153083},
+  {name:"Oregon",embed_2025:636250,embed_2026_ytd:257449,embed_2026_ann:706533,yoy:11.0,sstb26ytd:186650,masa26ytd:1309,sthd26ytd:69490},
+  {name:"Pennsylvania",embed_2025:103841,embed_2026_ytd:35929,embed_2026_ann:98602,yoy:-5.0,sstb26ytd:1680,masa26ytd:5366,sthd26ytd:28883},
+  {name:"Rhode Island",embed_2025:5646,embed_2026_ytd:1639,embed_2026_ann:4498,yoy:-20.3,sstb26ytd:0,masa26ytd:0,sthd26ytd:1639},
+  {name:"South Carolina",embed_2025:751424,embed_2026_ytd:343035,embed_2026_ann:941412,yoy:25.3,sstb26ytd:9726,masa26ytd:170008,sthd26ytd:163301},
+  {name:"South Dakota",embed_2025:43229,embed_2026_ytd:11401,embed_2026_ann:31288,yoy:-27.6,sstb26ytd:0,masa26ytd:1599,sthd26ytd:9802},
+  {name:"Tennessee",embed_2025:767010,embed_2026_ytd:302569,embed_2026_ann:830359,yoy:8.3,sstb26ytd:1352,masa26ytd:90370,sthd26ytd:210846},
+  {name:"Texas",embed_2025:11425198,embed_2026_ytd:4703348,embed_2026_ann:12907684,yoy:13.0,sstb26ytd:13838,masa26ytd:991820,sthd26ytd:3697690},
+  {name:"US/Not assigned",embed_2025:355,embed_2026_ytd:5624,embed_2026_ann:15434,yoy:4249.9,sstb26ytd:0,masa26ytd:0,sthd26ytd:5624},
+  {name:"Utah",embed_2025:1586814,embed_2026_ytd:546958,embed_2026_ann:1501050,yoy:-5.4,sstb26ytd:26633,masa26ytd:547,sthd26ytd:519777},
+  {name:"Vermont",embed_2025:5959,embed_2026_ytd:999,embed_2026_ann:2742,yoy:-54.0,sstb26ytd:0,masa26ytd:55,sthd26ytd:944},
+  {name:"Virginia",embed_2025:398421,embed_2026_ytd:127118,embed_2026_ann:348858,yoy:-12.4,sstb26ytd:814,masa26ytd:49037,sthd26ytd:77267},
+  {name:"Washington",embed_2025:1626992,embed_2026_ytd:678980,embed_2026_ann:1863366,yoy:14.5,sstb26ytd:123105,masa26ytd:9327,sthd26ytd:546549},
+  {name:"West Virginia",embed_2025:1066,embed_2026_ytd:273,embed_2026_ann:749,yoy:-29.7,sstb26ytd:0,masa26ytd:0,sthd26ytd:273},
+  {name:"Wisconsin",embed_2025:126322,embed_2026_ytd:41379,embed_2026_ann:113559,yoy:-10.1,sstb26ytd:5461,masa26ytd:18692,sthd26ytd:17226},
+  {name:"Wyoming",embed_2025:42893,embed_2026_ytd:13179,embed_2026_ann:36168,yoy:-15.7,sstb26ytd:4407,masa26ytd:362,sthd26ytd:8410},
+  {name:"District of Columbia",embed_2025:0,embed_2026_ytd:0,embed_2026_ann:0,yoy:0,sstb26ytd:0,masa26ytd:0,sthd26ytd:0}
 ];
 
 // Merge embed data into DATA.states
 (function mergeEmbedData() {
+  const YTD_FRAC = 0.3644;
   const byName = {};
   EMBED_STATES.forEach(e => byName[e.name] = e);
   DATA.states.forEach(s => {
     const e = byName[s.name];
     if (e) {
       s.embed_2025 = e.embed_2025;
-      s.embed_2026_q1 = e.embed_2026_q1;
+      s.embed_2026_ytd = e.embed_2026_ytd;
       s.embed_2026_ann = e.embed_2026_ann;
       s.embed_yoy = e.yoy;
-      s.sstb_2025 = e.sstb25; s.masa_2025 = e.masa25; s.sthd_2025 = e.sthd25;
-      s.sstb_2026_ann = (e.sstb26 || 0) * 4;
-      s.masa_2026_ann = (e.masa26 || 0) * 4;
-      s.sthd_2026_ann = (e.sthd26 || 0) * 4;
-    } else {
-      s.embed_2025 = 0; s.embed_2026_q1 = 0; s.embed_2026_ann = 0; s.embed_yoy = 0;
       s.sstb_2025 = 0; s.masa_2025 = 0; s.sthd_2025 = 0;
+      s.sstb_2026_ytd = e.sstb26ytd || 0;
+      s.masa_2026_ytd = e.masa26ytd || 0;
+      s.sthd_2026_ytd = e.sthd26ytd || 0;
+      s.sstb_2026_ann = Math.round((e.sstb26ytd || 0) / YTD_FRAC);
+      s.masa_2026_ann = Math.round((e.masa26ytd || 0) / YTD_FRAC);
+      s.sthd_2026_ann = Math.round((e.sthd26ytd || 0) / YTD_FRAC);
+    } else {
+      s.embed_2025 = 0; s.embed_2026_ytd = 0; s.embed_2026_ann = 0; s.embed_yoy = 0;
+      s.sstb_2025 = 0; s.masa_2025 = 0; s.sthd_2025 = 0;
+      s.sstb_2026_ytd = 0; s.masa_2026_ytd = 0; s.sthd_2026_ytd = 0;
       s.sstb_2026_ann = 0; s.masa_2026_ann = 0; s.sthd_2026_ann = 0;
     }
   });
-  // Sum national subtotals
-  EMBED_STATES.forEach(e => {
-    EMBED.sstb_2025 += e.sstb25 || 0;
-    EMBED.masa_2025 += e.masa25 || 0;
-    EMBED.sthd_2025 += e.sthd25 || 0;
-    EMBED.sstb_2026_ann += (e.sstb26 || 0) * 4;
-    EMBED.masa_2026_ann += (e.masa26 || 0) * 4;
-    EMBED.sthd_2026_ann += (e.sthd26 || 0) * 4;
-  });
+  // Set national subtotals directly from JSON (pre-computed)
+  EMBED.sstb_2026_ann = 10884566;
+  EMBED.masa_2026_ann = 10878460;
+  EMBED.sthd_2026_ann = 26854396;
 })();
 
 // Classify states by embed YoY
@@ -1640,8 +1644,8 @@ const sparkCharts = {};
 
 function buildSignalKPIs(grid) {
   const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
-  const embedAnn = EMBED.national_q1_2026 * 4;
-  const embedYoY = ((embedAnn - EMBED.national_total_2025) / EMBED.national_total_2025 * 100);
+  const embedAnn = EMBED.national_ann_2026;
+  const embedYoY = EMBED.national_yoy;
   const r = computeEmbedPermitCorrelation();
   const corrLabel = r > 0.8 ? 'Strong' : r >= 0.5 ? 'Moderate' : 'Weak';
   const corrColor = r > 0.8 ? '#34d399' : r >= 0.5 ? '#ffd166' : '#fb7185';
@@ -2271,7 +2275,7 @@ function buildSegmentMovers() {
 
 function buildSignalMovers() {
   // Filter out noisy small-volume states (<$50K in 2025)
-  const eligible = DATA.states.filter(s => (s.embed_2025 || 0) >= 50000);
+  const eligible = DATA.states.filter(s => (s.embed_2025 || 0) >= 1000000);
   const sorted = [...eligible].sort((a,b) => (b.embed_yoy || 0) - (a.embed_yoy || 0));
   const top5 = sorted.slice(0, 5);
   const bottom5 = sorted.slice(-5).reverse();
@@ -2336,11 +2340,13 @@ const SEGMENT_ALERTS = [
 ];
 
 const SIGNAL_ALERTS = [
-  { text: '<strong>NATIONAL:</strong> Embed sales annualizing at $93.7M — up 6.9% vs 2025. Foundations are going in.' },
-  { text: '<strong>NC SURGE:</strong> North Carolina embeds +35.1% YoY — strongest SST growth in the Southeast' },
-  { text: '<strong>CA + TX:</strong> Combined $52M/yr in embeds — 56% of national volume. Both accelerating.' },
-  { text: '<strong>NV COOLING:</strong> Nevada embeds -11.9% YoY despite strong permit data — builders hesitating?' },
-  { text: '<strong>SC BREAKOUT:</strong> South Carolina embeds +27.2% — outpacing permit growth of -5.1%. SST gaining share.' }
+  { text: '<strong>NEW DATA:</strong> Embed sales YTD through 5/13 — annualized pace $48.6M, +11.0% vs 2025 (was projected +6.9% from Q1)' },
+  { text: '<strong>CA SURGE:</strong> California embeds +18.1% YoY — pacing at $14.1M annualized, largest market' },
+  { text: '<strong>TX GROWTH:</strong> Texas embeds +13.0% YoY — pacing at $12.9M, holding share despite -3% permits' },
+  { text: '<strong>NC + GA BREAKOUT:</strong> NC +37.6%, GA +24.9% — Southeast accelerating into foundation orders' },
+  { text: '<strong>WEST COOLING:</strong> Utah -5.4%, Nevada -5.1% — first negative readings since tracking began' },
+  { text: '<strong>OK FREEZE:</strong> Oklahoma -25.0% — 2025 boom not repeating in 2026' },
+  { text: '<strong>STHD DOMINANCE:</strong> Holdowns now $26.9M annualized — 55% of embed mix (code-driven)' }
 ];
 
 let alertIndex = 0;
