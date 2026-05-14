@@ -713,6 +713,32 @@ html, body {
   50% { opacity: 0.5; }
 }
 
+/* ─── Legend-click pulse animation ─── */
+@keyframes statePulse {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 0px currentColor); }
+  50% { filter: brightness(1.4) drop-shadow(0 0 12px var(--accent)); }
+}
+.states path.pulse {
+  animation: statePulse 1.6s ease-in-out infinite;
+  stroke: var(--accent) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+.legend-bucket {
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin: -4px -6px;
+}
+.legend-bucket:hover {
+  background: rgba(250, 70, 22, 0.1);
+}
+.legend-bucket.active {
+  background: rgba(250, 70, 22, 0.2);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .app {
@@ -1435,6 +1461,61 @@ function fmtSegMoney(v) {
 // ════════════════════════════════════════════════════════════════════════
 let activeSegment = 'all';
 
+// ─── Legend-click highlight state ───
+let activeHighlight = null; // 'surge' | 'heating' | 'stable' | 'cooling' | 'freeze' | null
+
+function highlightClassification(cls) {
+  if (activeHighlight === cls) {
+    activeHighlight = null;
+  } else {
+    activeHighlight = cls;
+  }
+  applyHighlight();
+}
+
+function applyHighlight() {
+  const svg = d3.select('#map svg');
+  if (!svg.node()) return; // map not yet initialised
+
+  // Update legend button styling
+  document.querySelectorAll('.legend-bucket').forEach(b => {
+    b.classList.toggle('active', b.dataset.cls === activeHighlight);
+  });
+
+  if (!activeHighlight) {
+    // Clear all highlights
+    svg.selectAll('.states path').classed('pulse', false).attr('opacity', null);
+    return;
+  }
+
+  // Determine classification for each state based on current tab
+  const getClass = (s) => {
+    if (activeSegment === 'signal') {
+      const pscv = computePSCV(s);
+      if (pscv === null) return null;
+      return pscvClassification(pscv).toLowerCase();
+    } else if (activeSegment === 'segments') {
+      return segmentClassify(segYoY(s)).toLowerCase();
+    } else {
+      return (s.classification || '').toLowerCase();
+    }
+  };
+
+  svg.selectAll('.states path').each(function(d) {
+    const state = fipsLookup[d.id];
+    if (!state) {
+      d3.select(this).classed('pulse', false).attr('opacity', 0.25);
+      return;
+    }
+    const cls = getClass(state);
+    if (cls === activeHighlight) {
+      d3.select(this).classed('pulse', true).attr('opacity', 1);
+    } else {
+      d3.select(this).classed('pulse', false).attr('opacity', 0.25);
+    }
+  });
+}
+
 function computeSegments() {
   const highSF = ['TX','FL','NC','SC','GA','TN','ID','AZ','UT','NV','CO'];
   const lowSF = ['NY','NJ','MA','CT','RI','DC','MD','VA','DE','HI','IL','PA'];
@@ -1508,6 +1589,9 @@ function getSegmentSAARPrior() {
 
 function switchSegment(seg) {
   activeSegment = seg;
+  // Clear any active classification highlight when switching tabs
+  activeHighlight = null;
+  applyHighlight();
   document.querySelectorAll('.seg-tab').forEach(t => t.classList.toggle('active', t.dataset.seg === seg));
   const note = document.getElementById('segNote');
   if (seg === 'com') {
@@ -2220,9 +2304,14 @@ function buildPVSLegend() {
   container.innerHTML = '';
   ['freeze','cooling','stable','heating','surge'].forEach(cls => {
     const el = document.createElement('div');
-    el.className = 'pvs-count-item';
+    el.className = 'pvs-count-item legend-bucket';
+    el.dataset.cls = cls;
     el.style.color = classColor(cls);
+    el.title = cls.charAt(0).toUpperCase() + cls.slice(1) + ' — click to highlight';
+    el.onclick = () => highlightClassification(cls);
     el.textContent = counts[cls];
+    // Restore active state if this bucket is currently highlighted
+    if (activeHighlight === cls) el.classList.add('active');
     container.appendChild(el);
   });
 }
@@ -2606,19 +2695,8 @@ async function initD3Map() {
     .attr('style', 'text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.5); pointer-events: none;')
     .text(d => d.abbr);
 
-  // Emoji faces below abbreviation
-  svg.append('g')
-    .attr('class', 'emojis')
-    .selectAll('text')
-    .data(labelData)
-    .enter().append('text')
-    .attr('x', d => projection([d.lng, d.lat])[0])
-    .attr('y', d => projection([d.lng, d.lat])[1] + 11)
-    .attr('text-anchor', 'middle')
-    .attr('font-size', '8px')
-    .attr('style', 'pointer-events: none;')
-    .text(d => CLASS_EMOJI[d.classification] || '😐');
 }
+// (emoji group removed — state labels show abbreviation only)
 
 // ─── Signal Icons: Crystal Balls & Smoke Clouds ───
 
@@ -2873,14 +2951,6 @@ function updateMapColors() {
         return 0.35 + 0.5 * (Math.log(v25 + 1) / Math.log(maxV + 1));
       });
 
-    // Emoji reflects segment classification
-    d3.selectAll('.emojis text')
-      .data(DATA.states.filter(s => projection([s.lng, s.lat]) !== null))
-      .text(d => {
-        const v25 = segVal2025(d);
-        if (!v25 || v25 < 100000) return '';
-        return CLASS_EMOJI[segmentClassify(segYoY(d))] || '😐';
-      });
     renderSignalIcons();
     return;
   }
@@ -2906,18 +2976,6 @@ function updateMapColors() {
         return 0.35 + 0.5 * (Math.log(e + 1) / Math.log(maxE + 1));
       });
 
-    // Update emoji labels for signal mode (use PSCV classification)
-    d3.selectAll('.emojis text')
-      .data(DATA.states.filter(s => {
-        const c = projection([s.lng, s.lat]);
-        return c !== null;
-      }))
-      .text(d => {
-        if (!d.embed_2025 || d.embed_2025 < 1000) return '';
-        const pscv = computePSCV(d);
-        const cls = pscvClassification(pscv);
-        return CLASS_EMOJI[cls] || '😐';
-      });
     renderSignalIcons();
     return;
   }
@@ -2939,13 +2997,6 @@ function updateMapColors() {
       return 0.3 + 0.5 * (Math.log(p + 1) / Math.log(maxP + 1));
     });
 
-  // Update emoji labels
-  d3.selectAll('.emojis text')
-    .data(DATA.states.filter(s => {
-      const c = projection([s.lng, s.lat]);
-      return c !== null;
-    }))
-    .text(d => CLASS_EMOJI[d.classification] || '😐');
 }
 
 // ─── TOOLTIP (Thought Bubble) — SVG centroid positioning ───
