@@ -3386,6 +3386,216 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateTimestamp, 1000);
 });
 </script>
+
+<!-- ─── AI CHAT PANEL ─── -->
+<style>
+  .chat-fab {
+    position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #FA4616, #ff6b3d);
+    border: none; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(250,70,22,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .chat-fab:hover { transform: scale(1.05); box-shadow: 0 8px 28px rgba(250,70,22,0.6); }
+  .chat-fab svg { width: 26px; height: 26px; color: white; }
+  .chat-fab.open { transform: rotate(90deg); }
+  
+  .chat-panel {
+    position: fixed; bottom: 96px; right: 24px; z-index: 1000;
+    width: 420px; max-width: calc(100vw - 48px); height: 600px; max-height: calc(100vh - 140px);
+    background: rgba(35, 24, 69, 0.97); backdrop-filter: blur(20px);
+    border: 1px solid rgba(250,70,22,0.3); border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: none; flex-direction: column; overflow: hidden;
+    font-family: 'Inter', sans-serif;
+  }
+  .chat-panel.open { display: flex; animation: chatSlide 0.25s ease-out; }
+  @keyframes chatSlide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  
+  .chat-header {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-header-title { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; }
+  .chat-header-sub { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+  
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .chat-msg {
+    font-size: 13px; line-height: 1.55; color: var(--text-primary);
+  }
+  .chat-msg.user {
+    align-self: flex-end; max-width: 85%;
+    background: var(--accent-dim); border: 1px solid rgba(250,70,22,0.3);
+    padding: 8px 12px; border-radius: 12px 12px 2px 12px;
+    color: var(--text-primary);
+  }
+  .chat-msg.bot {
+    align-self: flex-start; max-width: 95%;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+  }
+  .chat-msg.bot strong { color: var(--text-primary); font-weight: 600; }
+  .chat-msg.loading {
+    align-self: flex-start; color: var(--text-muted); font-style: italic; font-size: 12px;
+  }
+  .chat-msg.error { color: var(--negative); font-size: 12px; }
+  
+  .chat-prompts {
+    padding: 0 18px 12px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .chat-prompts-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .chat-prompt-btn {
+    background: rgba(167,139,250,0.08); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 12px;
+    color: var(--text-secondary); cursor: pointer; text-align: left;
+    font-family: 'Inter', sans-serif; transition: all 0.15s;
+  }
+  .chat-prompt-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--text-primary); }
+  
+  .chat-input-wrap {
+    padding: 12px 18px 16px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .chat-input {
+    flex: 1; background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: 8px; padding: 10px 12px; font-size: 13px;
+    color: var(--text-primary); outline: none; font-family: 'Inter', sans-serif;
+    transition: border 0.15s;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-send {
+    background: var(--accent); color: white; border: none; border-radius: 8px;
+    padding: 0 14px; font-weight: 600; cursor: pointer; font-size: 13px;
+  }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+
+<button class="chat-fab" id="chatFab" title="Ask the Permit Pulse Analyst" aria-label="Open AI chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>
+</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <span class="chat-header-title">PERMIT PULSE ANALYST</span>
+    <span class="chat-header-sub">Kimi K2</span>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">Ask me about market conditions, where to focus, or what's driving the data. I have access to all the dashboard data — permits, embed velocity, PSCV scores, segments, and the latest forecasts.</div>
+  </div>
+  <div class="chat-prompts" id="chatPrompts">
+    <div class="chat-prompts-label">Try asking</div>
+    <button class="chat-prompt-btn" data-prompt="Where should we focus sales efforts in Q3 based on PSCV and embed velocity?">Where should we focus sales efforts in Q3?</button>
+    <button class="chat-prompt-btn" data-prompt="Which states show the strongest share-gain signals comparing embeds to permits?">Which states show share-gain signals?</button>
+    <button class="chat-prompt-btn" data-prompt="What's the early warning state to watch this quarter?">Early warning state to watch?</button>
+  </div>
+  <div class="chat-input-wrap">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question..." maxlength="500">
+    <button class="chat-send" id="chatSend">Send</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const fab = document.getElementById('chatFab');
+  const panel = document.getElementById('chatPanel');
+  const messages = document.getElementById('chatMessages');
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  const prompts = document.getElementById('chatPrompts');
+  
+  fab.addEventListener('click', () => {
+    panel.classList.toggle('open');
+    fab.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      setTimeout(() => input.focus(), 200);
+    }
+  });
+  
+  function addMessage(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + cls;
+    if (cls === 'bot') {
+      div.innerHTML = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    } else {
+      div.textContent = text;
+    }
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    return div;
+  }
+  
+  function buildContext() {
+    // Pull current data from global vars defined elsewhere in the page
+    return {
+      tab: typeof activeSegment !== 'undefined' ? activeSegment : 'all',
+      sub_segment: typeof activeSubSegment !== 'undefined' ? activeSubSegment : null,
+      national_indicators: typeof DATA !== 'undefined' ? DATA.national : null,
+      embed_national: typeof EMBED !== 'undefined' ? EMBED : null,
+      segment_national: typeof SEGMENT_DATA !== 'undefined' ? SEGMENT_DATA.national : null,
+      states_summary: typeof DATA !== 'undefined' ? DATA.states.map(s => ({
+        abbr: s.abbr, name: s.name,
+        permits_2025: s.permits_2025, permits_yoy: s.yoy_change,
+        pvs: s.pvs, classification: s.classification,
+        embed_2025: s.embed_2025, embed_2026_ann: s.embed_2026_ann, embed_yoy: s.embed_yoy,
+        residential_2025: s.residential_2025, residential_yoy: s.residential_yoy,
+        commercial_2025: s.commercial_2025, commercial_yoy: s.commercial_yoy,
+        national_retail_2025: s.national_retail_2025, national_retail_yoy: s.national_retail_yoy,
+        oem_2025: s.oem_2025, oem_yoy: s.oem_yoy,
+        component_mfg_2025: s.component_mfg_2025, component_mfg_yoy: s.component_mfg_yoy
+      })) : []
+    };
+  }
+  
+  async function sendQuestion(question) {
+    if (!question || !question.trim()) return;
+    addMessage(question, 'user');
+    input.value = '';
+    sendBtn.disabled = true;
+    prompts.style.display = 'none';
+    
+    const loading = addMessage('Analyzing...', 'loading');
+    
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question.trim(), context: buildContext() })
+      });
+      loading.remove();
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        addMessage('Error: ' + (errData.error || res.statusText), 'error');
+      } else {
+        const data = await res.json();
+        addMessage(data.answer, 'bot');
+      }
+    } catch (e) {
+      loading.remove();
+      addMessage('Error: ' + e.message, 'error');
+    }
+    sendBtn.disabled = false;
+    input.focus();
+  }
+  
+  sendBtn.addEventListener('click', () => sendQuestion(input.value));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendQuestion(input.value);
+  });
+  prompts.addEventListener('click', (e) => {
+    if (e.target.classList.contains('chat-prompt-btn')) {
+      sendQuestion(e.target.dataset.prompt);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
 <!-- redeploy trigger 1778802095 -->
