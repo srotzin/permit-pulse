@@ -6,7 +6,7 @@
   ],
   "routes": [
     { "src": "/health", "dest": "/server.js" },
-    { "src": "/ai/(.*)", "dest": "/server.js" },
+    { "src": "/api/(.*)", "dest": "/server.js" },
     { "src": "/app", "dest": "/app.html" },
     { "src": "/", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/$1" }
