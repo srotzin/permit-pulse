@@ -1018,6 +1018,34 @@ html, body {
   .subseg-note { display: none; }
   .mix-legend { grid-template-columns: 1fr; }
 }
+
+/* ─── Branch Pill Bar ─── */
+.branch-bar {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 50;
+  background: rgba(35,24,69,0.92); padding: 6px 8px; border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+.branch-pill {
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
+  border-radius: 6px; display: flex; align-items: center; gap: 5px;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+  white-space: nowrap;
+}
+.branch-pill:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+.branch-pill.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.branch-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.branch-banner {
+  position: absolute; top: 58px; left: 50%; transform: translateX(-50%);
+  background: rgba(35,24,69,0.97); padding: 8px 16px; border-radius: 8px;
+  font-size: 12px; color: var(--text-secondary); z-index: 50;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  text-align: center; line-height: 1.5;
+  white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -1139,6 +1167,24 @@ html, body {
   <div class="map-container">
     <div id="map"></div>
     <div class="map-tooltip" id="tooltip"></div>
+
+    <!-- ─── BRANCH PILL BAR (always visible, permanent overlay) ─── -->
+    <div class="branch-bar" id="branchBar">
+      <button class="branch-pill active" data-branch="all" onclick="filterByBranch(null)">All Branches</button>
+      <button class="branch-pill" data-branch="BR20" onclick="filterByBranch('BR20')">
+        <span class="branch-dot" style="background:#10b981"></span> Stockton
+      </button>
+      <button class="branch-pill" data-branch="BR22" onclick="filterByBranch('BR22')">
+        <span class="branch-dot" style="background:#ec4899"></span> Riverside
+      </button>
+      <button class="branch-pill" data-branch="BR23" onclick="filterByBranch('BR23')">
+        <span class="branch-dot" style="background:#fb923c"></span> McKinney
+      </button>
+      <button class="branch-pill" data-branch="BR24" onclick="filterByBranch('BR24')">
+        <span class="branch-dot" style="background:#3b82f6"></span> Columbus
+      </button>
+    </div>
+    <div class="branch-banner" id="branchBanner" style="display:none;"></div>
   </div>
 
   <!-- ─── BOTTOM BAR ─── -->
@@ -1476,6 +1522,51 @@ const SEGMENT_DATA = {"national":{"residential_2025":1146929396,"residential_202
   });
 })();
 
+// ════════════════════════════════════════════════════════════════════════
+// BRANCH FACTORY DATA
+// ════════════════════════════════════════════════════════════════════════
+const BRANCHES = {
+  BR20: {
+    name: 'Stockton',
+    location: 'Stockton, CA',
+    lat: 37.9577, lng: -121.2908,
+    color: '#10b981', // emerald green
+    states: ['CA','NV','AK','WA','OR','ID','MT','WY','UT','CO'],
+    note: 'Northern CA + Northern Nevada (south to King City / north of Vegas served by Riverside)'
+  },
+  BR22: {
+    name: 'Riverside',
+    location: 'Riverside, CA',
+    lat: 33.9806, lng: -117.3755,
+    color: '#ec4899', // pink
+    states: ['AZ','NM','HI'],
+    note: 'Southern CA + Las Vegas region also served from Riverside'
+  },
+  BR23: {
+    name: 'McKinney',
+    location: 'McKinney, TX',
+    lat: 33.1972, lng: -96.6398,
+    color: '#fb923c', // orange
+    states: ['TX','OK','AR','LA','MS','AL','TN','KY','MO','GA','FL','SC','NC','VA']
+  },
+  BR24: {
+    name: 'Columbus',
+    location: 'Columbus, OH',
+    lat: 39.9612, lng: -82.9988,
+    color: '#3b82f6', // blue
+    states: ['OH','MI','IN','IL','WI','MN','IA','ND','SD','NE','KS','PA','NY','NJ','MA','CT','RI','NH','VT','ME','WV','MD','DE','DC']
+  }
+};
+
+// Reverse lookup: state abbr → branch ID
+const STATE_TO_BRANCH = {};
+Object.keys(BRANCHES).forEach(brId => {
+  BRANCHES[brId].states.forEach(s => { STATE_TO_BRANCH[s] = brId; });
+});
+
+// Branch filter state (independent of segment/highlight filters)
+let activeBranch = null; // null = show all
+
 // Sub-segment state (only relevant when activeSegment === 'segments')
 let activeSubSegment = 'residential';
 
@@ -1541,6 +1632,8 @@ function applyHighlight() {
   if (!activeHighlight) {
     // Clear all highlights
     svg.selectAll('.states path').classed('pulse', false).attr('opacity', null);
+    // Re-apply branch filter if active
+    if (activeBranch) applyBranchFilter();
     return;
   }
 
@@ -1557,10 +1650,18 @@ function applyHighlight() {
     }
   };
 
+  // If branch filter active, only highlight within that territory
+  const branchSet = activeBranch ? new Set(BRANCHES[activeBranch].states) : null;
+
   svg.selectAll('.states path').each(function(d) {
     const state = fipsLookup[d.id];
     if (!state) {
       d3.select(this).classed('pulse', false).attr('opacity', 0.25);
+      return;
+    }
+    // If branch filter active, dim states outside territory
+    if (branchSet && !branchSet.has(state.abbr)) {
+      d3.select(this).classed('pulse', false).attr('opacity', 0.1);
       return;
     }
     const cls = getClass(state);
@@ -1703,6 +1804,8 @@ function switchSegment(seg) {
   rotateAlert(true);
   if (selectedState) selectState(selectedState.abbr);
   renderSignalIcons();
+  // Re-apply branch filter overlay if one is active (persists across tab switches)
+  if (activeBranch) applyBranchFilter();
 }
 
 // Switch sub-segment inside the Segments tab
@@ -2386,7 +2489,13 @@ function buildMovers() {
   }
   const pKey25 = getPermitKey2025();
   const pKey24 = getPermitKey2024();
-  const sorted = [...DATA.states].sort((a,b) => b.pvs - a.pvs);
+  // Filter by active branch if one is selected
+  let statePool = DATA.states;
+  if (activeBranch) {
+    const branchSet = new Set(BRANCHES[activeBranch].states);
+    statePool = DATA.states.filter(s => branchSet.has(s.abbr));
+  }
+  const sorted = [...statePool].sort((a,b) => b.pvs - a.pvs);
   const top5 = sorted.slice(0, 5);
   const bottom5 = sorted.slice(-5).reverse();
 
@@ -2426,7 +2535,12 @@ function segmentMoverThreshold() {
 
 function buildSegmentMovers() {
   const threshold = segmentMoverThreshold();
-  const eligible = DATA.states.filter(s => segVal2025(s) >= threshold);
+  let pool = DATA.states;
+  if (activeBranch) {
+    const branchSet = new Set(BRANCHES[activeBranch].states);
+    pool = pool.filter(s => branchSet.has(s.abbr));
+  }
+  const eligible = pool.filter(s => segVal2025(s) >= threshold);
   const sorted = [...eligible].sort((a, b) => segYoY(b) - segYoY(a));
   const top5 = sorted.slice(0, 5);
   const bottom5 = sorted.slice(-5).reverse();
@@ -2462,7 +2576,12 @@ function buildSegmentMovers() {
 
 function buildSignalMovers() {
   // Filter to states with embed_2025 > $500K to avoid noise from tiny states
-  const eligible = DATA.states.filter(s => (s.embed_2025 || 0) >= 500000);
+  let pool = DATA.states;
+  if (activeBranch) {
+    const branchSet = new Set(BRANCHES[activeBranch].states);
+    pool = pool.filter(s => branchSet.has(s.abbr));
+  }
+  const eligible = pool.filter(s => (s.embed_2025 || 0) >= 500000);
   // Compute PSCV for each, filter out nulls
   const withPSCV = eligible
     .map(s => ({ s, pscv: computePSCV(s) }))
@@ -2753,6 +2872,15 @@ async function initD3Map() {
     .attr('style', 'text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.5); pointer-events: none;')
     .text(d => d.abbr);
 
+  // ─── Branch Factories (permanent overlay, on top of everything) ───
+  const factoryG = svg.append('g').attr('class', 'factories');
+  Object.entries(BRANCHES).forEach(([id, br]) => {
+    const coords = projection([br.lng, br.lat]);
+    if (coords) {
+      drawFactory(factoryG, coords[0], coords[1], { ...br, id }, 1);
+    }
+  });
+
 }
 // (emoji group removed — state labels show abbreviation only)
 
@@ -2985,6 +3113,200 @@ function renderSignalIcons() {
       drawSmoke(g, x, y, smokeSeverity);
     }
   });
+}
+
+// ─── Factory Icon Drawing ───
+function drawFactory(g, x, y, branch, scale) {
+  scale = scale || 1;
+  const factory = g.append('g')
+    .attr('transform', `translate(${x}, ${y}) scale(${scale})`)
+    .attr('class', `factory factory-${branch.id}`)
+    .attr('cursor', 'pointer');
+
+  // Glow halo
+  factory.append('circle')
+    .attr('cx', 0).attr('cy', 0).attr('r', 22)
+    .attr('fill', branch.color + '33')
+    .attr('class', 'factory-glow');
+
+  // Building base
+  factory.append('rect')
+    .attr('x', -10).attr('y', -2)
+    .attr('width', 20).attr('height', 12)
+    .attr('rx', 1)
+    .attr('fill', '#3a2d5e')
+    .attr('stroke', branch.color)
+    .attr('stroke-width', 1.2);
+
+  // Roof
+  factory.append('path')
+    .attr('d', 'M-10,-2 L-7,-6 L-3,-2 L0,-6 L4,-2 L7,-6 L10,-2 Z')
+    .attr('fill', '#3a2d5e')
+    .attr('stroke', branch.color)
+    .attr('stroke-width', 1.2);
+
+  // Smokestack
+  factory.append('rect')
+    .attr('x', -8).attr('y', -10)
+    .attr('width', 3).attr('height', 6)
+    .attr('fill', '#3a2d5e')
+    .attr('stroke', branch.color)
+    .attr('stroke-width', 1);
+
+  // Smoke puffs
+  for (let i = 0; i < 2; i++) {
+    const puff = factory.append('circle')
+      .attr('cx', -6.5).attr('cy', -10).attr('r', 1.8)
+      .attr('fill', branch.color).attr('opacity', 0.6);
+    puff.append('animate')
+      .attr('attributeName', 'cy').attr('values', '-10;-18')
+      .attr('dur', '2s').attr('begin', `${i * 1}s`).attr('repeatCount', 'indefinite');
+    puff.append('animate')
+      .attr('attributeName', 'r').attr('values', '1.5;3.5')
+      .attr('dur', '2s').attr('begin', `${i * 1}s`).attr('repeatCount', 'indefinite');
+    puff.append('animate')
+      .attr('attributeName', 'opacity').attr('values', '0.7;0')
+      .attr('dur', '2s').attr('begin', `${i * 1}s`).attr('repeatCount', 'indefinite');
+  }
+
+  // Windows
+  for (let i = -7; i <= 7; i += 4) {
+    factory.append('rect')
+      .attr('x', i - 1).attr('y', 2).attr('width', 2).attr('height', 2)
+      .attr('fill', '#fbbf24').attr('opacity', 0.85);
+  }
+
+  // Branch label beneath the factory
+  factory.append('text')
+    .attr('x', 0).attr('y', 20)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', 'Inter, sans-serif')
+    .attr('font-size', '8px')
+    .attr('font-weight', '700')
+    .attr('fill', branch.color)
+    .attr('pointer-events', 'none')
+    .text(branch.name);
+
+  // Invisible hit area for easier clicking
+  factory.append('rect')
+    .attr('x', -22).attr('y', -22)
+    .attr('width', 44).attr('height', 50)
+    .attr('fill', 'transparent')
+    .on('mouseenter', () => showFactoryTooltip(branch))
+    .on('mouseleave', hideTooltip)
+    .on('click', () => filterByBranch(branch.id));
+
+  return factory;
+}
+
+// ─── Factory Tooltip ───
+function showFactoryTooltip(branch) {
+  const tip = document.getElementById('tooltip');
+  tip.innerHTML = `
+    <div class="tooltip-name">
+      <span style="color:${branch.color};">⌂ ${branch.name}</span>
+      <span class="tooltip-classification" style="color:${branch.color};border:1px solid ${branch.color}44">${branch.id}</span>
+    </div>
+    <div class="tooltip-grid">
+      <span class="tooltip-label">Location</span>
+      <span class="tooltip-val">${branch.location}</span>
+      <span class="tooltip-label">Territory</span>
+      <span class="tooltip-val">${branch.states.length} states</span>
+      <span class="tooltip-label">States</span>
+      <span class="tooltip-val" style="font-size:10px;max-width:140px;white-space:normal;word-break:break-word;">${branch.states.join(', ')}</span>
+    </div>
+    ${branch.note ? `<div style="font-size:10px;color:var(--text-muted);margin-top:6px;line-height:1.4;">${branch.note}</div>` : ''}
+    <div style="font-size:10px;color:var(--text-muted);margin-top:6px;font-style:italic;">Click to filter map</div>
+  `;
+
+  // Position near cursor — use map-relative positioning
+  // We position in the center-top area since factory position is fixed
+  const mapRect = document.getElementById('map').getBoundingClientRect();
+  const svgEl = document.querySelector('#map svg');
+  if (!svgEl) return;
+  const svgRect = svgEl.getBoundingClientRect();
+  const scaleX = svgRect.width / 975;
+  const scaleY = svgRect.height / 610;
+
+  // Project factory lat/lng to screen
+  if (projection) {
+    const coords = projection([branch.lng, branch.lat]);
+    if (coords) {
+      const screenX = svgRect.left - mapRect.left + coords[0] * scaleX;
+      const screenY = svgRect.top - mapRect.top + coords[1] * scaleY;
+
+      tip.style.visibility = 'hidden';
+      tip.classList.add('visible');
+      const tipHeight = tip.offsetHeight;
+      const tipWidth = tip.offsetWidth;
+
+      let left = screenX;
+      let top = screenY - tipHeight - 30;
+      if (top < 5) top = screenY + 30;
+      if (left - tipWidth / 2 < 10) left = tipWidth / 2 + 10;
+      else if (left + tipWidth / 2 > mapRect.width - 10) left = mapRect.width - tipWidth / 2 - 10;
+
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+      tip.style.visibility = '';
+      return;
+    }
+  }
+  tip.classList.add('visible');
+}
+
+// ─── Branch Filter Logic ───
+function filterByBranch(brId) {
+  if (activeBranch === brId) {
+    activeBranch = null; // toggle off
+  } else {
+    activeBranch = brId;
+  }
+  applyBranchFilter();
+}
+
+function applyBranchFilter() {
+  if (window.updateChatPromptsForBranch) window.updateChatPromptsForBranch();
+  const svg = d3.select('#map svg');
+
+  // Update pill bar
+  document.querySelectorAll('.branch-pill').forEach(p => {
+    const isAll = (p.dataset.branch === 'all');
+    const isActive = activeBranch === null ? isAll : (p.dataset.branch === activeBranch);
+    p.classList.toggle('active', isActive);
+  });
+
+  if (!activeBranch) {
+    // Clear branch filter — restore full opacity on states
+    svg.selectAll('.states path').attr('opacity', null);
+    // Restore factories to full opacity
+    svg.selectAll('.factory').attr('opacity', 1);
+    document.getElementById('branchBanner').style.display = 'none';
+    // Re-run highlight in case one was active
+    applyHighlight();
+    return;
+  }
+
+  const branch = BRANCHES[activeBranch];
+  const stateSet = new Set(branch.states);
+
+  svg.selectAll('.states path').each(function(d) {
+    const state = fipsLookup[d.id];
+    if (!state) { d3.select(this).attr('opacity', 0.12); return; }
+    d3.select(this).attr('opacity', stateSet.has(state.abbr) ? 1 : 0.12);
+  });
+
+  // Dim all factories, brighten active one
+  svg.selectAll('.factory').attr('opacity', 0.3);
+  svg.select(`.factory-${activeBranch}`).attr('opacity', 1);
+
+  // Show banner
+  const banner = document.getElementById('branchBanner');
+  banner.style.display = 'block';
+  banner.innerHTML = `<span style="color:${branch.color};font-weight:700;">⌂ ${branch.name}</span> Territory · ${branch.states.length} states · ${branch.location}${branch.note ? `<br><span style="font-size:10px;color:var(--text-muted);white-space:normal;">${branch.note}</span>` : ''}`;
+
+  // Also rebuild movers to filter by this branch
+  buildMovers();
 }
 
 // ─── Update map fills when segment changes or simulation ticks ───
@@ -3490,10 +3812,12 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="chat-msg bot">Ask me about market conditions, where to focus, or what's driving the data. I have access to all the dashboard data — permits, embed velocity, PSCV scores, segments, and the latest forecasts.</div>
   </div>
   <div class="chat-prompts" id="chatPrompts">
-    <div class="chat-prompts-label">Try asking</div>
-    <button class="chat-prompt-btn" data-prompt="Where should we focus sales efforts in Q3 based on PSCV and embed velocity?">Where should we focus sales efforts in Q3?</button>
-    <button class="chat-prompt-btn" data-prompt="Which states show the strongest share-gain signals comparing embeds to permits?">Which states show share-gain signals?</button>
-    <button class="chat-prompt-btn" data-prompt="What's the early warning state to watch this quarter?">Early warning state to watch?</button>
+    <div class="chat-prompts-label" id="chatPromptsLabel">Try asking</div>
+    <div id="chatPromptsList">
+      <button class="chat-prompt-btn" data-prompt="Where should we focus sales efforts in Q3 based on PSCV and embed velocity?">Where should we focus sales efforts in Q3?</button>
+      <button class="chat-prompt-btn" data-prompt="Which states show the strongest share-gain signals comparing embeds to permits?">Which states show share-gain signals?</button>
+      <button class="chat-prompt-btn" data-prompt="What's the early warning state to watch this quarter?">Early warning state to watch?</button>
+    </div>
   </div>
   <div class="chat-input-wrap">
     <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question..." maxlength="500">
@@ -3532,14 +3856,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function buildContext() {
-    // Pull current data from global vars defined elsewhere in the page
+    const branch = typeof activeBranch !== 'undefined' && activeBranch ? BRANCHES[activeBranch] : null;
+    const stateFilter = branch ? new Set(branch.states) : null;
+    
+    let states = typeof DATA !== 'undefined' ? DATA.states : [];
+    if (stateFilter) states = states.filter(s => stateFilter.has(s.abbr));
+    
     return {
       tab: typeof activeSegment !== 'undefined' ? activeSegment : 'all',
       sub_segment: typeof activeSubSegment !== 'undefined' ? activeSubSegment : null,
+      active_branch: branch ? {
+        id: typeof activeBranch !== 'undefined' ? activeBranch : null,
+        name: branch.name,
+        location: branch.location,
+        territory_states: branch.states,
+        territory_count: branch.states.length,
+        note: branch.note || null
+      } : null,
       national_indicators: typeof DATA !== 'undefined' ? DATA.national : null,
       embed_national: typeof EMBED !== 'undefined' ? EMBED : null,
       segment_national: typeof SEGMENT_DATA !== 'undefined' ? SEGMENT_DATA.national : null,
-      states_summary: typeof DATA !== 'undefined' ? DATA.states.map(s => ({
+      states_summary: states.map(s => ({
         abbr: s.abbr, name: s.name,
         permits_2025: s.permits_2025, permits_yoy: s.yoy_change,
         pvs: s.pvs, classification: s.classification,
@@ -3549,7 +3886,7 @@ document.addEventListener('DOMContentLoaded', () => {
         national_retail_2025: s.national_retail_2025, national_retail_yoy: s.national_retail_yoy,
         oem_2025: s.oem_2025, oem_yoy: s.oem_yoy,
         component_mfg_2025: s.component_mfg_2025, component_mfg_yoy: s.component_mfg_yoy
-      })) : []
+      }))
     };
   }
   
@@ -3584,6 +3921,34 @@ document.addEventListener('DOMContentLoaded', () => {
     input.focus();
   }
   
+
+  // Branch-aware prompts that swap when a branch is selected
+  window.updateChatPromptsForBranch = function() {
+    const list = document.getElementById('chatPromptsList');
+    const label = document.getElementById('chatPromptsLabel');
+    if (!list || !label) return;
+    
+    const branch = typeof activeBranch !== 'undefined' && activeBranch ? BRANCHES[activeBranch] : null;
+    
+    if (branch) {
+      label.textContent = `${branch.name} Branch · Try asking`;
+      list.innerHTML = `
+        <button class="chat-prompt-btn" data-prompt="Generate a full briefing for the ${branch.name} branch: focus markets, cooling markets, product movement, production strategy, marketing plays, and the biggest 90-day risk.">⚡ Generate ${branch.name} Branch Brief</button>
+        <button class="chat-prompt-btn" data-prompt="Where should the ${branch.name} branch focus its sales effort next quarter?">Where to focus this branch's sales?</button>
+        <button class="chat-prompt-btn" data-prompt="What's the early warning state to watch in the ${branch.name} territory?">Early warning state in this territory?</button>
+        <button class="chat-prompt-btn" data-prompt="How should ${branch.name} production be flexed given current demand signals? Consider plant capacity and territory mix.">How should production flex for this branch?</button>
+        <button class="chat-prompt-btn" data-prompt="What's the biggest share-loss risk in the ${branch.name} branch's territory and what action would mitigate it?">Biggest share-loss risk?</button>
+      `;
+    } else {
+      label.textContent = 'Try asking';
+      list.innerHTML = `
+        <button class="chat-prompt-btn" data-prompt="Where should we focus sales efforts in Q3 based on PSCV and embed velocity?">Where should we focus sales efforts in Q3?</button>
+        <button class="chat-prompt-btn" data-prompt="Which states show the strongest share-gain signals comparing embeds to permits?">Which states show share-gain signals?</button>
+        <button class="chat-prompt-btn" data-prompt="What's the early warning state to watch this quarter?">Early warning state to watch?</button>
+      `;
+    }
+  };
+
   sendBtn.addEventListener('click', () => sendQuestion(input.value));
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendQuestion(input.value);

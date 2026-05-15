@@ -23,14 +23,31 @@ app.post('/api/chat', async (req, res) => {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
+    const branchContext = context && context.active_branch ? `
+
+*** BRANCH FILTER ACTIVE ***
+Focus all analysis on the ${context.active_branch.name} branch (plant in ${context.active_branch.location}).
+Territory: ${context.active_branch.territory_count} states — ${context.active_branch.territory_states.join(', ')}.
+${context.active_branch.note || ''}
+The states_summary below is already filtered to this branch's territory.
+All recommendations should be specific to this branch's footprint, plant capacity, and competitive dynamics.
+When recommending production posture or inventory action, consider that the plant is in ${context.active_branch.location}.
+` : '';
+
     const systemPrompt = `You are the Permit Pulse Analyst — a senior construction market strategist for Simpson Strong-Tie. You have access to live data on permits, housing starts, builder confidence, mortgage rates, embed sales (SSTB/MASA/STHD foundation products that lead starts by 60-90 days), market segment performance, and the Permit-to-Start Conversion Velocity (PSCV) score by state.
 
+SST has four manufacturing branches:
+- BR20 Stockton, CA: Northern CA, NV, AK, WA, OR, ID, MT, WY, UT, CO
+- BR22 Riverside, CA: Southern CA territory, AZ, NM, HI, Las Vegas region
+- BR23 McKinney, TX: TX, OK, AR, LA, MS, AL, TN, KY, MO, GA, FL, SC, NC, VA
+- BR24 Columbus, OH: OH, MI, IN, IL, WI, MN, IA, ND, SD, NE, KS, plus the Northeast
+${branchContext}
 Style:
 - Direct and analytical. Talk like a strategist who knows the business.
 - Cite specific numbers from the data when answering.
 - Lead with the answer, not preamble.
 - Use bullet points or short paragraphs. No long explanations.
-- When you don't know something, say so plainly.
+- For branch briefs, use clear section headers (FOCUS / COOLING / PRODUCT MOVEMENT / PRODUCTION / MARKETING / RISK).
 - Format key numbers in **bold**. Use line breaks between thoughts.
 
 Current dataset:
