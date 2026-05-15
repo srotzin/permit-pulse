@@ -351,6 +351,37 @@ html, body {
   text-align: right;
 }
 
+/* ─── Market Brief ─── */
+.market-brief-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.market-brief-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 4px;
+}
+.market-brief-body p {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.market-brief-forecast {
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+.market-brief-source {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(61,46,107,0.5);
+}
+
 /* ─── Alerts ─── */
 .alerts-panel {
   background: var(--bg-card);
@@ -1088,6 +1119,16 @@ html, body {
       <div id="alertContent"></div>
     </div>
 
+    <div class="market-brief-panel">
+      <div class="section-label">Market Brief</div>
+      <div class="market-brief-body">
+        <p>Residential downshifting. March starts surged (SF + MF both up) but read it as Feb weather payback, not a turnaround. YTD permits -2.6%, single-family slowdown driven by buyer affordability, soft new-home sales, and elevated inventory.</p>
+        <p>Multifamily outperforming on firmer apartment fundamentals and lower cost of capital.</p>
+        <p class="market-brief-forecast">Forecast: April housing starts at 1,337K SAAR — below consensus.</p>
+      </div>
+      <div class="market-brief-source">SST Research &middot; Updated May 2026</div>
+    </div>
+
     <div class="movers-panel">
       <div class="section-label">Bottom Movers — Cooling</div>
       <div id="bottomMovers"></div>
@@ -1150,7 +1191,8 @@ const DATA = {
         {date:"2025-04",value:1398},{date:"2025-05",value:1282},{date:"2025-06",value:1353},
         {date:"2025-07",value:1238},{date:"2025-08",value:1361},{date:"2025-09",value:1328},
         {date:"2025-10",value:1272},{date:"2025-11",value:1324},{date:"2025-12",value:1387},
-        {date:"2026-01",value:1487}
+        {date:"2026-01",value:1487},{date:"2026-02",value:1322},{date:"2026-03",value:1487},
+        {date:"2026-04",value:1337}
       ]
     },
     builder_confidence_hmi: {
@@ -2456,6 +2498,10 @@ function buildSignalMovers() {
 // ALERTS
 // ═══════════════════════════════════════════════════════════════════════
 const ALERTS = [
+  { text: '<strong>MARCH SURGE:</strong> Housing starts jumped on SF + MF gains — but read as Feb weather payback, not turnaround' },
+  { text: '<strong>PERMITS YTD:</strong> Down -2.6% through March — single-family slowdown on affordability + inventory' },
+  { text: '<strong>FORECAST:</strong> April starts expected at 1,337K SAAR — below consensus, reflecting moderating trend' },
+  { text: '<strong>MULTIFAMILY EDGE:</strong> Apartment fundamentals firming, lower cost of capital — MF outperforming SF' },
   { text: '<strong>CA:</strong> 8 disaster events in 2025 — rebuild permits expected Q2 2026' },
   { text: '<strong>TX:</strong> Largest permit volume nationally (218.5K) despite -3.2% YoY decline' },
   { text: '<strong>HI:</strong> Permit surge +10.5% YoY — only state with accelerating permits' },
