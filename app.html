@@ -1046,6 +1046,235 @@ html, body {
   text-align: center; line-height: 1.5;
   white-space: nowrap;
 }
+
+/* ─── iOS-style Toggle Switch ─── */
+.layer-toggle-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-switch input[type="checkbox"] {
+  display: none;
+}
+.toggle-track {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--border);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.toggle-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: var(--accent);
+}
+.toggle-switch input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+}
+.toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.warehouse-icon {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.warehouse-icon:hover {
+  opacity: 1 !important;
+}
+
+/* ─── Globe Tab ─── */
+.seg-tab.globe-tab {
+  position: relative;
+}
+.globe-glyph {
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 13px;
+  vertical-align: -1px;
+}
+.seg-tab.globe-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(13,10,31,0.6) 0%, rgba(45,35,88,0.6) 100%);
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.4), 0 0 12px rgba(167,139,250,0.25);
+}
+
+/* ─── Globe View Layout ─── */
+#globeView {
+  display: flex;
+}
+.globe-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px 8px;
+  background: rgba(13,10,31,0.7);
+  border-bottom: 1px solid rgba(167,139,250,0.2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.globe-region-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.2);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.globe-region-btn:hover {
+  color: var(--text-primary);
+  background: rgba(167,139,250,0.18);
+  border-color: rgba(167,139,250,0.5);
+}
+.globe-region-btn.active {
+  color: #fff;
+  background: rgba(167,139,250,0.25);
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.3);
+}
+.globe-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(13,10,31,0.6);
+  border-top: 1px solid rgba(167,139,250,0.15);
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.globe-stat-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #a78bfa;
+}
+.globe-stat-sep {
+  color: var(--border);
+}
+.globe-legend {
+  position: absolute;
+  bottom: 50px;
+  right: 16px;
+  background: rgba(13,10,31,0.85);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+.globe-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+.globe-legend-item:last-child { margin-bottom: 0; }
+.globe-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+/* ─── Globe Facility Detail Card ─── */
+.globe-facility-card {
+  position: absolute;
+  bottom: 50px;
+  left: 16px;
+  width: 280px;
+  background: rgba(35,24,69,0.97);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(250,70,22,0.35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  z-index: 200;
+  animation: slideIn 0.25s ease-out;
+}
+.globe-card-close {
+  position: absolute;
+  top: 8px; right: 12px;
+  background: none; border: none;
+  color: var(--text-muted);
+  cursor: pointer; font-size: 18px;
+  line-height: 1; padding: 2px;
+}
+.globe-card-close:hover { color: var(--text-primary); }
+.globe-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  padding-right: 20px;
+}
+.globe-card-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.07);
+  margin-bottom: 10px;
+}
+.globe-card-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+.globe-card-label { color: var(--text-muted); }
+.globe-card-val { font-weight: 600; color: var(--text-primary); }
+.globe-tooltip {
+  position: absolute;
+  background: rgba(35,24,69,0.95);
+  border: 1px solid rgba(167,139,250,0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.15s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.globe-tooltip.visible { opacity: 1; }
 </style>
 </head>
 <body>
@@ -1072,6 +1301,7 @@ html, body {
     <button class="seg-tab" data-seg="com" onclick="switchSegment('com')">Commercial ≤5 Stories</button>
     <button class="seg-tab signal-tab" data-seg="signal" onclick="switchSegment('signal')"><span class="signal-dot"></span>Simpson Signal</button>
     <button class="seg-tab segments-tab" data-seg="segments" onclick="switchSegment('segments')"><span class="segments-glyph">◆</span>SST Segments</button>
+    <button class="seg-tab globe-tab" data-seg="globe" onclick="switchSegment('globe')"><span class="globe-glyph">🌍</span>Global</button>
     <span class="seg-note" id="segNote">Commercial ≤5 stories · Estimated from residential permit ratios · Live data via Shovels.ai</span>
   </nav>
 
@@ -1147,6 +1377,15 @@ html, body {
       <div id="alertContent"></div>
     </div>
 
+    <!-- Warehouse Layer Toggle -->
+    <div class="layer-toggle-panel">
+      <label class="toggle-switch">
+        <input type="checkbox" id="warehouseToggle" onchange="toggleWarehouseLayer(this.checked)" />
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">Show Warehouses</span>
+      </label>
+    </div>
+
     <div class="market-brief-panel">
       <div class="section-label">Market Brief</div>
       <div class="market-brief-body">
@@ -1166,6 +1405,34 @@ html, body {
   <!-- ─── MAP ─── -->
   <div class="map-container">
     <div id="map"></div>
+
+    <!-- ─── GLOBE VIEW (7th tab) ─── -->
+    <div id="globeView" style="display:none; width:100%; height:100%; flex-direction:column; background:var(--bg-primary); position:absolute; top:0; left:0;">
+      <div class="globe-controls">
+        <button class="globe-region-btn" data-region="world">🌍 World</button>
+        <button class="globe-region-btn" data-region="north_america">🇺🇸 N. America</button>
+        <button class="globe-region-btn" data-region="europe">🇪🇺 Europe</button>
+        <button class="globe-region-btn" data-region="asia_pacific">🌏 Asia Pacific</button>
+        <button class="globe-region-btn" data-region="latam">🇨🇱 LATAM</button>
+      </div>
+      <div id="globeContainer" style="flex:1; position:relative; overflow:hidden;"></div>
+      <div class="globe-stats">
+        <span class="globe-stat"><span class="globe-stat-val">69</span> Facilities</span>
+        <span class="globe-stat-sep">&middot;</span>
+        <span class="globe-stat"><span class="globe-stat-val">21</span> Countries</span>
+        <span class="globe-stat-sep">&middot;</span>
+        <span class="globe-stat"><span class="globe-stat-val">5</span> Regions</span>
+        <span class="globe-stat-sep">&middot;</span>
+        <span class="globe-stat" id="globeStatFilter"><span class="globe-stat-val">All</span> Types</span>
+      </div>
+    </div>
+
+    <!-- ─── GLOBE FACILITY DETAIL CARD ─── -->
+    <div id="globeFacilityCard" class="globe-facility-card" style="display:none;">
+      <button class="globe-card-close" onclick="closeGlobeFacilityCard()">&times;</button>
+      <div id="globeFacilityCardContent"></div>
+    </div>
+
     <div class="map-tooltip" id="tooltip"></div>
 
     <!-- ─── BRANCH PILL BAR (always visible, permanent overlay) ─── -->
@@ -1555,6 +1822,24 @@ const BRANCHES = {
     lat: 39.9612, lng: -82.9988,
     color: '#3b82f6', // blue
     states: ['OH','MI','IN','IL','WI','MN','IA','ND','SD','NE','KS','PA','NY','NJ','MA','CT','RI','NH','VT','ME','WV','MD','DE','DC']
+  },
+  BR25: {
+    name: 'Kent',
+    location: 'Kent, WA',
+    lat: 47.4099, lng: -122.2126,
+    color: '#06b6d4', // cyan — distinct from other 4
+    states: [], // No primary territory — overflow capacity, not added to filter
+    note: 'Pacific Northwest manufacturing — supports Stockton territory',
+    hidden_from_filter: true // Don\'t add to branch pill bar
+  },
+  BR_BRAMPTON: {
+    name: 'Brampton',
+    location: 'Brampton, ON, Canada',
+    lat: 43.7315, lng: -79.7624,
+    color: '#a855f7', // purple — Canada
+    states: [], // Canada province coverage (future)
+    note: 'Canada plant — serves all 7 Canadian provinces',
+    hidden_from_filter: true
   }
 };
 
@@ -1745,7 +2030,53 @@ function getSegmentSAARPrior() {
 }
 
 function switchSegment(seg) {
+  const prevSeg = activeSegment;
   activeSegment = seg;
+
+  // ── Globe tab: show globe, hide map UI ──────────────────────────────
+  const globeView = document.getElementById('globeView');
+  const mapDiv    = document.getElementById('map');
+  const branchBar = document.getElementById('branchBar');
+
+  if (seg === 'globe') {
+    // Show globe, hide map + branch bar
+    if (globeView) globeView.style.display = 'flex';
+    if (mapDiv)    mapDiv.style.display    = 'none';
+    if (branchBar) branchBar.style.display = 'none';
+
+    // Update tab highlights
+    document.querySelectorAll('.seg-tab').forEach(t => t.classList.toggle('active', t.dataset.seg === seg));
+
+    // Set seg note
+    const note = document.getElementById('segNote');
+    if (note) {
+      note.textContent = '69 SST facilities across 21 countries · 5 global regions';
+      note.classList.add('visible');
+    }
+
+    // Hide sub-segment bar if visible
+    const subsegBar = document.getElementById('subsegBar');
+    if (subsegBar) subsegBar.classList.remove('visible');
+
+    // Launch globe (idempotent — won't re-init if already running)
+    initGlobe();
+    return;
+  }
+
+  // ── Leaving globe tab: restore map UI ───────────────────────────────
+  if (prevSeg === 'globe') {
+    if (globeView) globeView.style.display = 'none';
+    if (mapDiv)    mapDiv.style.display    = '';
+    if (branchBar) branchBar.style.display = '';
+    // Pause globe animation
+    if (typeof globeAnimFrame !== 'undefined' && globeAnimFrame) {
+      cancelAnimationFrame(globeAnimFrame);
+      globeAnimFrame = null;
+    }
+    globeInitialized = false;
+  }
+
+  // ── Normal tab logic ────────────────────────────────────────────────
   // Clear any active classification highlight when switching tabs
   activeHighlight = null;
   applyHighlight();
@@ -2681,6 +3012,537 @@ function rotateAlert(resetIndex) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// WAREHOUSE DATA
+// ═══════════════════════════════════════════════════════════════════════
+const WAREHOUSES_NA = [
+  {id:'WH_ATL',name:'Atlanta',lat:34.015,lng:-84.6157,country:'USA',state:'GA',address:'3600 Cobb International Drive Suite 100, Kennesaw, GA 30152'},
+  {id:'WH_CHA',name:'Chandler',lat:33.3062,lng:-111.8413,country:'USA',state:'AZ',address:'154 S Kyrene Rd, Chandler, AZ 85226'},
+  {id:'WH_DEN',name:'Denver',lat:39.7392,lng:-104.9903,country:'USA',state:'CO',address:'5725 Pecos Street Suite 100, Denver, CO 80221'},
+  {id:'WH_ENF',name:'Enfield',lat:41.9762,lng:-72.5917,country:'USA',state:'CT',address:'7 Pearson Way, Enfield, CT 06082'},
+  {id:'WH_HPT',name:'High Point',lat:35.9557,lng:-80.0053,country:'USA',state:'NC',address:'4485 Premier Dr #101, High Point, NC 27265'},
+  {id:'WH_HOU',name:'Houston',lat:29.7604,lng:-95.3698,country:'USA',state:'TX',address:'2710 Reed Road Suite 180, Houston, TX 77051'},
+  {id:'WH_IGH',name:'Inver Grove Heights',lat:44.8479,lng:-93.0427,country:'USA',state:'MN',address:'8450 Courthouse Blvd Building 1, Inver Grove Heights, MN 55077'},
+  {id:'WH_JAX',name:'Jacksonville',lat:30.3322,lng:-81.6557,country:'USA',state:'FL',address:'8701 Jesse B. Smith Court, Jacksonville, FL 32219'},
+  {id:'WH_JES',name:'Jessup',lat:39.1517,lng:-76.7644,country:'USA',state:'MD',address:'7951 Oceano Avenue Suite B, Jessup, MD 20794'},
+  {id:'WH_KCK',name:'Kansas City',lat:39.1142,lng:-94.6275,country:'USA',state:'KS',address:'825 Armourdale Parkway, Kansas City, KS 66105'},
+  {id:'WH_KAP',name:'Kapolei',lat:21.3458,lng:-158.0581,country:'USA',state:'HI',address:'91-312 Komohana Street, Kapolei, HI 96707'},
+  {id:'WH_OXN',name:'Oxnard',lat:34.1975,lng:-119.1771,country:'USA',state:'CA',address:'2260 Camino Del Sol, Oxnard, CA 93030'},
+  {id:'WH_SLC',name:'Salt Lake City',lat:40.7589,lng:-111.9636,country:'USA',state:'UT',address:'2234 S 5900 W Suite 100, Salt Lake City, UT 84128'},
+  {id:'WH_BIL',name:'Billings',lat:45.7833,lng:-108.5007,country:'USA',state:'MT',address:'3218 South Frontage Road, 200, Billings, MT 59101'},
+  {id:'WH_LV',name:'Las Vegas',lat:36.0395,lng:-115.2487,country:'USA',state:'NV',address:'7050 S Buffalo Dr. Suite 100, Las Vegas, NV 89113'},
+  {id:'WH_THE',name:'Theodore',lat:30.551,lng:-88.1761,country:'USA',state:'AL',address:'6835 SALP Blvd, Theodore, AL 36582'},
+  // Canada warehouses
+  {id:'CA_AB',name:'Calgary',lat:51.0447,lng:-114.0719,country:'Canada',state:'AB',address:'190 - 11555 Barlow Trail NE, Calgary, AB'},
+  {id:'CA_BC',name:'Pitt Meadows',lat:49.2207,lng:-122.6892,country:'Canada',state:'BC',address:'#811 - 19055 Airport Way, Pitt Meadows, BC'},
+  {id:'CA_MB',name:'Winnipeg',lat:49.8951,lng:-97.1384,country:'Canada',state:'MB',address:'Winnipeg, MB'},
+  {id:'CA_NB',name:'Saint John',lat:45.2733,lng:-66.0633,country:'Canada',state:'NB',address:'Saint John, NB'},
+  {id:'CA_QC',name:'Qu\u00e9bec',lat:46.8139,lng:-71.208,country:'Canada',state:'QC',address:'Qu\u00e9bec, QC'},
+  {id:'CA_NS_OFF',name:'Halifax',lat:44.6488,lng:-63.5752,country:'Canada',state:'NS',address:'5668 South Street, Halifax, NS'}
+];
+
+let warehouseLayerVisible = false;
+
+function drawWarehouse(g, x, y, wh) {
+  const wIcon = g.append('g')
+    .attr('class', 'warehouse-icon')
+    .attr('transform', `translate(${x},${y})`)
+    .attr('opacity', 0.82);
+  // Shadow
+  wIcon.append('rect').attr('x', -3.5).attr('y', -3.5).attr('width', 7).attr('height', 6)
+    .attr('fill', '#000').attr('opacity', 0.3).attr('rx', 0.5)
+    .attr('transform', 'translate(0.5,0.5)');
+  // Building rectangle
+  wIcon.append('rect').attr('x', -3).attr('y', -3).attr('width', 6).attr('height', 5)
+    .attr('fill', '#FA4616').attr('opacity', 0.85).attr('stroke', '#fff').attr('stroke-width', 0.5).attr('rx', 0.5);
+  // Roof triangle
+  wIcon.append('path').attr('d', 'M-3.5,-3 L0,-5.5 L3.5,-3 Z')
+    .attr('fill', '#e03a10').attr('stroke', '#fff').attr('stroke-width', 0.4);
+  // Door
+  wIcon.append('rect').attr('x', -1).attr('y', 0).attr('width', 2).attr('height', 2)
+    .attr('fill', '#1a1033').attr('opacity', 0.7);
+  // Hover tooltip
+  const country = wh.country === 'Canada' ? ' (CA)' : '';
+  wIcon.append('title').text(`${wh.name}${country} • ${wh.address}`);
+  // Invisible hit area
+  wIcon.append('rect').attr('x', -8).attr('y', -10).attr('width', 16).attr('height', 18)
+    .attr('fill', 'transparent')
+    .on('mouseenter', function(event) { showWarehouseTooltip(wh, event); })
+    .on('mouseleave', hideTooltip);
+}
+
+function showWarehouseTooltip(wh, event) {
+  const tip = document.getElementById('tooltip');
+  const country = wh.country === 'Canada' ? ' \ud83c\udde8\ud83c\udde6' : '\ud83c\uddfa\ud83c\uddf8';
+  tip.innerHTML = `
+    <div class="tooltip-name">
+      <span style="color:#FA4616;">■ ${wh.name}${country}</span>
+      <span class="tooltip-classification" style="color:#FA4616;border:1px solid rgba(250,70,22,0.3)">Warehouse</span>
+    </div>
+    <div class="tooltip-grid">
+      <span class="tooltip-label">Address</span>
+      <span class="tooltip-val" style="font-size:10px;white-space:normal;max-width:140px;">${wh.address}</span>
+      <span class="tooltip-label">State/Prov.</span>
+      <span class="tooltip-val">${wh.state}</span>
+    </div>
+  `;
+  const mapRect = document.getElementById('map').getBoundingClientRect();
+  const svgEl = document.querySelector('#map svg');
+  if (!svgEl) return;
+  const svgRect = svgEl.getBoundingClientRect();
+  const scaleX = svgRect.width / 975;
+  const scaleY = svgRect.height / 610;
+  if (projection) {
+    const coords = projection([wh.lng, wh.lat]);
+    if (coords) {
+      const screenX = svgRect.left - mapRect.left + coords[0] * scaleX;
+      const screenY = svgRect.top - mapRect.top + coords[1] * scaleY;
+      tip.style.visibility = 'hidden';
+      tip.classList.add('visible');
+      const tipH = tip.offsetHeight, tipW = tip.offsetWidth;
+      let left = screenX, top = screenY - tipH - 20;
+      if (top < 5) top = screenY + 20;
+      if (left - tipW/2 < 10) left = tipW/2 + 10;
+      else if (left + tipW/2 > mapRect.width - 10) left = mapRect.width - tipW/2 - 10;
+      tip.style.left = left + 'px'; tip.style.top = top + 'px'; tip.style.visibility = '';
+      return;
+    }
+  }
+  tip.classList.add('visible');
+}
+
+function toggleWarehouseLayer(visible) {
+  warehouseLayerVisible = visible;
+  const svg = d3.select('#map svg');
+  if (!svg.node() || !projection) return;
+  // Remove old warehouse layer
+  svg.selectAll('.warehouses').remove();
+  if (!visible) return;
+  // Draw new warehouse layer
+  const wg = svg.append('g').attr('class', 'warehouses');
+  WAREHOUSES_NA.forEach(wh => {
+    const coords = projection([wh.lng, wh.lat]);
+    if (coords) drawWarehouse(wg, coords[0], coords[1], wh);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// GLOBAL FACILITIES DATA (69 locations)
+// ═══════════════════════════════════════════════════════════════════════
+const GLOBAL_FACILITIES = [
+  {id:'BR20',name:'Stockton',type:'plant_sales',tier:1,country:'USA',region:'north_america',city:'Stockton',lat:37.9577,lng:-121.2908,address:'5151 S. Airport Way, Stockton, CA 95206'},
+  {id:'BR22',name:'Riverside',type:'plant_sales',tier:1,country:'USA',region:'north_america',city:'Riverside',lat:33.9806,lng:-117.3755,address:'12246 Holly Street, Riverside, CA 92509'},
+  {id:'BR23',name:'McKinney',type:'plant_sales',tier:1,country:'USA',region:'north_america',city:'McKinney',lat:33.1972,lng:-96.6398,address:'2151 S Airport Drive, McKinney, TX 75069'},
+  {id:'BR24',name:'Columbus',type:'plant_sales',tier:1,country:'USA',region:'north_america',city:'Columbus',lat:39.9612,lng:-82.9988,address:'2600 International St., Columbus, OH 43228'},
+  {id:'BR25',name:'Kent',type:'plant_sales',tier:1,country:'USA',region:'north_america',city:'Kent',lat:47.4099,lng:-122.2126,address:'20210 66th Ave. South Bldg. 3, Kent, WA 98032'},
+  {id:'MFG_GAL',name:'Gallatin',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'Gallatin',lat:36.3873,lng:-86.4467,address:'1585 Airport Road, Gallatin, TN 37066'},
+  {id:'MFG_WCH',name:'West Chicago',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'West Chicago',lat:41.8847,lng:-88.204,address:'2505 Enterprise Circle, West Chicago, IL 60185'},
+  {id:'MFG_EFR',name:'EasyFrame Sacramento',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'West Sacramento',lat:38.5805,lng:-121.5302,address:'1749 Enterprise Blvd., West Sacramento, CA 95691'},
+  {id:'MFG_EFA',name:'EasyFrame AL',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'Huntsville',lat:34.6875,lng:-86.6125,address:'3304 Long Av SW, Huntsville, AL 35805'},
+  {id:'MFG_FUL1',name:'Fulton MO Site 1',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'Fulton',lat:38.8467,lng:-91.9479,address:'3100 Dogwood Drive, Fulton, MO 65251'},
+  {id:'MFG_FUL2',name:'Fulton MO Site 2',type:'plant_specialty',tier:2,country:'USA',region:'north_america',city:'Fulton',lat:38.847,lng:-91.9479,address:'2010 South Business 54, Fulton, MO 65251'},
+  {id:'WH_ATL',name:'Atlanta WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Kennesaw',lat:34.015,lng:-84.6157,address:'3600 Cobb International Drive Suite 100, Kennesaw, GA 30152'},
+  {id:'WH_CHA',name:'Chandler WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Chandler',lat:33.3062,lng:-111.8413,address:'154 S Kyrene Rd, Chandler, AZ 85226'},
+  {id:'WH_DEN',name:'Denver WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Denver',lat:39.7392,lng:-104.9903,address:'5725 Pecos Street Suite 100, Denver, CO 80221'},
+  {id:'WH_ENF',name:'Enfield WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Enfield',lat:41.9762,lng:-72.5917,address:'7 Pearson Way, Enfield, CT 06082'},
+  {id:'WH_HPT',name:'High Point WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'High Point',lat:35.9557,lng:-80.0053,address:'4485 Premier Dr #101, High Point, NC 27265'},
+  {id:'WH_HOU',name:'Houston WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Houston',lat:29.7604,lng:-95.3698,address:'2710 Reed Road Suite 180, Houston, TX 77051'},
+  {id:'WH_IGH',name:'Inver Grove Heights WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Inver Grove Heights',lat:44.8479,lng:-93.0427,address:'8450 Courthouse Blvd Building 1, Inver Grove Heights, MN 55077'},
+  {id:'WH_JAX',name:'Jacksonville WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Jacksonville',lat:30.3322,lng:-81.6557,address:'8701 Jesse B. Smith Court, Jacksonville, FL 32219'},
+  {id:'WH_JES',name:'Jessup WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Jessup',lat:39.1517,lng:-76.7644,address:'7951 Oceano Avenue Suite B, Jessup, MD 20794'},
+  {id:'WH_KCK',name:'Kansas City WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Kansas City',lat:39.1142,lng:-94.6275,address:'825 Armourdale Parkway, Kansas City, KS 66105'},
+  {id:'WH_KAP',name:'Kapolei WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Kapolei',lat:21.3458,lng:-158.0581,address:'91-312 Komohana Street, Kapolei, HI 96707'},
+  {id:'WH_OXN',name:'Oxnard WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Oxnard',lat:34.1975,lng:-119.1771,address:'2260 Camino Del Sol, Oxnard, CA 93030'},
+  {id:'WH_SLC',name:'Salt Lake City WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Salt Lake City',lat:40.7589,lng:-111.9636,address:'2234 S 5900 W Suite 100, Salt Lake City, UT 84128'},
+  {id:'WH_BIL',name:'Billings WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Billings',lat:45.7833,lng:-108.5007,address:'3218 South Frontage Road, 200, Billings, MT 59101'},
+  {id:'WH_LV',name:'Las Vegas WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Las Vegas',lat:36.0395,lng:-115.2487,address:'7050 S Buffalo Dr. Suite 100, Las Vegas, NV 89113'},
+  {id:'WH_THE',name:'Theodore WH',type:'warehouse',tier:3,country:'USA',region:'north_america',city:'Theodore',lat:30.551,lng:-88.1761,address:'6835 SALP Blvd, Theodore, AL 36582'},
+  {id:'HQ',name:'Pleasanton HQ',type:'headquarters',tier:1,country:'USA',region:'north_america',city:'Pleasanton',lat:37.6624,lng:-121.8747,address:'5956 W. Las Positas Blvd. Pleasanton, CA 94588'},
+  {id:'HQ_PLA',name:'Plano TX HQ',type:'headquarters',tier:1,country:'USA',region:'north_america',city:'Plano',lat:33.0198,lng:-96.6989,address:'5525 Granite Parkway Suite 1200, Plano, TX 75024'},
+  {id:'LAB_STK',name:'Stockton Lab',type:'lab',tier:4,country:'USA',region:'north_america',city:'Stockton',lat:37.958,lng:-121.29,address:'1255 Performance Drive, Stockton, CA 95206'},
+  {id:'INSP_STK',name:'Stockton Inspection',type:'service',tier:4,country:'USA',region:'north_america',city:'Stockton',lat:37.9575,lng:-121.291,address:'5151 S. Airport Way, Stockton, CA 95206'},
+  {id:'CA_ON',name:'Brampton (Canada Plant)',type:'plant_sales',tier:1,country:'Canada',region:'north_america',city:'Brampton',lat:43.7315,lng:-79.7624,address:'5 Kenview Boulevard, Brampton, ON L6T 5G5'},
+  {id:'CA_AB',name:'Calgary WH',type:'warehouse',tier:3,country:'Canada',region:'north_america',city:'Calgary',lat:51.0447,lng:-114.0719,address:'190 - 11555 Barlow Trail NE, Calgary, AB T3N 2M4'},
+  {id:'CA_BC',name:'Pitt Meadows WH',type:'warehouse',tier:3,country:'Canada',region:'north_america',city:'Pitt Meadows',lat:49.2207,lng:-122.6892,address:'#811 – 19055 Airport Way, Pitt Meadows, BC V3Y 0G4'},
+  {id:'CA_MB',name:'Winnipeg WH',type:'warehouse',tier:3,country:'Canada',region:'north_america',city:'Winnipeg',lat:49.8951,lng:-97.1384,address:'Winnipeg, MB R3C 4W3'},
+  {id:'CA_NB',name:'Saint John WH',type:'warehouse',tier:3,country:'Canada',region:'north_america',city:'Saint John',lat:45.2733,lng:-66.0633,address:'Saint John, NB E2L 3X9'},
+  {id:'CA_NS',name:'Halifax Office',type:'office',tier:4,country:'Canada',region:'north_america',city:'Halifax',lat:44.6488,lng:-63.5752,address:'5668 South Street, Halifax, NS B3J 2Y2'},
+  {id:'CA_QC',name:'Qu\u00e9bec WH',type:'warehouse',tier:3,country:'Canada',region:'north_america',city:'Qu\u00e9bec',lat:46.8139,lng:-71.208,address:'Qu\u00e9bec, QC G1K 7E2'},
+  // Europe
+  {id:'EU_FR_SGL',name:'Ste Gemme La Plaine',type:'plant_sales',tier:1,country:'France',region:'europe',city:'Ste Gemme La Plaine',lat:46.4486,lng:-1.0731,address:'ZAC des 4 chemins, 85400 Ste Gemme La Plaine'},
+  {id:'EU_PL_MAL',name:'Malbork (S&P Poland)',type:'plant_specialty',tier:2,country:'Poland',region:'europe',city:'Malbork',lat:54.0359,lng:19.0265,address:'Bydgoska 9, 82-200 Malbork'},
+  {id:'EU_PT_ELV',name:'Elvas (S&P Portugal)',type:'plant_specialty',tier:2,country:'Portugal',region:'europe',city:'Elvas',lat:38.8814,lng:-7.1638,address:'Rua de Portugal n\u00b0 10, Zona Industrial das Fontainhas, 7350-297 Elvas'},
+  {id:'EU_FR_CAR',name:'Cardet (S&P France)',type:'plant_sales',tier:1,country:'France',region:'europe',city:'Cardet',lat:44.0825,lng:4.0817,address:'ZI Les Mourgues, 30350 Cardet'},
+  {id:'EU_NL_TIL',name:'Tilburg (S&P Netherlands)',type:'plant_specialty',tier:2,country:'Netherlands',region:'europe',city:'Tilburg',lat:51.5719,lng:5.0913,address:'Aphroditestraat 24, 5047 TW Tilburg'},
+  {id:'EU_UK_TAM',name:'Tamworth (UK)',type:'plant_sales',tier:1,country:'UK',region:'europe',city:'Tamworth',lat:52.6336,lng:-1.6938,address:'Cardinal Point, Winchester Rd, Tamworth B78 3HG'},
+  {id:'EU_FR_AUB',name:'Aubergenville (LRMI)',type:'office',tier:4,country:'France',region:'europe',city:'Aubergenville',lat:48.9667,lng:1.85,address:'12 Rue du Clos Reine, 78410 Aubergenville'},
+  {id:'EU_NL_DRO',name:'Dronten (NL)',type:'office',tier:4,country:'Netherlands',region:'europe',city:'Dronten',lat:52.5253,lng:5.7194,address:'De Gouwe 30, 8253 PA Dronten'},
+  {id:'EU_FR_MAG',name:'Magnac Bourg (PLA)',type:'office',tier:4,country:'France',region:'europe',city:'Magnac Bourg',lat:45.6433,lng:1.4489,address:'LD Le Monceau, 87380 Magnac Bourg'},
+  {id:'EU_DE_PMJ',name:'Sch\u00f6newalde (PMJ)',type:'office',tier:4,country:'Germany',region:'europe',city:'Sch\u00f6newalde',lat:51.8533,lng:13.1833,address:'Stra\u00dfe der Jugend 5F, 04916 Sch\u00f6newalde'},
+  {id:'EU_FR_LP',name:'Le Port (RFIX)',type:'office',tier:4,country:'France',region:'europe',city:'Le Port',lat:-20.9367,lng:55.2925,address:'1 Rue Claude Chappe, 97420 Le Port (R\u00e9union)'},
+  {id:'EU_CH_SEE',name:'Seewen (S&P Admin)',type:'office',tier:4,country:'Switzerland',region:'europe',city:'Seewen',lat:47.0167,lng:8.6167,address:'Seewernstrasse 127, 6423 Seewen'},
+  {id:'EU_PT_LIS',name:'Lisbon (S&P)',type:'office',tier:4,country:'Portugal',region:'europe',city:'Amora',lat:38.6244,lng:-9.1375,address:'Rua Jos\u00e9 Fontana, 76, 2845-408 Amora'},
+  {id:'EU_ES_ALC',name:'Alcal\u00e1 de Henares (S&P Spain)',type:'office',tier:4,country:'Spain',region:'europe',city:'Alcal\u00e1 de Henares',lat:40.4819,lng:-3.365,address:'C/Carlos Jim\u00e9nez Diaz, 17, 28806 Alcal\u00e1 de Henares'},
+  {id:'EU_SE_GUN',name:'Gunnebo (S&P Sweden)',type:'office',tier:4,country:'Sweden',region:'europe',city:'Gunnebo',lat:57.7167,lng:16.5333,address:'Bruksv\u00e4gen 3, 593 75 Gunnebo'},
+  {id:'EU_BE_THU',name:'Thuin (Belgium)',type:'office',tier:4,country:'Belgium',region:'europe',city:'Thuin',lat:50.3411,lng:4.2864,address:'Rue des Fauldeurs-6, B-6530 Thuin'},
+  {id:'EU_IE_DUB',name:'Dublin (Ireland)',type:'office',tier:4,country:'Ireland',region:'europe',city:'Dublin',lat:53.3441,lng:-6.2342,address:'20 Ringsend Rd, Dublin 4'},
+  {id:'EU_IE_DUN',name:'Dundalk',type:'office',tier:4,country:'Ireland',region:'europe',city:'Dundalk',lat:54.0019,lng:-6.4058,address:'Blackthorn Business Park, Coes Road, Dundalk'},
+  {id:'EU_DE_FRA',name:'Bad Nauheim (Frankfurt)',type:'office',tier:4,country:'Germany',region:'europe',city:'Bad Nauheim',lat:50.37,lng:8.74,address:'Hubert-Verg\u00f6lst-Stra\u00dfe 6-14, 61231 Bad Nauheim'},
+  {id:'EU_AT_VIE',name:'Vienna (SYS Austria)',type:'office',tier:4,country:'Austria',region:'europe',city:'Vienna',lat:48.2082,lng:16.3738,address:'Main Street, A-1010 Vienna'},
+  {id:'EU_DE_BER',name:'Berlin (SYS)',type:'office',tier:4,country:'Germany',region:'europe',city:'Berlin',lat:52.52,lng:13.405,address:'Wei\u00dfenseer Weg 37, 13055 Berlin'},
+  {id:'EU_PL_WAR',name:'Warszawa',type:'office',tier:4,country:'Poland',region:'europe',city:'Warsaw',lat:52.2297,lng:21.0122,address:'Karczunkowska 42, 02-871 Warszawa'},
+  {id:'EU_FR_HQ',name:'European Admin (Ste Gemme)',type:'headquarters',tier:1,country:'France',region:'europe',city:'Ste Gemme La Plaine',lat:46.449,lng:-1.073,address:'Zac des 4 chemins, 85400 Ste Gemme La Plaine'},
+  // Asia Pacific
+  {id:'AP_CN_ZJG',name:'Zhangjiagang (China)',type:'plant_specialty',tier:2,country:'China',region:'asia_pacific',city:'Zhangjiagang',lat:31.8758,lng:120.5444,address:'No: 10 Nanyuan Road, South Area of Economic Development Zone, Zhangjiagang 215600'},
+  {id:'AP_HK',name:'Hong Kong',type:'office',tier:4,country:'Hong Kong',region:'asia_pacific',city:'Hong Kong',lat:22.2978,lng:114.1722,address:'Wharf T&T Centre, Harbour City, 7 Canton Road'},
+  {id:'AP_TW_KAO',name:'Kaohsiung (Taiwan)',type:'office',tier:4,country:'Taiwan',region:'asia_pacific',city:'Kaohsiung',lat:22.6273,lng:120.3014,address:'13F-2, No. 260, Zhongshan 2nd Road, Qianzhen District'},
+  {id:'AP_VN_HCM',name:'Ho Chi Minh (Vietnam)',type:'engineering',tier:4,country:'Vietnam',region:'asia_pacific',city:'Ho Chi Minh',lat:10.8231,lng:106.6297,address:'E.town 6 No. 364 Cong Hoa, Tan Binh District'},
+  {id:'AP_AU_MEL',name:'Melbourne',type:'office',tier:4,country:'Australia',region:'asia_pacific',city:'Melbourne',lat:-37.8868,lng:145.1281,address:'Units 7-10, 20-22 Hardner Road, Mount Waverly VIC 3149'},
+  {id:'AP_AU_SYD',name:'QuikDrive Australia',type:'office',tier:4,country:'Australia',region:'asia_pacific',city:'Glendenning',lat:-33.7619,lng:150.85,address:'Unit 2A, 201-203 Power Street, Glendenning NSW 2761'},
+  {id:'AP_NZ_AUC',name:'Auckland',type:'office',tier:4,country:'New Zealand',region:'asia_pacific',city:'Auckland',lat:-36.7281,lng:174.7044,address:'52a Arrenway Dr, Albany, Auckland 0632'},
+  // LATAM
+  {id:'LA_CL_SAN',name:'Santiago (Chile)',type:'warehouse',tier:3,country:'Chile',region:'latam',city:'Santiago',lat:-33.5933,lng:-70.7,address:'Av. Roberto Simpson 1401 A7, San Bernardo, Santiago'}
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+// GLOBE
+// ═══════════════════════════════════════════════════════════════════════
+let globeInitialized = false;
+let globeProjection = null;
+let globePathGen = null;
+let globeSvg = null;
+let globeRotation = [0, -20, 0];
+let globeIsPaused = false;
+let globeDragStart = null;
+let globeAnimFrame = null;
+let globeScale = 280;
+const GLOBE_WIDTH = 800, GLOBE_HEIGHT = 580;
+
+function getFacilityColor(f) {
+  if (f.type === 'plant_sales' || f.type === 'headquarters') return '#FA4616';
+  if (f.type === 'plant_specialty') return '#ff8c42';
+  if (f.type === 'warehouse') return '#a78bfa';
+  return '#6366f1'; // office / lab / service / engineering
+}
+function getFacilityRadius(f) {
+  if (f.tier === 1) return 5.5;
+  if (f.tier === 2) return 4;
+  if (f.tier === 3) return 3;
+  return 2.5;
+}
+function getFacilityTypeLabel(type) {
+  const labels = { plant_sales: 'Plant / Sales', plant_specialty: 'Specialty Plant', warehouse: 'Warehouse', headquarters: 'Headquarters', office: 'Office', lab: 'Lab', service: 'Service Center', engineering: 'Engineering' };
+  return labels[type] || type;
+}
+
+async function initGlobe() {
+  if (globeInitialized) return;
+  globeInitialized = true;
+
+  const container = document.getElementById('globeContainer');
+  if (!container) return;
+
+  // Load world atlas
+  let world;
+  try {
+    world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">Failed to load world map data. Check network connection.</div>';
+    return;
+  }
+
+  const land = topojson.feature(world, world.objects.land);
+  const countries = topojson.feature(world, world.objects.countries);
+  const borders = topojson.mesh(world, world.objects.countries, (a,b) => a !== b);
+
+  globeProjection = d3.geoOrthographic()
+    .scale(globeScale)
+    .translate([GLOBE_WIDTH/2, GLOBE_HEIGHT/2])
+    .clipAngle(90)
+    .rotate(globeRotation);
+  globePathGen = d3.geoPath(globeProjection);
+
+  const svgEl = d3.select(container).append('svg')
+    .attr('viewBox', `0 0 ${GLOBE_WIDTH} ${GLOBE_HEIGHT}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', '100%')
+    .style('cursor', 'grab');
+  globeSvg = svgEl;
+
+  // Defs: glow filter
+  const defs = svgEl.append('defs');
+  const glowFilt = defs.append('filter').attr('id','globeGlow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  glowFilt.append('feGaussianBlur').attr('stdDeviation','2').attr('result','blur');
+  const gm = glowFilt.append('feMerge');
+  gm.append('feMergeNode').attr('in','blur');
+  gm.append('feMergeNode').attr('in','SourceGraphic');
+
+  // Atmosphere glow (outer halo)
+  const atmoGrad = defs.append('radialGradient').attr('id','atmoGrad').attr('cx','50%').attr('cy','50%').attr('r','50%');
+  atmoGrad.append('stop').attr('offset','75%').attr('stop-color','#0d0a1f').attr('stop-opacity',0);
+  atmoGrad.append('stop').attr('offset','85%').attr('stop-color','#7c3aed').attr('stop-opacity',0.15);
+  atmoGrad.append('stop').attr('offset','100%').attr('stop-color','#7c3aed').attr('stop-opacity',0);
+
+  // Atmosphere
+  svgEl.append('circle')
+    .attr('cx', GLOBE_WIDTH/2).attr('cy', GLOBE_HEIGHT/2)
+    .attr('r', globeScale + 18)
+    .attr('fill', 'url(#atmoGrad)');
+
+  // Sphere (ocean)
+  const spherePath = svgEl.append('path')
+    .datum({type:'Sphere'})
+    .attr('class','g-sphere')
+    .attr('fill', '#0d0a1f')
+    .attr('stroke', 'rgba(124,58,237,0.35)')
+    .attr('stroke-width', 1.2)
+    .attr('d', globePathGen);
+
+  // Graticule
+  const graticule = d3.geoGraticule10();
+  const grat = svgEl.append('path').datum(graticule)
+    .attr('class','g-grat')
+    .attr('fill', 'none')
+    .attr('stroke', 'rgba(167,139,250,0.07)')
+    .attr('stroke-width', 0.5)
+    .attr('d', globePathGen);
+
+  // Land
+  const landPath = svgEl.append('path').datum(land)
+    .attr('class','g-land')
+    .attr('fill', '#2d2358')
+    .attr('stroke', 'rgba(167,139,250,0.25)')
+    .attr('stroke-width', 0.4)
+    .attr('d', globePathGen);
+
+  // Borders
+  const bordersPath = svgEl.append('path').datum(borders)
+    .attr('class','g-borders')
+    .attr('fill', 'none')
+    .attr('stroke', 'rgba(250,70,22,0.2)')
+    .attr('stroke-width', 0.5)
+    .attr('d', globePathGen);
+
+  // Dots group
+  const dotsG = svgEl.append('g').attr('class','g-dots');
+
+  // Globe tooltip
+  const globeTip = d3.select(container).append('div').attr('class','globe-tooltip').attr('id','globeTip');
+
+  function renderDots() {
+    const dots = dotsG.selectAll('circle').data(GLOBAL_FACILITIES, d => d.id);
+    const entered = dots.enter().append('circle')
+      .attr('r', d => getFacilityRadius(d))
+      .attr('fill', d => getFacilityColor(d))
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 0.6)
+      .style('cursor', 'pointer')
+      .on('mouseenter', function(event, d) {
+        const [mx, my] = d3.pointer(event, container);
+        globeTip
+          .style('left', (mx + 12) + 'px')
+          .style('top', (my - 10) + 'px')
+          .html(`<strong>${d.name}</strong><br><span style="color:var(--text-muted);font-size:10px;">${getFacilityTypeLabel(d.type)} &bull; ${d.country}</span>`)
+          .classed('visible', true);
+        d3.select(this).attr('stroke', '#FA4616').attr('stroke-width', 1.5);
+      })
+      .on('mouseleave', function() {
+        globeTip.classed('visible', false);
+        d3.select(this).attr('stroke', '#fff').attr('stroke-width', 0.6);
+      })
+      .on('click', function(event, d) {
+        event.stopPropagation();
+        showGlobeFacilityCard(d);
+        // Stop rotation and zoom to facility
+        globeIsPaused = true;
+        setTimeout(() => { globeIsPaused = false; }, 4000);
+        zoomToGlobeFacility(d);
+      });
+
+    dots.merge(entered).each(function(d) {
+      const coords = globeProjection([d.lng, d.lat]);
+      if (!coords) { d3.select(this).attr('display','none'); return; }
+      const dist = d3.geoDistance([d.lng, d.lat], globeProjection.invert([GLOBE_WIDTH/2, GLOBE_HEIGHT/2]));
+      const visible = dist <= Math.PI / 2;
+      d3.select(this)
+        .attr('display', visible ? null : 'none')
+        .attr('cx', coords[0])
+        .attr('cy', coords[1])
+        .attr('opacity', visible ? Math.max(0.3, 1 - dist / (Math.PI/2) * 0.5) : 0);
+    });
+    dots.exit().remove();
+  }
+
+  function redraw() {
+    globeProjection.rotate(globeRotation);
+    svgEl.selectAll('.g-sphere,.g-grat,.g-land,.g-borders').attr('d', globePathGen);
+    renderDots();
+  }
+
+  // Animation loop
+  function spin() {
+    globeAnimFrame = requestAnimationFrame(spin);
+    if (!globeIsPaused) {
+      globeRotation[0] += 0.18;
+      if (globeRotation[0] >= 360) globeRotation[0] -= 360;
+      redraw();
+    }
+  }
+  spin();
+
+  // Pause on hover
+  svgEl.on('mouseenter', () => { globeIsPaused = true; svgEl.style('cursor','grab'); })
+       .on('mouseleave', () => { globeIsPaused = false; globeDragStart = null; svgEl.style('cursor','grab'); });
+
+  // Drag to rotate
+  svgEl.on('mousedown', function(event) {
+    globeDragStart = { x: event.clientX, y: event.clientY, rot: [...globeRotation] };
+    globeIsPaused = true;
+    svgEl.style('cursor','grabbing');
+    event.preventDefault();
+  });
+  d3.select(window).on('mousemove.globe', function(event) {
+    if (!globeDragStart) return;
+    const dx = event.clientX - globeDragStart.x;
+    const dy = event.clientY - globeDragStart.y;
+    globeRotation[0] = globeDragStart.rot[0] + dx * 0.35;
+    globeRotation[1] = Math.max(-85, Math.min(85, globeDragStart.rot[1] - dy * 0.35));
+    redraw();
+  });
+  d3.select(window).on('mouseup.globe', function() {
+    if (globeDragStart) {
+      globeDragStart = null;
+      svgEl.style('cursor','grab');
+      // Resume spin after short pause
+      setTimeout(() => { globeIsPaused = false; }, 800);
+    }
+  });
+
+  // Zoom on mouse wheel
+  svgEl.on('wheel', function(event) {
+    event.preventDefault();
+    globeScale = Math.max(120, Math.min(600, globeScale - event.deltaY * 0.5));
+    globeProjection.scale(globeScale);
+    // Update atmosphere
+    svgEl.select('circle').attr('r', globeScale + 18);
+    redraw();
+  });
+
+  // Region buttons
+  document.querySelectorAll('.globe-region-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.globe-region-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      zoomToGlobeRegion(btn.dataset.region);
+    });
+  });
+
+  // Add legend
+  const legendDiv = d3.select(container).append('div').attr('class','globe-legend');
+  legendDiv.html(`
+    <div class="globe-legend-item"><div class="globe-legend-dot" style="background:#FA4616;border-color:#FA4616"></div> Plant / HQ (Tier 1)</div>
+    <div class="globe-legend-item"><div class="globe-legend-dot" style="background:#ff8c42;border-color:#ff8c42"></div> Specialty Plant (Tier 2)</div>
+    <div class="globe-legend-item"><div class="globe-legend-dot" style="background:#a78bfa;border-color:#a78bfa"></div> Warehouse (Tier 3)</div>
+    <div class="globe-legend-item"><div class="globe-legend-dot" style="background:#6366f1;border-color:#6366f1"></div> Office / Other (Tier 4)</div>
+  `);
+
+  renderDots();
+}
+
+function zoomToGlobeRegion(region) {
+  const targets = {
+    world:         [-20, -20, 0],
+    north_america: [100, -40, 0],
+    europe:        [-10, -50, 0],
+    asia_pacific:  [-120, -5, 0],
+    latam:         [65, 20, 0]
+  };
+  const t = targets[region];
+  if (!t || !globeProjection) return;
+  const startRot = [...globeRotation];
+  const startScale = globeScale;
+  const targetScale = region === 'world' ? 280 : 340;
+  const interp = d3.interpolate(startRot, t);
+  globeIsPaused = true;
+  d3.transition().duration(1400).ease(d3.easeCubicInOut)
+    .tween('globeRotate', () => t2 => {
+      const r = interp(t2);
+      globeRotation = [...r];
+      globeScale = startScale + (targetScale - startScale) * t2;
+      globeProjection.rotate(globeRotation).scale(globeScale);
+      d3.selectAll('#globeContainer svg circle').first().attr('r', globeScale + 18);
+      d3.selectAll('#globeContainer svg .g-sphere,.g-grat,.g-land,.g-borders').attr('d', globePathGen);
+      // Update atmosphere
+      const atmoCircle = document.querySelector('#globeContainer svg circle');
+      if (atmoCircle) atmoCircle.setAttribute('r', globeScale + 18);
+    })
+    .on('end', () => {
+      globeIsPaused = false;
+    });
+}
+
+function zoomToGlobeFacility(d) {
+  if (!globeProjection) return;
+  const startRot = [...globeRotation];
+  const targetRot = [-d.lng, -d.lat, 0];
+  const interp = d3.interpolate(startRot, targetRot);
+  globeIsPaused = true;
+  d3.transition().duration(1200).ease(d3.easeCubicInOut)
+    .tween('globeToFacility', () => t => {
+      globeRotation = interp(t);
+      globeProjection.rotate(globeRotation);
+      d3.selectAll('#globeContainer svg .g-sphere,.g-grat,.g-land,.g-borders').attr('d', globePathGen);
+      // Redraw dots
+      const dotsEl = document.querySelector('#globeContainer svg .g-dots');
+      if (dotsEl) {
+        d3.select(dotsEl).selectAll('circle').each(function(fd) {
+          if (!fd) return;
+          const coords = globeProjection([fd.lng, fd.lat]);
+          if (!coords) { d3.select(this).attr('display','none'); return; }
+          const dist = d3.geoDistance([fd.lng, fd.lat], globeProjection.invert([GLOBE_WIDTH/2, GLOBE_HEIGHT/2]));
+          d3.select(this)
+            .attr('display', dist <= Math.PI/2 ? null : 'none')
+            .attr('cx', coords[0]).attr('cy', coords[1]);
+        });
+      }
+    })
+    .on('end', () => {
+      globeIsPaused = false;
+    });
+}
+
+function showGlobeFacilityCard(d) {
+  const card = document.getElementById('globeFacilityCard');
+  const content = document.getElementById('globeFacilityCardContent');
+  const typeColor = getFacilityColor(d);
+  const regionLabels = { north_america: 'North America', europe: 'Europe', asia_pacific: 'Asia Pacific', latam: 'LATAM' };
+  content.innerHTML = `
+    <div class="globe-card-name">${d.name}</div>
+    <div class="globe-card-type" style="color:${typeColor};border:1px solid ${typeColor}44;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${typeColor};display:inline-block;"></span>
+      ${getFacilityTypeLabel(d.type)}
+    </div>
+    <div class="globe-card-grid">
+      <span class="globe-card-label">Country</span>
+      <span class="globe-card-val">${d.country}</span>
+      <span class="globe-card-label">Region</span>
+      <span class="globe-card-val">${regionLabels[d.region] || d.region}</span>
+      <span class="globe-card-label">City</span>
+      <span class="globe-card-val">${d.city}</span>
+      <span class="globe-card-label">Tier</span>
+      <span class="globe-card-val">${d.tier}</span>
+      <span class="globe-card-label">Address</span>
+      <span class="globe-card-val" style="font-size:10.5px;line-height:1.35;">${d.address}</span>
+    </div>
+  `;
+  card.style.display = 'block';
+}
+
+function closeGlobeFacilityCard() {
+  document.getElementById('globeFacilityCard').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // D3 MAP
 // ═══════════════════════════════════════════════════════════════════════
 let selectedState = null;
@@ -3257,6 +4119,12 @@ function showFactoryTooltip(branch) {
 
 // ─── Branch Filter Logic ───
 function filterByBranch(brId) {
+  // Hidden branches (Kent, Brampton) have no territory — just show their tooltip
+  const branch = BRANCHES[brId];
+  if (branch && branch.hidden_from_filter) {
+    showFactoryTooltip(branch);
+    return;
+  }
   if (activeBranch === brId) {
     activeBranch = null; // toggle off
   } else {
